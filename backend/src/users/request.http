@@ -1,0 +1,10 @@
+### Signup
+POST http://localhost:3000/auth/signup
+Content-Type: application/json
+
+{
+  "username": "john_doe",
+  "email": "john@example.com",
+  "password": "parola123",
+  "role": "buyer"
+}
