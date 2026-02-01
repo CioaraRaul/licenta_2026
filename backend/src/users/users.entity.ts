@@ -15,6 +15,12 @@ export class User {
   @Column({ unique: true })
   username: string;
 
+  @Column()
+  firstName: string;
+
+  @Column()
+  lastName: string;
+
   @Column({ unique: true })
   email: string;
 
@@ -27,6 +33,9 @@ export class User {
     default: UserRole.GUEST,
   })
   role: UserRole;
+
+  @Column({ nullable: true })
+  bio?: string;
 
   @CreateDateColumn()
   createdAt: Date;

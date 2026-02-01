@@ -3,6 +3,7 @@ import {
   IsEnum,
   IsNotEmpty,
   IsOptional,
+  IsString,
   MinLength,
 } from 'class-validator';
 import { UserRole } from '../enum/user-role.enum';
@@ -10,6 +11,14 @@ import { UserRole } from '../enum/user-role.enum';
 export class CreateUserDto {
   @IsNotEmpty({ message: 'Username should not be empty' })
   username: string;
+
+  @IsNotEmpty()
+  @IsString()
+  firstName: string;
+
+  @IsNotEmpty()
+  @IsString()
+  lastName: string;
 
   @IsEmail({}, { message: 'Invalid email address' })
   email: string;

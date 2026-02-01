@@ -1,10 +1,23 @@
 ### Signup
+### Create new user
 POST http://localhost:3000/auth/signup
 Content-Type: application/json
 
 {
-  "username": "yalin",
-  "email": "yalin@example.com",
-  "password": "parola1235",
+  "username": "johndoe",
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john.doe@example.com",
+  "password": "SecurePass123!",
   "role": "buyer"
+}
+
+
+### signin
+POST http://localhost:3000/auth/signin
+Content-Type: application/json
+
+{
+  "username": "johndoe",
+  "password": "SecurePass123!"
 }

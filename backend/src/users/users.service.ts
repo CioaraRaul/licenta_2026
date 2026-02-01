@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './users.entity';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { UserRole } from './enum/user-role.enum';
 
 @Injectable()
@@ -27,5 +27,22 @@ export class UsersService {
     });
 
     return await this.repo.save(user);
+  }
+
+  async findByUsernameOrEmail(
+    username?: string,
+    email?: string,
+  ): Promise<User | null> {
+    const where: FindOptionsWhere<User>[] = [];
+    if (username) {
+      where.push({ username });
+    }
+    if (email) {
+      where.push({ email });
+    }
+
+    return await this.repo.findOne({
+      where,
+    });
   }
 }
