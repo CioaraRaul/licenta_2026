@@ -4,13 +4,15 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  TableInheritance,
 } from 'typeorm';
-import { UserRole } from './enum/user-role.enum';
+import { UserRole } from '../enum/user-role.enum';
 
 @Entity('users')
+@TableInheritance({ column: { type: 'text', name: 'role' } })
 export class User {
   @PrimaryGeneratedColumn()
-  id: string;
+  id: number;
 
   @Column({ unique: true })
   username: string;
@@ -27,11 +29,7 @@ export class User {
   @Column()
   password: string;
 
-  @Column({
-    type: 'text',
-    enum: UserRole,
-    default: UserRole.GUEST,
-  })
+  @Column({ type: 'text' })
   role: UserRole;
 
   @Column({ nullable: true })

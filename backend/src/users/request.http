@@ -4,20 +4,24 @@ POST http://localhost:3000/auth/signup
 Content-Type: application/json
 
 {
-  "username": "johndoe",
+  "username": "buyer_john",
   "firstName": "John",
   "lastName": "Doe",
-  "email": "john.doe@example.com",
-  "password": "SecurePass123!",
+  "email": "john@buyer.com",
+  "password": "parola123",
   "role": "buyer"
 }
 
 
-### signin
-POST http://localhost:3000/auth/signin
+### Create Seller
+POST http://localhost:3000/auth/signup
 Content-Type: application/json
 
 {
-  "username": "johndoe",
-  "password": "SecurePass123!"
+  "username": "seller_mike",
+  "firstName": "Mike",
+  "lastName": "Auto",
+  "email": "mike@seller.com",
+  "password": "parola123",
+  "role": "seller"
 }
