@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { promisify } from 'util';
 import { scrypt as _scrypt, randomBytes } from 'crypto';
 import { UsersService } from '../users.service';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { LoginDTO } from '../dtos/login.dto';
 import { JwtService } from '@nestjs/jwt';
+import { UserRole } from '../enum/user-role.enum';
 
 const scrypt = promisify(_scrypt);
 
@@ -102,5 +103,47 @@ export class AuthService {
   async refreshTokens(userId: number, username: string) {
     const tokens = await this.getTokens(userId, username);
     return tokens;
+  }
+
+  async googleLogin(req: any) {
+    if (!req.user) {
+      throw new BadRequestException('No user from google');
+    }
+
+    const { email, firstName, lastName } = req.user;
+
+    let user = await this.usersService.findByUsernameOrEmail(undefined, email);
+
+    if (!user) {
+      const username = email.split('@')[0] + '_' + Date.now();
+
+      const randomPassword = randomBytes(32).toString('hex');
+      const salt = randomBytes(8).toString('hex');
+      const hash = (await scrypt(randomPassword, salt, 32)) as Buffer;
+      const hashedPassword = salt + '.' + hash.toString('hex');
+
+      user = await this.usersService.createUserAccount({
+        username,
+        firstName,
+        lastName,
+        email,
+        password: hashedPassword,
+        role: UserRole.GUEST,
+      });
+    }
+
+    const tokens = await this.getTokens(user.id, user.username);
+
+    return {
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        firstname: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+      },
+      ...tokens,
+    };
   }
 }
