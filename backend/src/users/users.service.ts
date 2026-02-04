@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dtos/create-user.dto';
+import { CreateUserDto } from './auth/dtos/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/users.entity';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { FindOptionsWhere, MoreThan, Repository } from 'typeorm';
 import { UserRole } from './enum/user-role.enum';
 import { Buyer } from './entities/buyer.entity';
 import { Seller } from './entities/seller.entity';
@@ -68,5 +68,58 @@ export class UsersService {
 
   async findById(id: number): Promise<User | null> {
     return await this.userRepo.findOne({ where: { id } });
+  }
+
+  async updateResetToken(
+    userId: number,
+    resetToken: string,
+    resetTokenExpires: Date,
+  ): Promise<void> {
+    await this.userRepo.update(userId, {
+      resetPasswordToken: resetToken,
+      resetPasswordExpires: resetTokenExpires,
+    });
+  }
+
+  async findByResetToken(resetToken: string): Promise<User | null> {
+    return await this.userRepo.findOne({
+      where: {
+        resetPasswordToken: resetToken,
+        resetPasswordExpires: MoreThan(new Date()),
+      },
+    });
+  }
+
+  async updatePassword(userId: number, hashedPassword: string): Promise<void> {
+    await this.userRepo.update(userId, {
+      password: hashedPassword,
+    });
+  }
+
+  async clearResetToken(userId: number): Promise<void> {
+    await this.userRepo.update(userId, {
+      resetPasswordToken: null,
+      resetPasswordExpires: null,
+    });
+  }
+
+  create(createUserDto: CreateUserDto) {
+    return this.createUserAccount(createUserDto);
+  }
+
+  findAll() {
+    return this.userRepo.find();
+  }
+
+  findOne(id: number) {
+    return this.findById(id);
+  }
+
+  update(id: number, updateUserDto: any) {
+    return this.userRepo.update(id, updateUserDto);
+  }
+
+  remove(id: number) {
+    return this.userRepo.delete(id);
   }
 }

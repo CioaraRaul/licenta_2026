@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { UsersService } from '../users.service';
-import { GeneralUser } from './types/general-user-types';
-import { User } from '../entities/users.entity';
+import { UsersService } from 'src/users/users.service';
+import { GeneralUser } from '../types/general-user-types';
+import { User } from 'src/users/entities/users.entity';
 import { randomBytes, scrypt as _scrypt } from 'crypto';
 import { promisify } from 'util';
-import { UserRole } from '../enum/user-role.enum';
+import { UserRole } from 'src/users/enum/user-role.enum';
 
 const scrypt = promisify(_scrypt);
 

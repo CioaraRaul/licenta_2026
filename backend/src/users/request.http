@@ -25,3 +25,23 @@ Content-Type: application/json
   "password": "parola123",
   "role": "seller"
 }
+
+
+### forgot password
+
+POST http://localhost:3000/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "mike@seller.com"
+}
+
+### reset password 
+
+POST http://localhost:3000/auth/reset-password
+Content-Type: application/json
+
+{
+  "resetToken": "bc9f7d360ac1a7050fbb9ddbaabaef458d2036539db07048156245fc59617fbc",
+  "newPassword": "new_password_123"
+}

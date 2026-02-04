@@ -6,7 +6,7 @@ import {
   IsString,
   MinLength,
 } from 'class-validator';
-import { UserRole } from '../enum/user-role.enum';
+import { UserRole } from 'src/users/enum/user-role.enum';
 
 export class CreateUserDto {
   @IsNotEmpty({ message: 'Username should not be empty' })

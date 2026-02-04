@@ -35,6 +35,12 @@ export class User {
   @Column({ nullable: true })
   bio?: string;
 
+  @Column({ nullable: true })
+  resetPasswordToken?: string;
+
+  @Column({ nullable: true })
+  resetPasswordExpires?: Date;
+
   @CreateDateColumn()
   createdAt: Date;
 

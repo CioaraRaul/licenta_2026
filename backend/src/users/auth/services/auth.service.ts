@@ -1,13 +1,17 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { promisify } from 'util';
 import { scrypt as _scrypt, randomBytes } from 'crypto';
-import { UsersService } from '../users.service';
+import { UsersService } from '../../users.service';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { LoginDTO } from '../dtos/login.dto';
 import { JwtService } from '@nestjs/jwt';
-import { UserRole } from '../enum/user-role.enum';
-import { FacebookUser, GoogleUser } from './types/general-user-types';
+import { UserRole } from '../../enum/user-role.enum';
+import { FacebookUser, GoogleUser } from '../types/general-user-types';
 import { OAuthService } from './oauth.service';
+import { ForgotPasswordDto } from '../dtos/forgot-password.dto';
+import { ConfigService } from '@nestjs/config';
+import { ResetPasswordDto } from '../dtos/reset-password.dto';
+import { EmailService } from './email.service';
 
 const scrypt = promisify(_scrypt);
 
@@ -17,6 +21,8 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private oauthService: OAuthService,
+    private configService: ConfigService,
+    private emailService: EmailService,
   ) {}
 
   async signUp(createUserDto: CreateUserDto) {
@@ -174,6 +180,81 @@ export class AuthService {
         role: user.role,
       },
       ...tokens,
+    };
+  }
+
+  async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
+    const { email } = forgotPasswordDto;
+
+    const user = await this.usersService.findByUsernameOrEmail(
+      undefined,
+      email,
+    );
+
+    if (!user) {
+      return {
+        message:
+          'If your email is registered, you will receive a password reset link.',
+      };
+    }
+
+    const resetToken = randomBytes(32).toString('hex');
+    const resetTokenExpires = new Date(Date.now() + 3600000);
+
+    await this.usersService.updateResetToken(
+      user.id,
+      resetToken,
+      resetTokenExpires,
+    );
+
+    try {
+      await this.emailService.sendResetPasswordEmail(email, resetToken);
+    } catch (error) {
+      console.error('Failed to send reset email: ', error);
+      throw new BadRequestException('Failded to send reset email');
+    }
+
+    const frontendUrl = this.configService.get('FRONTEND_URL');
+    const resetUrl = `${frontendUrl}/auth/reset-password?token=${resetToken}`;
+
+    console.log('PASSWORD RESET REQUEST');
+    console.log('Email:', email);
+    console.log('Reset URL:', resetUrl);
+    console.log('Token:', resetToken);
+    console.log('Expires:', resetTokenExpires);
+
+    return {
+      message:
+        'If your email is registered, you will receive a password reset link.',
+      ...(this.configService.get('NODE_ENV') === 'development' && {
+        dev: {
+          resetUrl,
+          resetToken,
+        },
+      }),
+    };
+  }
+
+  async resetPassword(resetPasswordDto: ResetPasswordDto) {
+    const { resetToken, newPassword } = resetPasswordDto;
+
+    const user = await this.usersService.findByResetToken(resetToken);
+
+    if (!user) {
+      throw new BadRequestException('Invalid or expired reset token');
+    }
+
+    const salt = randomBytes(8).toString('hex');
+    const hash = (await scrypt(newPassword, salt, 32)) as Buffer;
+    const hashedPassword = salt + '.' + hash.toString('hex');
+
+    await this.usersService.updatePassword(user.id, hashedPassword);
+    await this.usersService.clearResetToken(user.id);
+
+    console.log('Password reset successfully for user:', user.email);
+
+    return {
+      message: 'Password has been reset successfully',
     };
   }
 }

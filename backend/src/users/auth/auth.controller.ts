@@ -8,12 +8,12 @@ import {
   Res,
 } from '@nestjs/common';
 import { Request as ExpressRequest, Response } from 'express';
-import { CreateUserDto } from '../dtos/create-user.dto';
-import { AuthService } from './auth.service';
-import { LoginDTO } from '../dtos/login.dto';
+import { CreateUserDto } from './dtos/create-user.dto';
+import { AuthService } from './services/auth.service';
+import { LoginDTO } from './dtos/login.dto';
 import { RefreshJWTAuthGuards } from './guards/refresh-token.guard';
-import { ResetPasswordDto } from '../dtos/reset-password.dto';
-import { ForgotPasswordDto } from '../dtos/forgot-password.dto';
+import { ResetPasswordDto } from './dtos/reset-password.dto';
+import { ForgotPasswordDto } from './dtos/forgot-password.dto';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { FacebookAuthGuard } from './guards/facebook-auth.guard';
 
@@ -71,11 +71,11 @@ export class AuthController {
 
   @Post('forgot-password')
   async forgotPassword(@Body() forgotPassword: ForgotPasswordDto) {
-    // Implementation for forgot password functionality goes here
+    return this.authService.forgotPassword(forgotPassword);
   }
 
   @Post('reset-password')
   async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
-    // Implementation for reset password functionality goes here
+    return await this.authService.resetPassword(resetPasswordDto);
   }
 }
