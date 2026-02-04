@@ -6,6 +6,8 @@ import { CreateUserDto } from '../dtos/create-user.dto';
 import { LoginDTO } from '../dtos/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { UserRole } from '../enum/user-role.enum';
+import { FacebookUser, GoogleUser } from './types/general-user-types';
+import { OAuthService } from './oauth.service';
 
 const scrypt = promisify(_scrypt);
 
@@ -14,6 +16,7 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private oauthService: OAuthService,
   ) {}
 
   async signUp(createUserDto: CreateUserDto) {
@@ -110,7 +113,9 @@ export class AuthService {
       throw new BadRequestException('No user from google');
     }
 
-    const { email, firstName, lastName } = req.user;
+    const googleUser = req.user as GoogleUser;
+
+    const { email, firstName, lastName } = googleUser;
 
     let user = await this.usersService.findByUsernameOrEmail(undefined, email);
 
@@ -140,6 +145,31 @@ export class AuthService {
         username: user.username,
         email: user.email,
         firstname: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+      },
+      ...tokens,
+    };
+  }
+
+  async facebookLogin(req: any) {
+    if (!req.user) {
+      throw new BadRequestException('No user from Facebook');
+    }
+
+    const user = await this.oauthService.handleSocialLogin(
+      'facebook',
+      req.user,
+    );
+
+    const tokens = await this.getTokens(user.id, user.username);
+
+    return {
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        firstName: user.firstName,
         lastName: user.lastName,
         role: user.role,
       },

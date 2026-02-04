@@ -6,17 +6,26 @@ function AuthCallback() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const accessToken = searchParams.get("accessToken");
-    const refreshToken = searchParams.get("refreshToken");
+    const handleAuth = async () => {
+      try {
+        const accessToken = searchParams.get("accessToken");
+        const refreshToken = searchParams.get("refreshToken");
 
-    if (accessToken && refreshToken) {
-      localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("refreshToken", refreshToken);
+        if (accessToken && refreshToken) {
+          localStorage.setItem("accessToken", accessToken);
+          localStorage.setItem("refreshToken", refreshToken);
 
-      navigate("/home");
-    } else {
-      navigate("/auth/login");
-    }
+          navigate("/home");
+        } else {
+          navigate("/auth/login");
+        }
+      } catch (error) {
+        console.error("Auth error:", error);
+        navigate("/auth/login");
+      }
+    };
+
+    handleAuth();
   }, [searchParams, navigate]);
 
   return (

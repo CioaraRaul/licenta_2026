@@ -15,6 +15,7 @@ import { RefreshJWTAuthGuards } from './guards/refresh-token.guard';
 import { ResetPasswordDto } from '../dtos/reset-password.dto';
 import { ForgotPasswordDto } from '../dtos/forgot-password.dto';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
+import { FacebookAuthGuard } from './guards/facebook-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -50,6 +51,19 @@ export class AuthController {
   async googleAuthRedirect(@Request() req, @Res() res: Response) {
     const result = await this.authService.googleLogin(req);
 
+    res.redirect(
+      `http://localhost:5173/auth/callback?accessToken=${result.accessToken}&refreshToken=${result.refreshToken}`,
+    );
+  }
+
+  @Get('facebook')
+  @UseGuards(FacebookAuthGuard)
+  async facebookAuth() {}
+
+  @Get('facebook/callback')
+  @UseGuards(FacebookAuthGuard)
+  async facebookAuthRedirect(@Request() req, @Res() res: Response) {
+    const result = await this.authService.facebookLogin(req);
     res.redirect(
       `http://localhost:5173/auth/callback?accessToken=${result.accessToken}&refreshToken=${result.refreshToken}`,
     );
