@@ -122,4 +122,32 @@ export class UsersService {
   remove(id: number) {
     return this.userRepo.delete(id);
   }
+
+  async updateVerificationToken(
+    userId: number,
+    verificationToken: string,
+    verificationExpires: Date,
+  ): Promise<void> {
+    await this.userRepo.update(userId, {
+      emailVerificationToken: verificationToken,
+      emailVerificationExpires: verificationExpires,
+    });
+  }
+
+  async findByVerificationToken(token: string): Promise<User | null> {
+    return await this.userRepo.findOne({
+      where: {
+        emailVerificationToken: token,
+        emailVerificationExpires: MoreThan(new Date()),
+      },
+    });
+  }
+
+  async verifyUserEmail(userId: number): Promise<void> {
+    await this.userRepo.update(userId, {
+      isEmailVerified: true,
+      emailVerificationToken: null,
+      emailVerificationExpires: null,
+    });
+  }
 }

@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { promisify } from 'util';
 import { scrypt as _scrypt, randomBytes } from 'crypto';
 import { UsersService } from '../../users.service';
@@ -12,6 +16,7 @@ import { ForgotPasswordDto } from '../dtos/forgot-password.dto';
 import { ConfigService } from '@nestjs/config';
 import { ResetPasswordDto } from '../dtos/reset-password.dto';
 import { EmailService } from './email.service';
+import { VerifyEmailDto } from '../dtos/verify-email.dto';
 
 const scrypt = promisify(_scrypt);
 
@@ -27,15 +32,31 @@ export class AuthService {
 
   async signUp(createUserDto: CreateUserDto) {
     const salt = randomBytes(8).toString('hex');
-
     const hash = (await scrypt(createUserDto.password, salt, 32)) as Buffer;
-
     const result = salt + '.' + hash.toString('hex');
 
     const user = await this.usersService.createUserAccount({
       ...createUserDto,
       password: result,
     });
+
+    const verificationToken = randomBytes(32).toString('hex');
+    const verificationExpires = new Date(Date.now() + 24 * 3600000);
+
+    await this.usersService.updateVerificationToken(
+      user.id,
+      verificationToken,
+      verificationExpires,
+    );
+
+    try {
+      await this.emailService.sendVerificationEmail(
+        user.email,
+        verificationToken,
+      );
+    } catch (error) {
+      console.error('FAiled to send verification email: ', error);
+    }
 
     const tokens = await this.getTokens(user.id, user.username);
 
@@ -45,8 +66,35 @@ export class AuthService {
         username: user.username,
         email: user.email,
         role: user.role,
+        isEmailVerified: user.isEmailVerified || false,
       },
       ...tokens,
+      message:
+        'Account created! Please check your email to verify your account.',
+    };
+  }
+
+  async verifyEmail(verifyEmailDto: VerifyEmailDto) {
+    const { token } = verifyEmailDto;
+
+    const user = await this.usersService.findByVerificationToken(token);
+
+    if (!user) {
+      throw new BadRequestException('Invalid or expired verification token');
+    }
+
+    await this.usersService.verifyUserEmail(user.id);
+
+    console.log('Email verified successfully for user: ', user.email);
+
+    return {
+      message: 'Email verified successfully! You can now all features',
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        isEmailVerified: true,
+      },
     };
   }
 
@@ -56,14 +104,14 @@ export class AuthService {
     const user = await this.usersService.findByUsernameOrEmail(username, email);
 
     if (!user) {
-      throw new Error('Invalid credentials');
+      throw new UnauthorizedException('Invalid credentials');
     }
 
     const [salt, storedHash] = user.password.split('.');
     const hash = (await scrypt(password, salt, 32)) as Buffer;
 
     if (storedHash !== hash.toString('hex')) {
-      throw new Error('Invalid credentials');
+      throw new UnauthorizedException('Invalid credentials');
     }
 
     const tokens = await this.getTokens(user.id, user.username);

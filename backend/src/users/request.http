@@ -18,12 +18,21 @@ POST http://localhost:3000/auth/signup
 Content-Type: application/json
 
 {
-  "username": "seller_mike",
-  "firstName": "Mike",
-  "lastName": "Auto",
-  "email": "mike@seller.com",
-  "password": "parola123",
-  "role": "seller"
+   "username": "seller_mike",
+     "firstName": "Mike",
+     "lastName": "Auto",
+     "email": "mike@seller.com",
+     "password": "parola123",
+     "role": "seller"
+}
+
+### Signin with email
+POST http://localhost:3000/auth/signin
+Content-Type: application/json
+
+{
+  "email": "john@buyer.com",
+  "password": "parola123"
 }
 
 
@@ -37,11 +46,18 @@ Content-Type: application/json
 }
 
 ### reset password 
-
 POST http://localhost:3000/auth/reset-password
 Content-Type: application/json
 
 {
   "resetToken": "bc9f7d360ac1a7050fbb9ddbaabaef458d2036539db07048156245fc59617fbc",
   "newPassword": "new_password_123"
+}
+
+### verify email
+POST http://localhost:3000/auth/verify-email
+Content-Type: application/json
+
+{
+  "token": "7f09caa26d635cff8a6c5129a0a374c4cefa9b66d34b6b431733a3be03b8fd9a"
 }

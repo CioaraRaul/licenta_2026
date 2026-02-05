@@ -35,6 +35,15 @@ export class User {
   @Column({ nullable: true })
   bio?: string;
 
+  @Column({ default: false })
+  isEmailVerified: boolean;
+
+  @Column({ nullable: true })
+  emailVerificationToken?: string;
+
+  @Column({ type: 'datetime', nullable: true })
+  emailVerificationExpires?: Date;
+
   @Column({ nullable: true })
   resetPasswordToken?: string;
 
