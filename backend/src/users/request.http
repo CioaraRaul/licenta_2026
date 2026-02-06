@@ -61,3 +61,11 @@ Content-Type: application/json
 {
   "token": "7f09caa26d635cff8a6c5129a0a374c4cefa9b66d34b6b431733a3be03b8fd9a"
 }
+
+### resend verification email 
+POST http://localhost:3000/auth/resend-verification
+Content-Type: application/json
+
+{
+  "email": "mike@seller.com"
+}

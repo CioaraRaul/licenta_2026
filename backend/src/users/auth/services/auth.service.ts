@@ -17,6 +17,7 @@ import { ConfigService } from '@nestjs/config';
 import { ResetPasswordDto } from '../dtos/reset-password.dto';
 import { EmailService } from './email.service';
 import { VerifyEmailDto } from '../dtos/verify-email.dto';
+import { ResendVerificationEmailDto } from '../dtos/resend-verification-email.dto';
 
 const scrypt = promisify(_scrypt);
 
@@ -303,6 +304,56 @@ export class AuthService {
 
     return {
       message: 'Password has been reset successfully',
+    };
+  }
+
+  async resendVerificationEmail(
+    resendVerificationEmailDto: ResendVerificationEmailDto,
+  ) {
+    const { email } = resendVerificationEmailDto;
+
+    const user = await this.usersService.findByUsernameOrEmail(
+      undefined,
+      email,
+    );
+
+    if (!user) {
+      return {
+        message:
+          'If your email is reqistered, you will receive a verification link',
+      };
+    }
+
+    if (user.isEmailVerified) {
+      throw new BadRequestException('Email is already verified');
+    }
+
+    const verificationToken = randomBytes(32).toString('hex');
+    const verificationExpires = new Date(Date.now() + 24 + 3600000);
+
+    await this.usersService.updateVerificationToken(
+      user.id,
+      verificationToken,
+      verificationExpires,
+    );
+
+    try {
+      await this.emailService.sendVerificationEmail(email, verificationToken);
+    } catch (error) {
+      console.error('Failed to send verification email: ', error);
+      throw new BadRequestException('Failed to send verification email');
+    }
+
+    console.log('verification send to', email);
+
+    return {
+      message: 'Verification email sent! Please check your inbox.',
+      ...(this.configService.get('NODE_ENV') === 'development' && {
+        dev: {
+          verificationUrl: `${this.configService.get('FRONTEND_URL')}/auth/verify-email/${verificationToken}`,
+          verificationToken,
+        },
+      }),
     };
   }
 }

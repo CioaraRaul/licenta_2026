@@ -6,6 +6,7 @@ import {
   Request,
   UseGuards,
   Res,
+  Patch,
 } from '@nestjs/common';
 import { Request as ExpressRequest, Response } from 'express';
 import { CreateUserDto } from './dtos/create-user.dto';
@@ -17,6 +18,10 @@ import { ForgotPasswordDto } from './dtos/forgot-password.dto';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { FacebookAuthGuard } from './guards/facebook-auth.guard';
 import { VerifyEmailDto } from './dtos/verify-email.dto';
+import { ResendVerificationEmailDto } from './dtos/resend-verification-email.dto';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { ChangePasswordDto } from './dtos/change-password.dto';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
@@ -84,4 +89,64 @@ export class AuthController {
   async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
     return this.authService.verifyEmail(verifyEmailDto);
   }
+
+  @Post('resend-verification')
+  async resendVerification(@Body() resendDto: ResendVerificationEmailDto) {
+    return this.authService.resendVerificationEmail(resendDto);
+  }
+
+  // @UseGuards(JwtAuthGuard)
+  // @Post('logout')
+  // async logout(@Request() req) {
+  //   return this.authService.logout(req.user.sub);
+  // }
+
+  // @UseGuards(JwtAuthGuard)
+  // @Post('change-password')
+  // async changePassword(
+  //   @Request() req,
+  //   @Body() changePasswordDto: ChangePasswordDto,
+  // ) {
+  //   return this.authService.changePassword(req.user.sub, changePasswordDto);
+  // }
+
+  // @UseGuards(JwtAuthGuard)
+  // @Post('revoke-sessions')
+  // async revokeSessions(@Request() req) {
+  //   return this.authService.revokeAllSessions(req.user.sub);
+  // }
+
+  // @UseGuards(JwtAuthGuard)
+  // @Get('me')
+  // async getCurrentUser(@Request() req) {
+  //   return this.authService.getCurrentUser(req.user.sub);
+  // }
+
+  // @Get('verify-reset-token')
+  // async verifyResetToken(@Query('token') token: string) {}
+
+  // @UseGuards(JwtAuthGuard)
+  // @Post('2fa/enable')
+  // async enable2FA(@Request() req) {}
+
+  // @UseGuards(JwtAuthGuard)
+  // @Post('2fa/verify')
+  // async verify2FA(@Request() req, @Body() veify2FADto: Verify2FADto) {}
+
+  // @UseGuards(JwtAuthGuard)
+  // @Post('2fa/disable')
+  // async disable2FA(@Request() req, @Body() verify2FADto: Verify2FaDto) {}
+
+  // @Throttle({ default: { limit: 5, ttl: 60000 } })
+  // @Post('2fa/validate')
+  // async validate2FA(@Body() verify2FADto: Verify2FADto) {}
+
+  // @UseGuards(JwtAuthGuard)
+  // @Patch('account/deactivate')
+  // async deactivateAccount(@Request() req) {}
+
+  // @UseGuards(JwtAuthGuard)
+  // @Throttle({ default: { limit: 1, ttl: 60000 } })
+  // @Delete('account/delete')
+  // async deleteAccount(@Request() req) {}
 }
