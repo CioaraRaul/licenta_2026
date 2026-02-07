@@ -23,6 +23,7 @@ import { TokenBlackList } from '../entities/token-blacklist.entity';
 import { Repository } from 'typeorm';
 import { TokenBlacklistService } from './token-blacklist.service';
 import { isEmail } from 'class-validator';
+import { ChangePasswordDto } from '../dtos/change-password.dto';
 
 const scrypt = promisify(_scrypt);
 
@@ -389,5 +390,34 @@ export class AuthService {
     });
 
     return !!blackListed;
+  }
+
+  async changePassword(userId: number, changePasswordDto: ChangePasswordDto) {
+    const { currentPassword, newPassword } = changePasswordDto;
+
+    const user = await this.usersService.findById(userId);
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    const [salt, storedHash] = user.password.split('.');
+    const hash = (await scrypt(currentPassword, salt, 32)) as Buffer;
+
+    if (storedHash !== hash.toString('hex')) {
+      throw new BadRequestException('Current password is incorrect');
+    }
+
+    const newSalt = randomBytes(8).toString('hex');
+    const newHash = (await scrypt(newPassword, newSalt, 32)) as Buffer;
+    const newHashedPassword = newSalt + '.' + newHash.toString('hex');
+
+    await this.usersService.updatePassword(user.id, newHashedPassword);
+
+    console.log(`Password changed successfully for user ${user.email}`);
+
+    return {
+      message: 'Password changed successfully',
+    };
   }
 }

@@ -32,7 +32,7 @@ Content-Type: application/json
 
 {
   "email": "john@buyer.com",
-  "password": "parola123"
+  "password": "new_password_456"
 }
 
 
@@ -73,4 +73,15 @@ Content-Type: application/json
 
 ### Logout
 POST http://localhost:3000/auth/logout
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiYnV5ZXJfam9obiIsImlhdCI6MTcwNzA3MjAwMCwiZXhwIjoxNzA3MDcyOTAwfQ...
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiYnV5ZXJfam9obiIsImlhdCI6MTc3MDUwMDM3NywiZXhwIjoxNzcwNTAxMjc3fQ.78_qYAMG8kxlaSmUNQFUC25G2wo6bH-QazK6mtn6lfM
+
+
+### change password
+POST http://localhost:3000/auth/change-password
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiYnV5ZXJfam9obiIsImlhdCI6MTc3MDUwMDUwOCwiZXhwIjoxNzcwNTAxNDA4fQ.29DM0mt0WVaDHOSoijdckHOCWPmw6nHGY7821C4m0xw
+Content-Type: application/json
+
+{
+  "currentPassword": "parola123",
+  "newPassword": "new_password_456"
+}

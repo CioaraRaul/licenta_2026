@@ -23,7 +23,6 @@ import { VerifyEmailDto } from './dtos/verify-email.dto';
 import { ResendVerificationEmailDto } from './dtos/resend-verification-email.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { ChangePasswordDto } from './dtos/change-password.dto';
-import { Throttle } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
@@ -106,17 +105,20 @@ export class AuthController {
       throw new BadRequestException('No token provided');
     }
 
-    return this.authService.logout(req.user.sub, token);
+    return this.authService.logout(req.user.userId, token);
   }
 
-  // @UseGuards(JwtAuthGuard)
-  // @Post('change-password')
-  // async changePassword(
-  //   @Request() req,
-  //   @Body() changePasswordDto: ChangePasswordDto,
-  // ) {
-  //   return this.authService.changePassword(req.user.sub, changePasswordDto);
-  // }
+  @UseGuards(JwtAuthGuard)
+  @Post('change-password')
+  async changePassword(
+    @Request() req,
+    @Body() changePasswordDto: ChangePasswordDto,
+  ) {
+    return await this.authService.changePassword(
+      req.user.userId,
+      changePasswordDto,
+    );
+  }
 
   // @UseGuards(JwtAuthGuard)
   // @Post('revoke-sessions')
