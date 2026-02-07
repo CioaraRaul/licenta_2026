@@ -31,22 +31,33 @@ export class UsersService {
       throw new Error('User with given email or username already exists');
     }
 
-    let user: User;
+    const user = this.userRepo.create(createUserDto);
+    const savedUser = await this.userRepo.save(user);
 
     switch (createUserDto.role) {
-      case UserRole.BUYER:
-        user = this.buyerRepo.create(createUserDto);
-        return await this.buyerRepo.save(user);
-      case UserRole.SELLER:
-        user = this.sellerRepo.create(createUserDto);
-        return await this.sellerRepo.save(user);
-      case UserRole.ADMIN:
-        user = this.adminRepo.create(createUserDto);
-        return await this.adminRepo.save(user);
-      case UserRole.GUEST:
-        user = this.guestRepo.create(createUserDto);
-        return await this.guestRepo.save(user);
+      case UserRole.BUYER: {
+        const buyer = this.buyerRepo.create({ userId: savedUser.id });
+        await this.buyerRepo.save(buyer);
+        break;
+      }
+      case UserRole.SELLER: {
+        const seller = this.sellerRepo.create({ userId: savedUser.id });
+        await this.sellerRepo.save(seller);
+        break;
+      }
+      case UserRole.ADMIN: {
+        const admin = this.adminRepo.create({ userId: savedUser.id });
+        await this.adminRepo.save(admin);
+        break;
+      }
+      case UserRole.GUEST: {
+        const guest = this.guestRepo.create({ userId: savedUser.id });
+        await this.guestRepo.save(guest);
+        break;
+      }
     }
+
+    return savedUser;
   }
 
   async findByUsernameOrEmail(

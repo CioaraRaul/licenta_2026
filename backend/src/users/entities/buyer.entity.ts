@@ -1,16 +1,22 @@
-import { ChildEntity, Column } from 'typeorm';
-import { UserRole } from '../enum/user-role.enum';
+import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
 import { User } from './users.entity';
 
-@ChildEntity(UserRole.BUYER)
-export class Buyer extends User {
+@Entity('buyers')
+export class Buyer {
+  @PrimaryColumn()
+  userId: number;
+
+  @OneToOne(() => User, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userId' })
+  user: User;
+
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
   walletBalance: number;
 
   @Column({ type: 'text', default: 'EUR' })
   currency: string;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   isWalletVerified: boolean;
 
   @Column({ nullable: true })
@@ -28,7 +34,7 @@ export class Buyer extends User {
   @Column({ nullable: true, type: 'text' })
   favoriteCarBrands?: string;
 
-  @Column({ default: true })
+  @Column({ type: 'boolean', default: true })
   receiveCarAlerts: boolean;
 
   @Column({ nullable: true })

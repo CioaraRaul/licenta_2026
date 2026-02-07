@@ -4,12 +4,10 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  TableInheritance,
 } from 'typeorm';
 import { UserRole } from '../enum/user-role.enum';
 
 @Entity('users')
-@TableInheritance({ column: { type: 'text', name: 'role' } })
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -35,7 +33,7 @@ export class User {
   @Column({ nullable: true })
   bio?: string;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   isEmailVerified: boolean;
 
   @Column({ nullable: true })

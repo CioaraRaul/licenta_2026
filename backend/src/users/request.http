@@ -59,7 +59,7 @@ POST http://localhost:3000/auth/verify-email
 Content-Type: application/json
 
 {
-  "token": "7f09caa26d635cff8a6c5129a0a374c4cefa9b66d34b6b431733a3be03b8fd9a"
+  "token": "71f5bc4900cd6ab33ac8d662b08f61d9ce4247006548099b886d3372ae317b80"
 }
 
 ### resend verification email 
@@ -69,3 +69,8 @@ Content-Type: application/json
 {
   "email": "mike@seller.com"
 }
+
+
+### Logout
+POST http://localhost:3000/auth/logout
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiYnV5ZXJfam9obiIsImlhdCI6MTcwNzA3MjAwMCwiZXhwIjoxNzA3MDcyOTAwfQ...

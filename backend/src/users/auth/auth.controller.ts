@@ -7,6 +7,8 @@ import {
   UseGuards,
   Res,
   Patch,
+  Headers,
+  BadRequestException,
 } from '@nestjs/common';
 import { Request as ExpressRequest, Response } from 'express';
 import { CreateUserDto } from './dtos/create-user.dto';
@@ -95,11 +97,17 @@ export class AuthController {
     return this.authService.resendVerificationEmail(resendDto);
   }
 
-  // @UseGuards(JwtAuthGuard)
-  // @Post('logout')
-  // async logout(@Request() req) {
-  //   return this.authService.logout(req.user.sub);
-  // }
+  @UseGuards(JwtAuthGuard)
+  @Post('logout')
+  async logout(@Request() req, @Headers('authorization') authHeader: string) {
+    const token = authHeader?.replace('Bearer ', '');
+
+    if (!token) {
+      throw new BadRequestException('No token provided');
+    }
+
+    return this.authService.logout(req.user.sub, token);
+  }
 
   // @UseGuards(JwtAuthGuard)
   // @Post('change-password')

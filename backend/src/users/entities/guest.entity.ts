@@ -1,9 +1,15 @@
-import { ChildEntity, Column } from 'typeorm';
-import { UserRole } from '../enum/user-role.enum';
+import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
 import { User } from './users.entity';
 
-@ChildEntity(UserRole.GUEST)
-export class Guest extends User {
+@Entity('guests')
+export class Guest {
+  @PrimaryColumn()
+  userId: number;
+
+  @OneToOne(() => User, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userId' })
+  user: User;
+
   @Column({ nullable: true })
   guestSessionId?: string;
 

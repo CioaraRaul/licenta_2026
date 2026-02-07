@@ -18,6 +18,11 @@ import { ResetPasswordDto } from '../dtos/reset-password.dto';
 import { EmailService } from './email.service';
 import { VerifyEmailDto } from '../dtos/verify-email.dto';
 import { ResendVerificationEmailDto } from '../dtos/resend-verification-email.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { TokenBlackList } from '../entities/token-blacklist.entity';
+import { Repository } from 'typeorm';
+import { TokenBlacklistService } from './token-blacklist.service';
+import { isEmail } from 'class-validator';
 
 const scrypt = promisify(_scrypt);
 
@@ -29,6 +34,9 @@ export class AuthService {
     private oauthService: OAuthService,
     private configService: ConfigService,
     private emailService: EmailService,
+    @InjectRepository(TokenBlackList)
+    private tokenBlackListRepo: Repository<TokenBlackList>,
+    private tokenBlackListService: TokenBlacklistService,
   ) {}
 
   async signUp(createUserDto: CreateUserDto) {
@@ -123,6 +131,7 @@ export class AuthService {
         username: user.username,
         email: user.email,
         role: user.role,
+        isEmailVerified: user.isEmailVerified || false,
       },
       ...tokens,
     };
@@ -355,5 +364,30 @@ export class AuthService {
         },
       }),
     };
+  }
+
+  async logout(userId: number, accessToken: string) {
+    const decoded = this.jwtService.decode(accessToken) as { exp: number };
+    const expiresAt = new Date(decoded.exp * 1000);
+
+    await this.tokenBlackListService.blacklistToken(
+      accessToken,
+      userId,
+      expiresAt,
+    );
+
+    console.log(` User ${userId} logged out successfully`);
+
+    return {
+      message: 'Logged out succesfully',
+    };
+  }
+
+  async isTokenBlackListed(token: string): Promise<boolean> {
+    const blackListed = await this.tokenBlackListRepo.findOne({
+      where: { token },
+    });
+
+    return !!blackListed;
   }
 }

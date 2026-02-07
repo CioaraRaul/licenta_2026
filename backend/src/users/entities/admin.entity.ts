@@ -1,10 +1,16 @@
-import { ChildEntity, Column } from 'typeorm';
-import { UserRole } from '../enum/user-role.enum';
+import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
 import { User } from './users.entity';
 
-@ChildEntity(UserRole.ADMIN)
-export class Admin extends User {
-  @Column({ default: false })
+@Entity('admins')
+export class Admin {
+  @PrimaryColumn()
+  userId: number;
+
+  @OneToOne(() => User, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userId' })
+  user: User;
+
+  @Column({ type: 'boolean', default: false })
   isSuperAdmin: boolean;
 
   @Column({ nullable: true, type: 'text' })
