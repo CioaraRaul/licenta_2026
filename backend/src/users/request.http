@@ -85,3 +85,8 @@ Content-Type: application/json
   "currentPassword": "parola123",
   "newPassword": "new_password_456"
 }
+ 
+### revoke sessions
+POST http://localhost:3000/auth/revoke-sessions
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiYnV5ZXJfam9obiIsImlhdCI6MTc3MDUwMTIwMSwiZXhwIjoxNzcwNTAyMTAxfQ.z7i5TAV6Ludler2jgi28oZlniww6HMaSGauDqWxTDFQ
+

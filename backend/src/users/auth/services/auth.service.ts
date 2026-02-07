@@ -420,4 +420,20 @@ export class AuthService {
       message: 'Password changed successfully',
     };
   }
+
+  async revokeAllSessions(userId: number) {
+    const user = await this.usersService.findById(userId);
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    await this.tokenBlackListService.blacklistAllUserTokens(userId);
+
+    console.log(`All sessions revoked for user ${user.email}`);
+
+    return {
+      message: 'All sessions revoked successfully',
+    };
+  }
 }

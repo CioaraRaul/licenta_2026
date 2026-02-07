@@ -120,11 +120,11 @@ export class AuthController {
     );
   }
 
-  // @UseGuards(JwtAuthGuard)
-  // @Post('revoke-sessions')
-  // async revokeSessions(@Request() req) {
-  //   return this.authService.revokeAllSessions(req.user.sub);
-  // }
+  @UseGuards(JwtAuthGuard)
+  @Post('revoke-sessions')
+  async revokeSessions(@Request() req) {
+    return this.authService.revokeAllSessions(req.user.userId);
+  }
 
   // @UseGuards(JwtAuthGuard)
   // @Get('me')
