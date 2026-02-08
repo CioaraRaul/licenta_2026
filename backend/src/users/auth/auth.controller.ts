@@ -9,7 +9,7 @@ import {
   Patch,
   Headers,
   BadRequestException,
-  Query,
+  Delete,
 } from '@nestjs/common';
 import { Request as ExpressRequest, Response } from 'express';
 import { CreateUserDto } from './dtos/create-user.dto';
@@ -25,6 +25,8 @@ import { ResendVerificationEmailDto } from './dtos/resend-verification-email.dto
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { ChangePasswordDto } from './dtos/change-password.dto';
 import { VerifyResetTokenDto } from './dtos/verify-resetToken.dto';
+import { DeleteAccountDto } from './dtos/delete-account.dto';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
@@ -174,8 +176,16 @@ export class AuthController {
     return this.authService.reactivateAccountByUserId(req.user.userId);
   }
 
-  // @UseGuards(JwtAuthGuard)
-  // @Throttle({ default: { limit: 1, ttl: 60000 } })
-  // @Delete('account/delete')
-  // async deleteAccount(@Request() req) {}
+  @UseGuards(JwtAuthGuard)
+  @Throttle({ default: { limit: 1, ttl: 60000 } })
+  @Delete('account/delete')
+  async deleteAccount(
+    @Request() req,
+    @Body() deleteAccountDto: DeleteAccountDto,
+  ) {
+    return this.authService.deleteAccount(
+      req.user.userId,
+      deleteAccountDto.password,
+    );
+  }
 }

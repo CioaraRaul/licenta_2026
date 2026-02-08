@@ -114,3 +114,12 @@ Content-Type: application/json
 {
   "email": "john@buyer.com"
 }
+
+### delete account
+DELETE http://localhost:3000/auth/account/delete
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiYnV5ZXJfam9obiIsImlhdCI6MTc3MDU1NDc1MywiZXhwIjoxNzcwNTU1NjUzfQ._APhMoTc4INkVoX8-K_zU9jk-3oUYPzcejonzRuqnQU
+Content-Type: application/json
+
+{
+  "password": "new_password_456"
+}

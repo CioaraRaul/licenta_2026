@@ -548,4 +548,28 @@ export class AuthService {
       message: 'Account reactivated successfully',
     };
   }
+
+  async deleteAccount(userId: number, password: string) {
+    const user = await this.usersService.findById(userId);
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    const [salt, storedHash] = user.password.split('.');
+    const hash = (await scrypt(password, salt, 32)) as Buffer;
+
+    if (storedHash !== hash.toString('hex')) {
+      throw new BadRequestException('Password is incorrect');
+    }
+
+    await this.tokenBlackListService.blacklistAllUserTokens(userId);
+    await this.usersService.deleteAccount(userId);
+
+    console.log(`Account deleted for user ${user.email}`);
+
+    return {
+      message: 'Account deleted successfully',
+    };
+  }
 }
