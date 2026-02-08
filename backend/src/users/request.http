@@ -42,7 +42,7 @@ POST http://localhost:3000/auth/forgot-password
 Content-Type: application/json
 
 {
-  "email": "mike@seller.com"
+  "email": "john@buyer.com"
 }
 
 ### reset password 
@@ -90,3 +90,14 @@ Content-Type: application/json
 POST http://localhost:3000/auth/revoke-sessions
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiYnV5ZXJfam9obiIsImlhdCI6MTc3MDUwMTIwMSwiZXhwIjoxNzcwNTAyMTAxfQ.z7i5TAV6Ludler2jgi28oZlniww6HMaSGauDqWxTDFQ
 
+### get current user
+GET http://localhost:3000/auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiYnV5ZXJfam9obiIsImlhdCI6MTc3MDUwODE4MSwiZXhwIjoxNzcwNTA5MDgxfQ.V5xgHci3bhmAPf1W9Z0e4aQh7ehrKx_AM1NxIMN9J24
+
+### Verify invalid token
+POST http://localhost:3000/auth/verify-reset-token
+Content-Type: application/json
+
+{
+  "token": "2f28a36a31878398ab691b02adfa9eae3d078d397749d3a5c67cd7802961c74d"
+}

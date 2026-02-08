@@ -436,4 +436,44 @@ export class AuthService {
       message: 'All sessions revoked successfully',
     };
   }
+
+  async getCurrentUser(userId: number) {
+    const user = await this.usersService.findById(userId);
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    return {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      role: user.role,
+      isEmailVerified: user.isEmailVerified,
+      bio: user.bio,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
+  }
+
+  async verifyResetToken(token: string) {
+    if (!token) {
+      throw new BadRequestException('No token provided');
+    }
+
+    const user = await this.usersService.findByResetToken(token);
+
+    if (!user) {
+      return {
+        valid: false,
+        message: 'Invalid or expired reset token',
+      };
+    }
+
+    return {
+      valid: true,
+      message: 'Reset token is valid',
+      email: user.email,
+    };
+  }
 }

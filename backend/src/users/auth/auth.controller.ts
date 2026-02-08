@@ -9,6 +9,7 @@ import {
   Patch,
   Headers,
   BadRequestException,
+  Query,
 } from '@nestjs/common';
 import { Request as ExpressRequest, Response } from 'express';
 import { CreateUserDto } from './dtos/create-user.dto';
@@ -23,6 +24,7 @@ import { VerifyEmailDto } from './dtos/verify-email.dto';
 import { ResendVerificationEmailDto } from './dtos/resend-verification-email.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { ChangePasswordDto } from './dtos/change-password.dto';
+import { VerifyResetTokenDto } from './dtos/verify-resetToken.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -126,14 +128,16 @@ export class AuthController {
     return this.authService.revokeAllSessions(req.user.userId);
   }
 
-  // @UseGuards(JwtAuthGuard)
-  // @Get('me')
-  // async getCurrentUser(@Request() req) {
-  //   return this.authService.getCurrentUser(req.user.sub);
-  // }
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async getCurrentUser(@Request() req) {
+    return this.authService.getCurrentUser(req.user.userId);
+  }
 
-  // @Get('verify-reset-token')
-  // async verifyResetToken(@Query('token') token: string) {}
+  @Post('verify-reset-token')
+  async verifyResetToken(@Body() verifyResetTokenDto: VerifyResetTokenDto) {
+    return this.authService.verifyResetToken(verifyResetTokenDto.token);
+  }
 
   // @UseGuards(JwtAuthGuard)
   // @Post('2fa/enable')
