@@ -101,3 +101,16 @@ Content-Type: application/json
 {
   "token": "2f28a36a31878398ab691b02adfa9eae3d078d397749d3a5c67cd7802961c74d"
 }
+
+
+### deactivate account
+PATCH http://localhost:3000/auth/account/deactivate
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiYnV5ZXJfam9obiIsImlhdCI6MTc3MDUxMTk2MSwiZXhwIjoxNzcwNTEyODYxfQ.rJlhTj16_370OS1CE2uIxS5cEe8oU5Pf526l_jeVoHo
+
+### reactivate account
+POST http://localhost:3000/auth/account/reactivate
+Content-Type: application/json
+
+{
+  "email": "john@buyer.com"
+}

@@ -161,4 +161,22 @@ export class UsersService {
       emailVerificationExpires: null,
     });
   }
+
+  async deactivateAccount(userId: number): Promise<void> {
+    await this.userRepo.update(userId, {
+      isActive: false,
+      deactivatedAt: new Date(),
+    });
+  }
+
+  async reactivateAccount(userId: number): Promise<void> {
+    await this.userRepo.update(userId, {
+      isActive: true,
+      deactivatedAt: null,
+    });
+  }
+
+  async deleteAccount(userId: number): Promise<void> {
+    await this.userRepo.delete(userId);
+  }
 }

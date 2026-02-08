@@ -155,9 +155,24 @@ export class AuthController {
   // @Post('2fa/validate')
   // async validate2FA(@Body() verify2FADto: Verify2FADto) {}
 
-  // @UseGuards(JwtAuthGuard)
-  // @Patch('account/deactivate')
-  // async deactivateAccount(@Request() req) {}
+  @UseGuards(JwtAuthGuard)
+  @Patch('account/deactivate')
+  async deactivateAccount(@Request() req) {
+    return await this.authService.deactivateAccount(req.user.userId);
+  }
+
+  @Post('account/reactivate')
+  async reactivateAccount(@Body('email') email: string) {
+    if (!email) {
+      throw new BadRequestException('Email is required');
+    }
+    return this.authService.reactivateAccountByEmail(email);
+  }
+
+  @Post('account/reactivate')
+  async reactivateAccountAuthenticated(@Request() req) {
+    return this.authService.reactivateAccountByUserId(req.user.userId);
+  }
 
   // @UseGuards(JwtAuthGuard)
   // @Throttle({ default: { limit: 1, ttl: 60000 } })

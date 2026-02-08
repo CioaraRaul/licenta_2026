@@ -33,6 +33,12 @@ export class User {
   @Column({ nullable: true })
   bio?: string;
 
+  @Column({ type: 'boolean', default: true })
+  isActive: boolean;
+
+  @Column({ type: 'datetime', nullable: true })
+  deactivatedAt?: Date;
+
   @Column({ type: 'boolean', default: false })
   isEmailVerified: boolean;
 

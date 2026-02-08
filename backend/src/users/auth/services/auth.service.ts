@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { promisify } from 'util';
@@ -115,6 +116,14 @@ export class AuthService {
 
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
+    }
+
+    if (!user.isActive) {
+      return {
+        accountDeactivated: true,
+        message: 'Your account is deactivated. Please reactivate to log in.',
+        email: user.email,
+      };
     }
 
     const [salt, storedHash] = user.password.split('.');
@@ -474,6 +483,69 @@ export class AuthService {
       valid: true,
       message: 'Reset token is valid',
       email: user.email,
+    };
+  }
+
+  async deactivateAccount(userId: number) {
+    const user = await this.usersService.findById(userId);
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    if (!user.isActive) {
+      throw new BadRequestException('Account is already deactivated');
+    }
+
+    await this.usersService.deactivateAccount(userId);
+    await this.tokenBlackListService.blacklistAllUserTokens(userId);
+
+    console.log(`Account deactivated for user ${user.email}`);
+
+    return {
+      message: 'Account deactivated successfully',
+    };
+  }
+
+  async reactivateAccountByEmail(email: string) {
+    const user = await this.usersService.findByUsernameOrEmail(null, email);
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    if (user.isActive) {
+      throw new BadRequestException('Account is already active');
+    }
+
+    await this.usersService.reactivateAccount(user.id);
+
+    console.log(`Account reactivated for user ${user.email}`);
+
+    return {
+      message: 'Account reactivated successfully',
+    };
+  }
+
+  async reactivateAccountByUserId(userId: number) {
+    const user = await this.usersService.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (user.isActive) {
+      return {
+        message: 'Account is already active',
+      };
+    }
+
+    await this.usersService.reactivateAccount(userId);
+
+    console.log(`✅ Account reactivated for user: ${user.email}`);
+
+    return {
+      message: 'Account reactivated successfully',
     };
   }
 }
