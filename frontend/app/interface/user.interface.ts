@@ -4,4 +4,6 @@ export interface User {
   email: string;
   password: string;
   isEmailVerified: boolean;
+  role: string;
+  isActive: boolean;
 }
