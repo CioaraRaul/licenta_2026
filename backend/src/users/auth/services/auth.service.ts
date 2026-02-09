@@ -30,6 +30,8 @@ const scrypt = promisify(_scrypt);
 
 @Injectable()
 export class AuthService {
+  private oauthCodes = new Map<string, any>();
+
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
@@ -571,5 +573,21 @@ export class AuthService {
     return {
       message: 'Account deleted successfully',
     };
+  }
+
+  async storeOAuthResult(result: any): Promise<string> {
+    const code = randomBytes(32).toString('hex');
+    this.oauthCodes.set(code, result);
+    setTimeout(() => this.oauthCodes.delete(code), 5 * 60 * 1000);
+    return code;
+  }
+
+  async getOAuthResult(code: string): Promise<any> {
+    const result = await this.oauthCodes.get(code);
+    if (!result) {
+      throw new BadRequestException('Invalid or expired code');
+    }
+    this.oauthCodes.delete(code);
+    return result;
   }
 }

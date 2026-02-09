@@ -10,6 +10,7 @@ import {
   Headers,
   BadRequestException,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { Request as ExpressRequest, Response } from 'express';
 import { CreateUserDto } from './dtos/create-user.dto';
@@ -61,10 +62,13 @@ export class AuthController {
   @UseGuards(GoogleAuthGuard)
   async googleAuthRedirect(@Request() req, @Res() res: Response) {
     const result = await this.authService.googleLogin(req);
+    const code = await this.authService.storeOAuthResult(result);
+    res.redirect(`http://localhost:5173/auth/callback?code=${code}`);
+  }
 
-    res.redirect(
-      `http://localhost:5173/auth/callback?accessToken=${result.accessToken}&refreshToken=${result.refreshToken}`,
-    );
+  @Get('oauth/exchange')
+  async exchangeOAuthCode(@Query('code') code: string) {
+    return await this.authService.getOAuthResult(code);
   }
 
   @Get('facebook')
@@ -75,9 +79,8 @@ export class AuthController {
   @UseGuards(FacebookAuthGuard)
   async facebookAuthRedirect(@Request() req, @Res() res: Response) {
     const result = await this.authService.facebookLogin(req);
-    res.redirect(
-      `http://localhost:5173/auth/callback?accessToken=${result.accessToken}&refreshToken=${result.refreshToken}`,
-    );
+    const code = await this.authService.storeOAuthResult(result);
+    res.redirect(`http://localhost:5173/auth/callback?code=${code}`);
   }
 
   @Post('forgot-password')

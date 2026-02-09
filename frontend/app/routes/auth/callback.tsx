@@ -1,31 +1,30 @@
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router";
+import { oauthExchange } from "~/api/auth.api";
+import { useAuthStore } from "~/store/auth.store";
 
 function AuthCallback() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { setTokens, setUsers } = useAuthStore.getState();
 
   useEffect(() => {
-    const handleAuth = async () => {
-      try {
-        const accessToken = searchParams.get("accessToken");
-        const refreshToken = searchParams.get("refreshToken");
+    const code = searchParams.get("code");
 
-        if (accessToken && refreshToken) {
-          localStorage.setItem("accessToken", accessToken);
-          localStorage.setItem("refreshToken", refreshToken);
+    if (!code) {
+      navigate("/auth/login", { replace: true });
+      return;
+    }
 
-          navigate("/home");
-        } else {
-          navigate("/auth/login");
-        }
-      } catch (error) {
-        console.error("Auth error:", error);
-        navigate("/auth/login");
-      }
-    };
-
-    handleAuth();
+    oauthExchange(code)
+      .then((data) => {
+        setTokens(data.accessToken, data.refreshToken);
+        setUsers(data.user);
+        navigate("/", { replace: true });
+      })
+      .catch(() => {
+        navigate("/auth/login", { replace: true });
+      });
   }, [searchParams, navigate]);
 
   return (

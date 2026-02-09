@@ -31,7 +31,7 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
     setTokens(data.accessToken, data.refreshToken);
     setUsers(data.user);
 
-    return redirect("/dashboard");
+    return redirect("/");
   } catch (error: any) {
     return {
       error: error.data?.message || "Login failed. Please try again.",

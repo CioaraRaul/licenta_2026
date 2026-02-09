@@ -50,3 +50,9 @@ export interface ChangePasswordPayload {
 export interface VerifyEmailPayload {
   token: string;
 }
+
+export interface OAuthExchangeResponse {
+  user: User;
+  accessToken: string;
+  refreshToken: string;
+}
