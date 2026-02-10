@@ -56,3 +56,12 @@ export interface OAuthExchangeResponse {
   accessToken: string;
   refreshToken: string;
 }
+
+export interface RegisterAccountPayload {
+  username: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  role: "buyer" | "seller" | "admin" | "guest";
+}

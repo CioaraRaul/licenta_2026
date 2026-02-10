@@ -2,6 +2,7 @@ import {
   type OAuthExchangeResponse,
   type AuthResponse,
   type LoginPayload,
+  type RegisterAccountPayload,
 } from "~/interface/auth.interface";
 import { httpClient } from "./http.api";
 
@@ -12,5 +13,14 @@ export async function login(loginPayload: LoginPayload) {
 export async function oauthExchange(code: string) {
   return await httpClient.get<OAuthExchangeResponse>(
     "/auth/oauth/exchange?code=" + code,
+  );
+}
+
+export async function registerAccount(
+  registerAccountPayload: RegisterAccountPayload,
+) {
+  return await httpClient.post<AuthResponse>(
+    "/auth/signup",
+    registerAccountPayload,
   );
 }
