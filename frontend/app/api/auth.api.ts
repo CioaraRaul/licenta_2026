@@ -16,6 +16,10 @@ export async function oauthExchange(code: string) {
   );
 }
 
+export async function forgotPassword(email: string) {
+  return await httpClient.post("/auth/forgot-password", { email });
+}
+
 export async function registerAccount(
   registerAccountPayload: RegisterAccountPayload,
 ) {
