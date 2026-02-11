@@ -65,3 +65,10 @@ export interface RegisterAccountPayload {
   password: string;
   role: "buyer" | "seller" | "admin" | "guest";
 }
+
+export type ResetPasswordProps = {
+  resetToken: string | null;
+  loaderError: string | null;
+  actionError?: string;
+  isSuccess?: boolean;
+};

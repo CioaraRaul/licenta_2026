@@ -144,6 +144,12 @@ export class AuthController {
     return this.authService.verifyResetToken(verifyResetTokenDto.token);
   }
 
+  @Get('reset/exchange')
+  async exchangeResetToken(@Query('code') code: string) {
+    const resetToken = await this.authService.exchangeResetCode(code);
+    return { resetToken };
+  }
+
   // @UseGuards(JwtAuthGuard)
   // @Post('2fa/enable')
   // async enable2FA(@Request() req) {}

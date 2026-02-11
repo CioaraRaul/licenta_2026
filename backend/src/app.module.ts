@@ -16,6 +16,10 @@ import { ConfigModule } from '@nestjs/config';
       database: 'database.sqlite',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
+      timeout: 5000,
+      prepareDatabase: (db) => {
+        db.pragma('journal_mode = WAL');
+      },
     }),
     UsersModule,
     AuthModule,

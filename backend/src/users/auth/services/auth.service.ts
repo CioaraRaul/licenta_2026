@@ -253,6 +253,22 @@ export class AuthService {
     };
   }
 
+  async storeResetCode(resetToken: string): Promise<string> {
+    const code = randomBytes(32).toString('hex');
+    this.oauthCodes.set(`reset_${code}`, resetToken);
+    setTimeout(() => this.oauthCodes.delete(`reset_${code}`), 5 * 60 * 1000);
+    return code;
+  }
+
+  async exchangeResetCode(code: string): Promise<string> {
+    const resetToken = this.oauthCodes.get(`reset_${code}`);
+    if (!resetToken) {
+      throw new BadRequestException('Invalid or expired code');
+    }
+    this.oauthCodes.delete(`reset_${code}`);
+    return resetToken;
+  }
+
   async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
     const { email } = forgotPasswordDto;
 
@@ -277,21 +293,19 @@ export class AuthService {
       resetTokenExpires,
     );
 
-    try {
-      await this.emailService.sendResetPasswordEmail(email, resetToken);
-    } catch (error) {
-      console.error('Failed to send reset email: ', error);
-      throw new BadRequestException('Failded to send reset email');
-    }
-
+    const code = await this.storeResetCode(resetToken);
     const frontendUrl = this.configService.get('FRONTEND_URL');
-    const resetUrl = `${frontendUrl}/auth/reset-password?token=${resetToken}`;
+    const resetUrl = `${frontendUrl}/auth/reset-password?code=${code}`;
+
+    try {
+      await this.emailService.sendResetPasswordEmail(email, code);
+    } catch (error) {
+      console.error('Error sending reset password email:', error);
+    }
 
     console.log('PASSWORD RESET REQUEST');
     console.log('Email:', email);
     console.log('Reset URL:', resetUrl);
-    console.log('Token:', resetToken);
-    console.log('Expires:', resetTokenExpires);
 
     return {
       message:
@@ -299,7 +313,7 @@ export class AuthService {
       ...(this.configService.get('NODE_ENV') === 'development' && {
         dev: {
           resetUrl,
-          resetToken,
+          code,
         },
       }),
     };

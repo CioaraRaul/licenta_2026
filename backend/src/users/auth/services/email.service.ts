@@ -18,9 +18,9 @@ export class EmailService {
     });
   }
 
-  async sendResetPasswordEmail(email: string, resetToken: string) {
+  async sendResetPasswordEmail(email: string, code: string) {
     const frontendUrl: string = this.configService.get('FRONTEND_URL');
-    const resetUrl: string = `${frontendUrl}/auth/reset-password?token=${resetToken}`;
+    const resetUrl: string = `${frontendUrl}/auth/reset-password?code=${code}`;
 
     const mailOptions = {
       from: this.configService.get('EMAIL_FROM'),
@@ -118,9 +118,6 @@ export class EmailService {
 
     try {
       await this.transporter.sendMail(mailOptions);
-      console.log(' Reset password email sent to:', email);
-      console.log('Reset URL:', resetUrl);
-      console.log(' Token:', resetToken);
     } catch (error) {
       console.error('Error sending email', error);
       throw error;
@@ -176,7 +173,7 @@ export class EmailService {
       console.log(' Verification email sent to:', email);
       console.log('Verification URL:', verificationUrl);
     } catch (error) {
-      console.error('❌ Error sending verification email:', error);
+      console.error('Error sending verification email:', error);
       throw new Error(
         `Failed to send verification email: ${error?.message || error}`,
       );

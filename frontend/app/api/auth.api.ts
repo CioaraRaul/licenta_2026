@@ -28,3 +28,16 @@ export async function registerAccount(
     registerAccountPayload,
   );
 }
+
+export async function resetPassword(resetToken: string, newPassword: string) {
+  return await httpClient.post("/auth/reset-password", {
+    resetToken,
+    newPassword,
+  });
+}
+
+export async function exchangeResetCode(code: string) {
+  return await httpClient.get<{ resetToken: string }>(
+    "/auth/reset/exchange?code=" + code,
+  );
+}
