@@ -150,6 +150,13 @@ export class AuthController {
     return { resetToken };
   }
 
+  @Get('verify/exchange')
+  async exchangeVerificationCode(@Query('code') code: string) {
+    const verificationToken =
+      await this.authService.exchangeEmailVerifcationCode(code);
+    return { verificationToken };
+  }
+
   // @UseGuards(JwtAuthGuard)
   // @Post('2fa/enable')
   // async enable2FA(@Request() req) {}

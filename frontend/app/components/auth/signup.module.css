@@ -867,3 +867,85 @@
   color: var(--silver);
   font-weight: 400;
 }
+.successIconWrap {
+  margin-bottom: 8px;
+}
+
+.successIconCircle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--success-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Verify instructions */
+.verifyInstructions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.verifyStep {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 10px;
+}
+
+.verifyStepIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--ember-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.verifyStepTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--pearl);
+  margin-bottom: 2px;
+}
+
+.verifyStepDesc {
+  font-size: 12.5px;
+  color: var(--silver);
+}
+
+/* Resend */
+.resendWrap {
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.resendText {
+  font-size: 13px;
+  color: var(--silver);
+  line-height: 1.5;
+}
+
+.resendLink {
+  background: none;
+  border: none;
+  color: var(--ember);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+  font-family: "DM Sans", sans-serif;
+  text-decoration: none;
+}
+
+.resendLink:hover {
+  text-decoration: underline;
+}

@@ -29,7 +29,7 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
       password,
       role: role as "buyer" | "seller" | "admin" | "guest",
     });
-    return { data };
+    return data;
   } catch (error) {
     return {
       error: "Failed to register account.",

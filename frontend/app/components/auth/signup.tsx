@@ -1,7 +1,7 @@
-// components/auth/register.tsx
-import { Form, Link, Links, useActionData, useNavigation } from "react-router";
+import { Form, Link, useActionData, useNavigation } from "react-router";
 import { useState, useEffect, useMemo } from "react";
 import s from "./signup.module.css";
+import { resendVerificationEmail } from "~/api/auth.api";
 
 export default function SignUpComponent() {
   const actionData = useActionData<any>();
@@ -11,6 +11,9 @@ export default function SignUpComponent() {
   const [mounted, setMounted] = useState(false);
   const [password, setPassword] = useState("");
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [resendStatus, setResendStatus] = useState<
+    "idle" | "sending" | "sent" | "error"
+  >("idle");
 
   useEffect(() => {
     setMounted(true);
@@ -48,6 +51,353 @@ export default function SignUpComponent() {
     return s.strengthTextStrong;
   };
 
+  // ===== SUCCESS — Check your email screen =====
+  if (actionData?.message && !actionData?.error) {
+    return (
+      <div className={s.register}>
+        {/* Empty hero panel for layout consistency */}
+        <div className={s.hero}>
+          <div className={s.grain} />
+          <div className={s.heroContent}>
+            <div className={cx(s.logoWrap, s.slide, s.d1)}>
+              <div className={s.logoIcon}>
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="white"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                </svg>
+              </div>
+              <span className={s.logoText}>AutoVault</span>
+            </div>
+          </div>
+          <div className={cx(s.heroContent, s.heroMiddle)}>
+            <div className={cx(s.accentBar, s.fade, s.d2)} />
+            <h1 className={cx(s.headline, s.rise, s.d3)}>
+              You're almost
+              <br />
+              <span className={s.headlineAccent}>there</span>.
+            </h1>
+            <p className={cx(s.heroDescription, s.rise, s.d4)}>
+              Just one more step to unlock the full AutoVault experience. Check
+              your inbox and verify your email.
+            </p>
+            <div className={cx(s.stepsList, s.rise, s.d5)}>
+              {[
+                {
+                  number: "✓",
+                  title: "Create your account",
+                  desc: "Account created successfully",
+                  state: "completed",
+                },
+                {
+                  number: "2",
+                  title: "Verify your email",
+                  desc: "Check your inbox",
+                  state: "active",
+                },
+                {
+                  number: "3",
+                  title: "Start exploring",
+                  desc: "Browse premium vehicles",
+                  state: "pending",
+                },
+              ].map((step, i) => (
+                <div
+                  key={i}
+                  className={
+                    step.state === "completed"
+                      ? s.stepCompleted
+                      : step.state === "active"
+                        ? s.stepActive
+                        : s.step
+                  }
+                >
+                  <div
+                    className={
+                      step.state === "completed"
+                        ? s.stepNumberCompleted
+                        : step.state === "active"
+                          ? s.stepNumberActive
+                          : s.stepNumber
+                    }
+                  >
+                    {step.number}
+                  </div>
+                  <div>
+                    <div className={s.stepTitle}>{step.title}</div>
+                    <div className={s.stepDesc}>{step.desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className={s.heroContent}>
+            <div className={cx(s.statsRow, s.rise, s.d7)}>
+              {[
+                { value: "15,200+", label: "Active listings" },
+                { value: "8,400", label: "Vehicles sold" },
+                { value: "4.9/5", label: "Buyer rating" },
+              ].map((stat, i) => (
+                <div key={i} className={s.statItem}>
+                  <div className={s.statValue}>{stat.value}</div>
+                  <div className={s.statLabel}>{stat.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Right panel — email verification message */}
+        <div className={s.formPanel}>
+          <div className={s.formInner}>
+            {/* Mobile logo */}
+            <div className={cx(s.mobileLogo, s.fade, s.d1)}>
+              <div className={s.logoIconSmall}>
+                <svg
+                  width="17"
+                  height="17"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="white"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                </svg>
+              </div>
+              <span className={s.logoTextSmall}>AutoVault</span>
+            </div>
+
+            {/* Email icon */}
+            <div className={cx(s.successIconWrap, s.rise, s.d2)}>
+              <div className={s.successIconCircle}>
+                <svg
+                  width="32"
+                  height="32"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="var(--success)"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <rect x="2" y="4" width="20" height="16" rx="2" />
+                  <path d="M22 7l-10 6L2 7" />
+                </svg>
+              </div>
+            </div>
+
+            {/* Heading */}
+            <div className={cx(s.headingWrap, s.rise, s.d3)}>
+              <h2 className={s.formHeading}>Check your email</h2>
+              <p className={s.formSubheading}>
+                We've sent a verification link to{" "}
+                {actionData.user?.email && (
+                  <strong style={{ color: "var(--white)" }}>
+                    {actionData.user.email}
+                  </strong>
+                )}
+              </p>
+            </div>
+
+            {/* Instructions */}
+            <div className={cx(s.verifyInstructions, s.rise, s.d4)}>
+              <div className={s.verifyStep}>
+                <div className={s.verifyStepIcon}>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="var(--ember)"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <rect x="2" y="4" width="20" height="16" rx="2" />
+                    <path d="M22 7l-10 6L2 7" />
+                  </svg>
+                </div>
+                <div>
+                  <div className={s.verifyStepTitle}>Open your email</div>
+                  <div className={s.verifyStepDesc}>
+                    Look for an email from AutoVault
+                  </div>
+                </div>
+              </div>
+              <div className={s.verifyStep}>
+                <div className={s.verifyStepIcon}>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="var(--ember)"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
+                    <polyline points="15 3 21 3 21 9" />
+                    <line x1="10" y1="14" x2="21" y2="3" />
+                  </svg>
+                </div>
+                <div>
+                  <div className={s.verifyStepTitle}>
+                    Click the verification link
+                  </div>
+                  <div className={s.verifyStepDesc}>
+                    This will activate your account
+                  </div>
+                </div>
+              </div>
+              <div className={s.verifyStep}>
+                <div className={s.verifyStepIcon}>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="var(--ember)"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+                    <polyline points="22 4 12 14.01 9 11.01" />
+                  </svg>
+                </div>
+                <div>
+                  <div className={s.verifyStepTitle}>Start exploring</div>
+                  <div className={s.verifyStepDesc}>
+                    Browse thousands of premium vehicles
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Resend info */}
+            {/* Resend info */}
+            <div className={cx(s.resendWrap, s.fade, s.d5)}>
+              {resendStatus === "sent" ? (
+                <div className={cx(s.alertSuccess, s.scale)}>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="var(--success)"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+                    <polyline points="22 4 12 14.01 9 11.01" />
+                  </svg>
+                  <span className={s.alertSuccessText}>
+                    Verification email resent! Check your inbox.
+                  </span>
+                </div>
+              ) : resendStatus === "error" ? (
+                <div className={cx(s.alertError, s.scale)}>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="var(--ember)"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="15" y1="9" x2="9" y2="15" />
+                    <line x1="9" y1="9" x2="15" y2="15" />
+                  </svg>
+                  <span className={s.alertErrorText}>
+                    Failed to resend. Please try again.
+                  </span>
+                </div>
+              ) : (
+                <p className={s.resendText}>
+                  Didn't receive the email? Check your spam folder or{" "}
+                  <button
+                    type="button"
+                    className={s.resendLink}
+                    disabled={resendStatus === "sending"}
+                    onClick={async () => {
+                      setResendStatus("sending");
+                      try {
+                        await resendVerificationEmail(
+                          actionData.user?.email || "",
+                        );
+                        setResendStatus("sent");
+                      } catch {
+                        setResendStatus("error");
+                      }
+                    }}
+                  >
+                    {resendStatus === "sending"
+                      ? "Sending…"
+                      : "resend verification email"}
+                  </button>
+                </p>
+              )}
+            </div>
+
+            {/* Divider */}
+            <div className={cx(s.divider, s.fade, s.d6)}>
+              <div className={s.dividerLine} />
+              <span className={s.dividerText}>or</span>
+              <div className={s.dividerLine} />
+            </div>
+
+            {/* Go to login */}
+            <a
+              href="/auth/login"
+              className={cx(s.btnPrimary, s.rise, s.d7)}
+              style={{
+                textDecoration: "none",
+                textAlign: "center",
+                display: "block",
+              }}
+            >
+              Go to Sign In
+            </a>
+
+            {/* Trust badge */}
+            <div className={cx(s.trustBadge, s.fade, s.d7)}>
+              <svg
+                width="13"
+                height="13"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="var(--silver)"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+              <span className={s.trustText}>
+                Protected with 256-bit SSL encryption
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ===== FORM =====
   return (
     <div className={s.register}>
       {/* ========== Left Hero Panel ========== */}
@@ -198,26 +548,6 @@ export default function SignUpComponent() {
                 <line x1="9" y1="9" x2="15" y2="15" />
               </svg>
               <span className={s.alertErrorText}>{actionData.error}</span>
-            </div>
-          )}
-
-          {/* Success alert */}
-          {actionData?.message && !actionData?.error && (
-            <div className={cx(s.alertSuccess, s.scale)}>
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="var(--success)"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
-                <polyline points="22 4 12 14.01 9 11.01" />
-              </svg>
-              <span className={s.alertSuccessText}>{actionData.message}</span>
             </div>
           )}
 
@@ -462,6 +792,7 @@ export default function SignUpComponent() {
               onClick={() => setAgreedToTerms(!agreedToTerms)}
             >
               <input
+                title="agreedTerms"
                 type="checkbox"
                 className={s.termsCheckbox}
                 checked={agreedToTerms}
@@ -476,7 +807,7 @@ export default function SignUpComponent() {
                   onClick={(e) => e.stopPropagation()}
                 >
                   Terms of Service
-                </Link>
+                </Link>{" "}
                 and{" "}
                 <Link
                   to="/auth/privacy-policy"
@@ -585,9 +916,9 @@ export default function SignUpComponent() {
           >
             <p className={s.signInText}>
               Already have an account?{" "}
-              <a href="/auth/login" className={s.signInLink}>
+              <Link to="/auth/login" className={s.signInLink}>
                 Sign In
-              </a>
+              </Link>
             </p>
           </div>
 

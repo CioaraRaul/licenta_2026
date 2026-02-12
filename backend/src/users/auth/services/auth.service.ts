@@ -11,7 +11,7 @@ import { CreateUserDto } from '../dtos/create-user.dto';
 import { LoginDTO } from '../dtos/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { UserRole } from '../../enum/user-role.enum';
-import { FacebookUser, GoogleUser } from '../types/general-user-types';
+import { GoogleUser } from '../types/general-user-types';
 import { OAuthService } from './oauth.service';
 import { ForgotPasswordDto } from '../dtos/forgot-password.dto';
 import { ConfigService } from '@nestjs/config';
@@ -23,7 +23,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { TokenBlackList } from '../entities/token-blacklist.entity';
 import { Repository } from 'typeorm';
 import { TokenBlacklistService } from './token-blacklist.service';
-import { isEmail } from 'class-validator';
 import { ChangePasswordDto } from '../dtos/change-password.dto';
 
 const scrypt = promisify(_scrypt);
@@ -42,6 +41,13 @@ export class AuthService {
     private tokenBlackListRepo: Repository<TokenBlackList>,
     private tokenBlackListService: TokenBlacklistService,
   ) {}
+
+  async storeEmailVerificationCode(verificationToken: string): Promise<string> {
+    const code = randomBytes(32).toString('hex');
+    this.oauthCodes.set(`verify_${code}`, verificationToken);
+    setTimeout(() => this.oauthCodes.delete(`verify_${code}`), 5 * 60 * 1000);
+    return code;
+  }
 
   async signUp(createUserDto: CreateUserDto) {
     const salt = randomBytes(8).toString('hex');
@@ -63,9 +69,11 @@ export class AuthService {
     );
 
     try {
+      const verificationCode =
+        await this.storeEmailVerificationCode(verificationToken);
       await this.emailService.sendVerificationEmail(
         user.email,
-        verificationToken,
+        verificationCode,
       );
     } catch (error) {
       console.error('FAiled to send verification email: ', error);
@@ -269,6 +277,13 @@ export class AuthService {
     return resetToken;
   }
 
+  async exchangeEmailVerifcationCode(code: string): Promise<string> {
+    const token = this.oauthCodes.get(`verify_${code}`);
+    if (!token) throw new BadRequestException('Invalid or expired code');
+    this.oauthCodes.delete(`verify_${code}`);
+    return token;
+  }
+
   async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
     const { email } = forgotPasswordDto;
 
@@ -373,7 +388,12 @@ export class AuthService {
     );
 
     try {
-      await this.emailService.sendVerificationEmail(email, verificationToken);
+      const verificationCode =
+        await this.storeEmailVerificationCode(verificationToken);
+      await this.emailService.sendVerificationEmail(
+        user.email,
+        verificationCode,
+      );
     } catch (error) {
       console.error('Failed to send verification email: ', error);
       throw new BadRequestException('Failed to send verification email');

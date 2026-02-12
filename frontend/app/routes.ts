@@ -9,6 +9,7 @@ export default [
     route("callback", "routes/auth/callback.tsx"),
     route("privacy-policy", "routes/auth/privacyPolicy.tsx"),
     route("terms", "routes/auth/terms.tsx"),
+    route("/auth/verify-email", "routes/auth/verifyEmail.tsx"),
   ]),
 
   route("", "routes/app-layout.tsx", [route("home", "routes/home.tsx")]),

@@ -41,3 +41,17 @@ export async function exchangeResetCode(code: string) {
     "/auth/reset/exchange?code=" + code,
   );
 }
+
+export async function resendVerificationEmail(email: string) {
+  return await httpClient.post("/auth/resend-verification", { email });
+}
+
+export async function verifyEmail(token: string) {
+  return await httpClient.post("/auth/verify-email", { token });
+}
+
+export async function exchangeVerificationCode(code: string) {
+  return await httpClient.get<{ verificationToken: string }>(
+    "/auth/verify/exchange?code=" + code,
+  );
+}
