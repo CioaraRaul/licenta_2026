@@ -24,6 +24,23 @@ export interface AuthResponse {
   refreshToken: string;
 }
 
+export interface AccountDeactivatedResponse {
+  accountDeactivated: boolean;
+  message: string;
+  email: string;
+}
+
+export interface EmailNotVerifiedResponse {
+  emailNotVerified: boolean;
+  message: string;
+  email: string;
+}
+
+export type LoginResponse =
+  | AuthResponse
+  | AccountDeactivatedResponse
+  | EmailNotVerifiedResponse;
+
 export interface SignupPayload {
   username: string;
   firstName: string;

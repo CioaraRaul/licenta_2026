@@ -729,3 +729,19 @@
   color: var(--silver);
   font-weight: 400;
 }
+.resendLink {
+  background: none;
+  border: none;
+  color: var(--ember);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 4px;
+  font-family: "DM Sans", sans-serif;
+  display: block;
+}
+
+.resendLink:hover {
+  text-decoration: underline;
+}

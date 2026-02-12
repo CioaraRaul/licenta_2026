@@ -143,6 +143,14 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    if (!user.isEmailVerified) {
+      return {
+        emailNotVerified: true,
+        message: 'Please verify your email before signing in.',
+        email: user.email,
+      };
+    }
+
     const tokens = await this.getTokens(user.id, user.username);
 
     return {

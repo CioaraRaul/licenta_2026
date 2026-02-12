@@ -2,6 +2,7 @@
 import { Form, Link, useActionData, useNavigation } from "react-router";
 import { useState, useEffect } from "react";
 import s from "./login.module.css";
+import { resendVerificationEmail } from "~/api/auth.api";
 
 export default function LoginComponent() {
   const actionData = useActionData<any>();
@@ -223,6 +224,41 @@ export default function LoginComponent() {
               <a href="/auth/reactivate" className={s.alertWarningLink}>
                 Reactivate account →
               </a>
+            </div>
+          )}
+
+          {actionData?.emailNotVerified && (
+            <div className={cx(s.alertError, s.scale)}>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="var(--ember)"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <rect x="2" y="4" width="20" height="16" rx="2" />
+                <path d="M22 7l-10 6L2 7" />
+              </svg>
+              <div>
+                <span className={s.alertErrorText}>{actionData.message}</span>
+                <button
+                  type="button"
+                  className={s.resendLink}
+                  onClick={async () => {
+                    try {
+                      await resendVerificationEmail(actionData.email);
+                      alert("Verification email sent! Check your inbox.");
+                    } catch {
+                      alert("Failed to resend. Please try again.");
+                    }
+                  }}
+                >
+                  Resend verification email
+                </button>
+              </div>
             </div>
           )}
 

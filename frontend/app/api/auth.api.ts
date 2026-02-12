@@ -3,11 +3,12 @@ import {
   type AuthResponse,
   type LoginPayload,
   type RegisterAccountPayload,
+  type LoginResponse,
 } from "~/interface/auth.interface";
 import { httpClient } from "./http.api";
 
 export async function login(loginPayload: LoginPayload) {
-  return await httpClient.post<AuthResponse>("/auth/signin", loginPayload);
+  return await httpClient.post<LoginResponse>("/auth/signin", loginPayload);
 }
 
 export async function oauthExchange(code: string) {

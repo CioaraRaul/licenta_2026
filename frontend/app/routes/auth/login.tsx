@@ -27,6 +27,14 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
       };
     }
 
+    if ("emailNotVerified" in data) {
+      return {
+        emailNotVerified: true,
+        message: data.message,
+        email: data.email,
+      };
+    }
+
     const { setTokens, setUsers } = useAuthStore.getState();
     setTokens(data.accessToken, data.refreshToken);
     setUsers(data.user);
