@@ -1,0 +1,125 @@
+### Signup
+### Create new user
+POST http://localhost:3000/auth/signup
+Content-Type: application/json
+
+{
+  "username": "buyer_john",
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john@buyer.com",
+  "password": "parola123",
+  "role": "buyer"
+}
+
+
+### Create Seller
+POST http://localhost:3000/auth/signup
+Content-Type: application/json
+
+{
+   "username": "seller_mike",
+     "firstName": "Mike",
+     "lastName": "Auto",
+     "email": "mike@seller.com",
+     "password": "parola123",
+     "role": "seller"
+}
+
+### Signin with email
+POST http://localhost:3000/auth/signin
+Content-Type: application/json
+
+{
+  "email": "mike@seller.com",
+  "password": "parola123"
+}
+
+
+### forgot password
+
+POST http://localhost:3000/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "john@buyer.com"
+}
+
+### reset password 
+POST http://localhost:3000/auth/reset-password
+Content-Type: application/json
+
+{
+  "resetToken": "bc9f7d360ac1a7050fbb9ddbaabaef458d2036539db07048156245fc59617fbc",
+  "newPassword": "new_password_123"
+}
+
+### verify email
+POST http://localhost:3000/auth/verify-email
+Content-Type: application/json
+
+{
+  "token": "71f5bc4900cd6ab33ac8d662b08f61d9ce4247006548099b886d3372ae317b80"
+}
+
+### resend verification email 
+POST http://localhost:3000/auth/resend-verification
+Content-Type: application/json
+
+{
+  "email": "mike@seller.com"
+}
+
+
+### Logout
+POST http://localhost:3000/auth/logout
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiYnV5ZXJfam9obiIsImlhdCI6MTc3MDUwMDM3NywiZXhwIjoxNzcwNTAxMjc3fQ.78_qYAMG8kxlaSmUNQFUC25G2wo6bH-QazK6mtn6lfM
+
+
+### change password
+POST http://localhost:3000/auth/change-password
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiYnV5ZXJfam9obiIsImlhdCI6MTc3MDUwMDUwOCwiZXhwIjoxNzcwNTAxNDA4fQ.29DM0mt0WVaDHOSoijdckHOCWPmw6nHGY7821C4m0xw
+Content-Type: application/json
+
+{
+  "currentPassword": "parola123",
+  "newPassword": "new_password_456"
+}
+ 
+### revoke sessions
+POST http://localhost:3000/auth/revoke-sessions
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiYnV5ZXJfam9obiIsImlhdCI6MTc3MDUwMTIwMSwiZXhwIjoxNzcwNTAyMTAxfQ.z7i5TAV6Ludler2jgi28oZlniww6HMaSGauDqWxTDFQ
+
+### get current user
+GET http://localhost:3000/auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiYnV5ZXJfam9obiIsImlhdCI6MTc3MDUwODE4MSwiZXhwIjoxNzcwNTA5MDgxfQ.V5xgHci3bhmAPf1W9Z0e4aQh7ehrKx_AM1NxIMN9J24
+
+### Verify invalid token
+POST http://localhost:3000/auth/verify-reset-token
+Content-Type: application/json
+
+{
+  "token": "2f28a36a31878398ab691b02adfa9eae3d078d397749d3a5c67cd7802961c74d"
+}
+
+
+### deactivate account
+PATCH http://localhost:3000/auth/account/deactivate
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiYnV5ZXJfam9obiIsImlhdCI6MTc3MDUxMTk2MSwiZXhwIjoxNzcwNTEyODYxfQ.rJlhTj16_370OS1CE2uIxS5cEe8oU5Pf526l_jeVoHo
+
+### reactivate account
+POST http://localhost:3000/auth/account/reactivate
+Content-Type: application/json
+
+{
+  "email": "john@buyer.com"
+}
+
+### delete account
+DELETE http://localhost:3000/auth/account/delete
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiYnV5ZXJfam9obiIsImlhdCI6MTc3MDU1NDc1MywiZXhwIjoxNzcwNTU1NjUzfQ._APhMoTc4INkVoX8-K_zU9jk-3oUYPzcejonzRuqnQU
+Content-Type: application/json
+
+{
+  "password": "new_password_456"
+}
