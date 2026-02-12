@@ -1,5 +1,18 @@
 import React from "react";
-import { Outlet } from "react-router";
+import { Outlet, redirect } from "react-router";
+import { useAuthStore } from "~/store/auth.store";
+import { waitForAuthRehydration } from "~/utils/auth.guard";
+
+export async function clientLoader() {
+  await waitForAuthRehydration();
+  const { isTokenValid, logout } = useAuthStore.getState();
+
+  if (!isTokenValid()) {
+    logout();
+    throw redirect("/auth/login");
+  }
+  return null;
+}
 
 function AppLayout() {
   return (
