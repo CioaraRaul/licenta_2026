@@ -1,11 +1,35 @@
 import { Injectable } from '@nestjs/common';
 import { CreateVehicleDto } from './dto/create-vehicle.dto';
 import { UpdateVehicleDto } from './dto/update-vehicle.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Vehicle } from './entities/vehicle.entity';
+import { Repository } from 'typeorm';
+import { VehicleStatus } from './enums/vehicle-status.enum';
 
 @Injectable()
 export class VehiclesService {
-  create(createVehicleDto: CreateVehicleDto) {
-    return 'This action adds a new vehicle';
+  constructor(
+    @InjectRepository(Vehicle)
+    private vehicleRepo: Repository<Vehicle>,
+  ) {}
+
+  async create(
+    createVehicleDto: CreateVehicleDto,
+    sellerId: number,
+  ): Promise<Vehicle> {
+    const vehicle = this.vehicleRepo.create({
+      ...createVehicleDto,
+      sellerId,
+      status: VehicleStatus.AVAILABLE,
+      isActive: true,
+    });
+
+    const savedVehicle = await this.vehicleRepo.save(vehicle);
+    console.log(
+      `Vehicle created: ${savedVehicle.make} ${savedVehicle.model} by seller ${sellerId}`,
+    );
+
+    return savedVehicle;
   }
 
   findAll() {
