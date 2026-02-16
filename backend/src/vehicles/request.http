@@ -1,0 +1,24 @@
+POST http://localhost:3000/vehicles
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIyLCJ1c2VybmFtZSI6InoiLCJpYXQiOjE3NzEyNTkwNjcsImV4cCI6MTc3MTI1OTk2N30.y1dUsOQ0pO_0fUQMABqujDWpdgcs_8ktr4dXPAZTe5s
+Content-Type: application/json
+
+{
+  "make": "BMW",
+  "model": "M5",
+  "year": 2023,
+  "type": "sports_car",
+  "condition": "new",
+  "price": 95000,
+  "mileage": 100,
+  "city": "Timișoara",
+  "country": "Romania",
+  "engineSize": 4.4,
+  "fuelType": "gasoline",
+  "transmission": "automatic",
+  "driveType": "awd",
+  "exteriorColor": "Black",
+  "vin": "WBA5A5C51GD123456",
+  "description": "Brand new BMW M5 Competition with full options",
+  "images": ["https://example.com/image1.jpg"],
+  "features": ["Sunroof", "Leather Seats", "Navigation"]
+}

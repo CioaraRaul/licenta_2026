@@ -160,7 +160,7 @@ export class CreateVehicleDto {
   // DESCRIPTION & MEDIA
   @IsNotEmpty()
   @IsString()
-  @Length(50, 5000)
+  @Length(10, 5000)
   description: string;
 
   @IsNotEmpty()
