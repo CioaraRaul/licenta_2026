@@ -11,7 +11,6 @@ import { Repository } from 'typeorm';
 import { VehicleStatus } from './enums/vehicle-status.enum';
 import { FilterVehicleDto } from './dto/filter-vehicle.dto';
 import { UpdateVehicleDto } from './dto/update-vehicle.dto';
-import { waitForDebugger } from 'inspector';
 
 @Injectable()
 export class VehiclesService {
