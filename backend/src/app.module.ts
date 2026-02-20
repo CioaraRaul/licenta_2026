@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './users/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { VehiclesModule } from './vehicles/vehicles.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { VehiclesModule } from './vehicles/vehicles.module';
     UsersModule,
     AuthModule,
     VehiclesModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],

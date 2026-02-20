@@ -196,13 +196,13 @@ Content-Type: application/json
 
 ### 23. Get my listings
 GET {{baseUrl}}/vehicles/my/listings
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIyLCJ1c2VybmFtZSI6InoiLCJpYXQiOjE3NzEzMjA4MTUsImV4cCI6MTc3MTMyMTcxNX0.E9eaP1eqWcs-zQ3uquK0-qMPSQ7zd1WkDHroPfzrulU
+Authorization: Bearer {{token}}
 
 ###
 
 ### 24. Get my listings with pagination
 GET {{baseUrl}}/vehicles/my/listings?page=1&limit=5
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIyLCJ1c2VybmFtZSI6InoiLCJpYXQiOjE3NzEzMjA4MTUsImV4cCI6MTc3MTMyMTcxNX0.E9eaP1eqWcs-zQ3uquK0-qMPSQ7zd1WkDHroPfzrulU
+Authorization: Bearer {{token}}
 
 ###
 
