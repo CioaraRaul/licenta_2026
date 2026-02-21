@@ -7,6 +7,7 @@ import { AuthModule } from './users/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { VehiclesModule } from './vehicles/vehicles.module';
 import { UploadModule } from './upload/upload.module';
+import { SavedVehiclesModule } from './saved-vehicles/saved-vehicles.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { UploadModule } from './upload/upload.module';
     AuthModule,
     VehiclesModule,
     UploadModule,
+    SavedVehiclesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
