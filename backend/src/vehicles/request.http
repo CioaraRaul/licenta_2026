@@ -1,5 +1,5 @@
 @baseUrl = http://localhost:3000
-@token = PASTE_YOUR_TOKEN_HERE
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIyLCJ1c2VybmFtZSI6InoiLCJpYXQiOjE3NzE4NzM0ODEsImV4cCI6MTc3MTg3NDM4MX0.mieySPscmpsmfni-MpC-RWkd3he0yqxtGqlGDHPWKi4
 
 # =============================================
 # VEHICLES API - Test Requests

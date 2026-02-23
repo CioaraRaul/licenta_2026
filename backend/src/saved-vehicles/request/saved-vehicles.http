@@ -1,5 +1,5 @@
 @baseUrl = http://localhost:3000
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIyLCJ1c2VybmFtZSI6InoiLCJpYXQiOjE3NzE2Nzc3MDUsImV4cCI6MTc3MTY3ODYwNX0.dGp3A5PQm-4-ji_D1m14UtW-yC6ILLP5e83HuI0ri00
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIyLCJ1c2VybmFtZSI6InoiLCJpYXQiOjE3NzE4NzM0ODEsImV4cCI6MTc3MTg3NDM4MX0.mieySPscmpsmfni-MpC-RWkd3he0yqxtGqlGDHPWKi4
 
 ### ============ SAVED VEHICLES ============
 

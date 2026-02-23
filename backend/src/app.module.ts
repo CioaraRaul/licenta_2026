@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { VehiclesModule } from './vehicles/vehicles.module';
 import { UploadModule } from './upload/upload.module';
 import { SavedVehiclesModule } from './saved-vehicles/saved-vehicles.module';
+import { BidsModule } from './bids/bids.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { SavedVehiclesModule } from './saved-vehicles/saved-vehicles.module';
     VehiclesModule,
     UploadModule,
     SavedVehiclesModule,
+    BidsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
