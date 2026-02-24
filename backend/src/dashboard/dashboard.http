@@ -1,0 +1,25 @@
+@baseUrl = http://localhost:3000
+@token = PASTE_YOUR_TOKEN_HERE
+
+### 1. Get stats (auto by role)
+GET {{baseUrl}}/dashboard/stats
+Authorization: Bearer {{token}}
+
+###
+
+### 2. Get seller stats explicit
+GET {{baseUrl}}/dashboard/stats/seller
+Authorization: Bearer {{token}}
+
+###
+
+### 3. Get buyer stats explicit
+GET {{baseUrl}}/dashboard/stats/buyer
+Authorization: Bearer {{token}}
+
+###
+
+### 4. Fara token (401)
+GET {{baseUrl}}/dashboard/stats
+
+###

@@ -11,6 +11,7 @@ import { SavedVehiclesModule } from './saved-vehicles/saved-vehicles.module';
 import { BidsModule } from './bids/bids.module';
 import { MessagesModule } from './messages/messages.module';
 import { WalletModule } from './wallet/wallet.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { WalletModule } from './wallet/wallet.module';
     BidsModule,
     MessagesModule,
     WalletModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService],
