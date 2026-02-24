@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import { exchangeVerificationCode, verifyEmail } from "~/api/auth.api";
 
-function VerifyEmailComponent({ code }: { code: string }) {
+function VerifyEmailComponent({ code }: { code: string | null }) {
   const [status, setStatus] = useState<"loading" | "success" | "error">(
     "loading",
   );
@@ -12,10 +12,11 @@ function VerifyEmailComponent({ code }: { code: string }) {
   useEffect(() => {
     if (!code || calledRef.current) return;
     calledRef.current = true;
+    const verifiedCode = code; // narrowed to string
 
     async function doVerify() {
       try {
-        const { verificationToken } = await exchangeVerificationCode(code);
+        const { verificationToken } = await exchangeVerificationCode(verifiedCode);
         await verifyEmail(verificationToken);
         setStatus("success");
       } catch (error: any) {
