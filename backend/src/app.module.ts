@@ -9,6 +9,7 @@ import { VehiclesModule } from './vehicles/vehicles.module';
 import { UploadModule } from './upload/upload.module';
 import { SavedVehiclesModule } from './saved-vehicles/saved-vehicles.module';
 import { BidsModule } from './bids/bids.module';
+import { MessagesModule } from './messages/messages.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { BidsModule } from './bids/bids.module';
     UploadModule,
     SavedVehiclesModule,
     BidsModule,
+    MessagesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
