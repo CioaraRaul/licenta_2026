@@ -17,7 +17,7 @@ export async function clientLoader({ request }: Route.ClientLoaderArgs) {
   const isPublicPath = publicPaths.some((p) => url.pathname.startsWith(p));
 
   if (isTokenValid() && !isPublicPath) {
-    throw redirect("/home");
+    throw redirect("/");
   }
 
   return null;

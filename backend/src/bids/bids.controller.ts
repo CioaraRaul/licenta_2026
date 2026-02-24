@@ -1,0 +1,77 @@
+import {
+  Body,
+  Controller,
+  DefaultValuePipe,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
+import { BidsService } from './bids.service';
+import { JwtAuthGuard } from 'src/users/auth/guards/jwt-auth.guard';
+
+@Controller('bids')
+export class BidsController {
+  constructor(private readonly bidsService: BidsService) {}
+
+  @Post(':vehicleId')
+  @UseGuards(JwtAuthGuard)
+  placeBid(
+    @Request() req,
+    @Param('vehicleId', ParseIntPipe) vehicleId: number,
+    @Body('amount') amount: number,
+    @Body('message') message?: string,
+  ) {
+    return this.bidsService.placeBid(
+      req.user.userId,
+      vehicleId,
+      amount,
+      message,
+    );
+  }
+
+  @Get('my')
+  @UseGuards(JwtAuthGuard)
+  getMyBids(
+    @Request() req,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number,
+  ) {
+    return this.bidsService.getMyBids(req.user.userId, page, limit);
+  }
+
+  @Get('vehicle/:vehicleId')
+  @UseGuards(JwtAuthGuard)
+  getVehicleBids(
+    @Request() req,
+    @Param('vehicleId', ParseIntPipe) vehicleId: number,
+  ) {
+    return this.bidsService.getVehicleBids(req.user.userId, vehicleId);
+  }
+
+  @Patch(':bidId/accept')
+  @UseGuards(JwtAuthGuard)
+  acceptBid(@Request() req, @Param('bidId', ParseIntPipe) bidId: number) {
+    return this.bidsService.acceptBid(req.user.userId, bidId);
+  }
+
+  @Patch(':bidId/reject')
+  @UseGuards(JwtAuthGuard)
+  rejectBid(
+    @Request() req,
+    @Param('bidId', ParseIntPipe) bidId: number,
+    @Body('reason') reason?: string,
+  ) {
+    return this.bidsService.rejectBid(req.user.userId, bidId, reason);
+  }
+
+  @Patch(':bidId/withdraw')
+  @UseGuards(JwtAuthGuard)
+  withdrawBid(@Request() req, @Param('bidId', ParseIntPipe) bidId: number) {
+    return this.bidsService.withdrawBid(req.user.userId, bidId);
+  }
+}

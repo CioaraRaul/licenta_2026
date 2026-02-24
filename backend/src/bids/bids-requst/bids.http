@@ -1,0 +1,118 @@
+@baseUrl = http://localhost:3000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIyLCJ1c2VybmFtZSI6InoiLCJpYXQiOjE3NzE4NzM0ODEsImV4cCI6MTc3MTg3NDM4MX0.mieySPscmpsmfni-MpC-RWkd3he0yqxtGqlGDHPWKi4
+
+### ============ BUYER ENDPOINTS ============
+
+### 1. Place a bid on a vehicle
+POST {{baseUrl}}/bids/2
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "amount": 45000,
+  "message": "I'm very interested in this vehicle, can we negotiate?"
+}
+
+###
+
+### 2. Place a bid fără mesaj
+POST {{baseUrl}}/bids/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "amount": 50000
+}
+
+###
+
+### 3. Get my bids
+GET {{baseUrl}}/bids/my
+Authorization: Bearer {{token}}
+
+###
+
+### 4. Get my bids cu paginare
+GET {{baseUrl}}/bids/my?page=1&limit=10
+Authorization: Bearer {{token}}
+
+###
+
+### 5. Withdraw bid (retrage oferta)
+PATCH {{baseUrl}}/bids/1/withdraw
+Authorization: Bearer {{token}}
+
+###
+
+
+### ============ SELLER ENDPOINTS ============
+
+### 6. Get all bids on my vehicle
+GET {{baseUrl}}/bids/vehicle/1
+Authorization: Bearer {{token}}
+
+###
+
+### 7. Accept a bid
+PATCH {{baseUrl}}/bids/1/accept
+Authorization: Bearer {{token}}
+
+###
+
+### 8. Reject a bid
+PATCH {{baseUrl}}/bids/1/reject
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "reason": "Sorry, I found a buyer locally"
+}
+
+###
+
+### 9. Reject fără motiv
+PATCH {{baseUrl}}/bids/1/reject
+Authorization: Bearer {{token}}
+
+###
+
+
+### ============ ERROR CASES ============
+
+### 10. Bid pe vehicul inexistent (404)
+POST {{baseUrl}}/bids/99999
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "amount": 10000
+}
+
+###
+
+### 11. Bid pe propriul vehicul (400)
+POST {{baseUrl}}/bids/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "amount": 10000
+}
+
+###
+
+### 12. Bid cu suma negativa (400)
+POST {{baseUrl}}/bids/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "amount": -500
+}
+
+###
+
+### 13. Fara token (401)
+GET {{baseUrl}}/bids/my
+
+###

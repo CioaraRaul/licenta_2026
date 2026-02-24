@@ -1,0 +1,294 @@
+@baseUrl = http://localhost:3000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIyLCJ1c2VybmFtZSI6InoiLCJpYXQiOjE3NzE4NzM0ODEsImV4cCI6MTc3MTg3NDM4MX0.mieySPscmpsmfni-MpC-RWkd3he0yqxtGqlGDHPWKi4
+
+# =============================================
+# VEHICLES API - Test Requests
+# =============================================
+
+
+### ============ PUBLIC ENDPOINTS ============
+
+### 1. Get all vehicles (no filters)
+GET {{baseUrl}}/vehicles
+
+###
+
+### 2. Search by keyword
+GET {{baseUrl}}/vehicles?search=BMW
+
+###
+
+### 3. Filter by make + model
+GET {{baseUrl}}/vehicles?make=BMW&model=M5
+
+###
+
+### 4. Filter by price range
+GET {{baseUrl}}/vehicles?priceFrom=10000&priceTo=50000
+
+###
+
+### 5. Filter by year range
+GET {{baseUrl}}/vehicles?yearFrom=2020&yearTo=2024
+
+###
+
+### 6. Filter by condition
+GET {{baseUrl}}/vehicles?condition=new
+
+###
+
+### 7. Filter by fuel type
+GET {{baseUrl}}/vehicles?fuelType=electric
+
+###
+
+### 8. Filter by transmission
+GET {{baseUrl}}/vehicles?transmission=automatic
+
+###
+
+### 9. Filter by type
+GET {{baseUrl}}/vehicles?type=suv
+
+###
+
+### 10. Filter by location
+GET {{baseUrl}}/vehicles?city=Timisoara&country=Romania
+
+###
+
+### 11. Filter by mileage
+GET {{baseUrl}}/vehicles?mileageFrom=0&mileageTo=50000
+
+###
+
+### 12. Combined filters (realistic search)
+GET {{baseUrl}}/vehicles?make=BMW&yearFrom=2020&priceFrom=30000&priceTo=80000&transmission=automatic&condition=used
+
+###
+
+### 13. Pagination
+GET {{baseUrl}}/vehicles?page=1&limit=10
+
+###
+
+### 14. Sorting by price ASC
+GET {{baseUrl}}/vehicles?sortBy=price&sortOrder=ASC
+
+###
+
+### 15. Sorting by year DESC
+GET {{baseUrl}}/vehicles?sortBy=year&sortOrder=DESC
+
+###
+
+### 16. Get featured vehicles
+GET {{baseUrl}}/vehicles/featured
+
+###
+
+### 17. Get featured vehicles (custom limit)
+GET {{baseUrl}}/vehicles/featured?limit=5
+
+###
+
+### 18. Get single vehicle by ID
+GET {{baseUrl}}/vehicles/1
+
+###
+
+### 19. Get similar vehicles
+GET {{baseUrl}}/vehicles/1/similar
+
+###
+
+### 20. Get similar vehicles (custom limit)
+GET {{baseUrl}}/vehicles/1/similar?limit=3
+
+###
+
+
+### ============ PROTECTED ENDPOINTS ============
+
+### 21. Create vehicle listing
+POST {{baseUrl}}/vehicles
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "make": "BMW",
+  "model": "M5",
+  "year": 2023,
+  "type": "sports_car",
+  "condition": "new",
+  "trim": "Competition",
+  "price": 95000,
+  "originalPrice": 100000,
+  "negotiable": true,
+  "mileage": 100,
+  "city": "Timisoara",
+  "country": "Romania",
+  "zipCode": "300001",
+  "engineSize": 4.4,
+  "engineType": "V8",
+  "horsepower": 600,
+  "torque": 750,
+  "fuelType": "gasoline",
+  "transmission": "automatic",
+  "driveType": "awd",
+  "exteriorColor": "Black",
+  "interiorColor": "Red",
+  "doors": 4,
+  "seats": 5,
+  "vin": "WBA5A5C51GD123456",
+  "licensePlate": "TM 01 ABC",
+  "description": "Brand new BMW M5 Competition with full options package. Never been driven on track. Full dealership warranty included.",
+  "images": ["https://example.com/bmw-m5-1.jpg", "https://example.com/bmw-m5-2.jpg"],
+  "videoUrl": "https://example.com/bmw-m5-video.mp4",
+  "previousOwners": 1,
+  "accidentHistory": false,
+  "serviceHistory": "Full dealership service history available",
+  "warrantyAvailable": true,
+  "features": ["Sunroof", "Leather Seats", "Navigation", "Bluetooth", "360 Camera", "Heads Up Display"],
+  "safetyFeatures": ["ABS", "8 Airbags", "Lane Assist", "Blind Spot Monitor", "Emergency Braking"]
+}
+
+###
+
+### 22. Create another vehicle (Toyota)
+POST {{baseUrl}}/vehicles
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "make": "Toyota",
+  "model": "Camry",
+  "year": 2022,
+  "type": "car",
+  "condition": "used",
+  "price": 25000,
+  "negotiable": true,
+  "mileage": 35000,
+  "city": "Bucuresti",
+  "country": "Romania",
+  "engineSize": 2.5,
+  "engineType": "Inline-4",
+  "horsepower": 203,
+  "fuelType": "hybrid",
+  "transmission": "automatic",
+  "driveType": "fwd",
+  "exteriorColor": "White",
+  "interiorColor": "Black",
+  "doors": 4,
+  "seats": 5,
+  "vin": "4T1BF1FK5CU123456",
+  "description": "Well maintained Toyota Camry Hybrid. Excellent fuel economy. One owner. No accidents.",
+  "images": ["https://example.com/camry-1.jpg"],
+  "previousOwners": 1,
+  "accidentHistory": false,
+  "warrantyAvailable": false,
+  "features": ["Bluetooth", "Backup Camera", "Cruise Control"],
+  "safetyFeatures": ["ABS", "6 Airbags", "Stability Control"]
+}
+
+###
+
+### 23. Get my listings
+GET {{baseUrl}}/vehicles/my/listings
+Authorization: Bearer {{token}}
+
+###
+
+### 24. Get my listings with pagination
+GET {{baseUrl}}/vehicles/my/listings?page=1&limit=5
+Authorization: Bearer {{token}}
+
+###
+
+### 25. Update vehicle listing
+PATCH {{baseUrl}}/vehicles/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "price": 90000,
+  "negotiable": true,
+  "description": "Price reduced! Brand new BMW M5 Competition. Full warranty included."
+}
+
+###
+
+### 26. Update vehicle images
+PATCH {{baseUrl}}/vehicles/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "images": [
+    "https://example.com/new-image-1.jpg",
+    "https://example.com/new-image-2.jpg",
+    "https://example.com/new-image-3.jpg"
+  ]
+}
+
+###
+
+### 27. Deactivate listing (hide from search)
+PATCH {{baseUrl}}/vehicles/1/deactivate
+Authorization: Bearer {{token}}
+
+###
+
+### 28. Reactivate listing
+PATCH {{baseUrl}}/vehicles/1/reactivate
+Authorization: Bearer {{token}}
+
+###
+
+### 29. Mark vehicle as SOLD
+PATCH {{baseUrl}}/vehicles/1/sold
+Authorization: Bearer {{token}}
+
+###
+
+### 30. Delete listing permanently
+DELETE {{baseUrl}}/vehicles/1
+Authorization: Bearer {{token}}
+
+###
+
+
+### ============ ERROR CASES ============
+
+### 31. Try to get non-existent vehicle (404)
+GET {{baseUrl}}/vehicles/99999
+
+###
+
+### 32. Try to create without auth (401)
+POST {{baseUrl}}/vehicles
+Content-Type: application/json
+
+{
+  "make": "BMW",
+  "model": "M5"
+}
+
+###
+
+### 33. Try to update someone else's vehicle (403)
+PATCH {{baseUrl}}/vehicles/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "price": 1
+}
+
+###
+
+### 34. Try to delete without auth (401)
+DELETE {{baseUrl}}/vehicles/1
+
+###
