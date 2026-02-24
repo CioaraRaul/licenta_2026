@@ -1,0 +1,53 @@
+@baseUrl = http://localhost:3000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIyLCJ1c2VybmFtZSI6InoiLCJpYXQiOjE3NzE4NzM0ODEsImV4cCI6MTc3MTg3NDM4MX0.mieySPscmpsmfni-MpC-RWkd3he0yqxtGqlGDHPWKi4
+
+### ============ SAVED VEHICLES ============
+
+### 1. Save a vehicle
+POST {{baseUrl}}/saved-vehicles/1
+Authorization: Bearer {{token}}
+
+###
+
+### 2. Unsave a vehicle
+DELETE {{baseUrl}}/saved-vehicles/1
+Authorization: Bearer {{token}}
+
+###
+
+### 3. Get my saved vehicles
+GET {{baseUrl}}/saved-vehicles
+Authorization: Bearer {{token}}
+
+###
+
+### 4. Get my saved vehicles (cu paginare)
+GET {{baseUrl}}/saved-vehicles?page=1&limit=10
+Authorization: Bearer {{token}}
+
+###
+
+### 5. Check if vehicle is saved
+GET {{baseUrl}}/saved-vehicles/check/1
+Authorization: Bearer {{token}}
+
+###
+
+### ============ ERROR CASES ============
+
+### 6. Save vehicle inexistent (404)
+GET {{baseUrl}}/saved-vehicles/99999
+Authorization: Bearer {{token}}
+
+###
+
+### 7. Save acelasi vehicle de 2 ori (409 Conflict)
+POST {{baseUrl}}/saved-vehicles/1
+Authorization: Bearer {{token}}
+
+###
+
+### 8. Fara token (401)
+GET {{baseUrl}}/saved-vehicles
+
+###

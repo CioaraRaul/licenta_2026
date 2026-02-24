@@ -1,0 +1,71 @@
+@baseUrl = http://localhost:3000
+@token = PASTE_YOUR_TOKEN_HERE
+
+### 1. Trimite primul mesaj (creează conversația automat)
+POST {{baseUrl}}/messages/vehicle/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "content": "Hello, I'm interested in this vehicle. Is it still available?"
+}
+
+###
+
+### 2. Reply într-o conversație existentă
+POST {{baseUrl}}/messages/1/reply
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "content": "Yes, the vehicle is still available! When can you come see it?"
+}
+
+###
+
+### 3. Get toate conversațiile mele
+GET {{baseUrl}}/messages
+Authorization: Bearer {{token}}
+
+###
+
+### 4. Get mesajele dintr-o conversație
+GET {{baseUrl}}/messages/1
+Authorization: Bearer {{token}}
+
+###
+
+### 5. Get mesaje cu paginare
+GET {{baseUrl}}/messages/1?page=1&limit=20
+Authorization: Bearer {{token}}
+
+###
+
+### ============ ERROR CASES ============
+
+### 6. Mesaj gol (400)
+POST {{baseUrl}}/messages/vehicle/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "content": ""
+}
+
+###
+
+### 7. Mesaj pe vehicul inexistent (404)
+POST {{baseUrl}}/messages/vehicle/99999
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "content": "Test message"
+}
+
+###
+
+### 8. Fara token (401)
+GET {{baseUrl}}/messages
+
+###

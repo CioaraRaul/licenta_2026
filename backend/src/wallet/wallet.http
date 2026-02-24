@@ -1,0 +1,60 @@
+@baseUrl = http://localhost:3000
+@token = PASTE_YOUR_TOKEN_HERE
+
+### 1. Get my wallet
+GET {{baseUrl}}/wallet
+Authorization: Bearer {{token}}
+
+###
+
+### 2. Deposit bani
+POST {{baseUrl}}/wallet/deposit
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "amount": 5000
+}
+
+###
+
+### 3. Get transaction history
+GET {{baseUrl}}/wallet/transactions
+Authorization: Bearer {{token}}
+
+###
+
+### 4. Get transactions cu paginare
+GET {{baseUrl}}/wallet/transactions?page=1&limit=10
+Authorization: Bearer {{token}}
+
+###
+
+### ============ ERROR CASES ============
+
+### 5. Deposit suma negativa (400)
+POST {{baseUrl}}/wallet/deposit
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "amount": -100
+}
+
+###
+
+### 6. Deposit peste limita (400)
+POST {{baseUrl}}/wallet/deposit
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "amount": 999999
+}
+
+###
+
+### 7. Fara token (401)
+GET {{baseUrl}}/wallet
+
+###

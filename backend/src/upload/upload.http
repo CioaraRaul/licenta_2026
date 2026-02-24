@@ -1,0 +1,31 @@
+@baseUrl = http://localhost:3000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIyLCJ1c2VybmFtZSI6InoiLCJpYXQiOjE3NzE1ODU5MjksImV4cCI6MTc3MTU4NjgyOX0.oD_sB5LsKKXr-r2-lKc34qZgidwo6UODTwbCspSVIlo
+
+### Upload single image
+POST {{baseUrl}}/upload/image
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="image"; filename="test.jpg"
+Content-Type: image/jpeg
+
+
+###
+
+### Upload multiple images
+POST {{baseUrl}}/upload/images
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="images"; filename="test.jpg"
+Content-Type: image/jpeg
+
+
+
+###
+
+### Delete image (inlocuieste publicId-ul cu ce primesti din upload)
+DELETE {{baseUrl}}/upload/autovault/vehicles/REPLACE_WITH_PUBLIC_ID
+Authorization: Bearer {{token}}
