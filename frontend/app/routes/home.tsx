@@ -1,13 +1,17 @@
-import Dashboard from "~/components/homepage/dashboard";
+import { redirect } from "react-router";
 import type { Route } from "../+types/root";
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
+    { title: "AutoVault" },
+    { name: "description", content: "Welcome to AutoVault" },
   ];
 }
 
+export function clientLoader() {
+  return redirect("/dashboard");
+}
+
 export default function Home() {
-  return <Dashboard />;
+  return null;
 }
