@@ -1,5 +1,5 @@
-import type { Conversation } from '~/interface/message.interface';
-import type { User } from '~/interface/user.interface';
+import type { Conversation } from "~/interface/message.interface";
+import type { User } from "~/interface/user.interface";
 
 /**
  * Returnează celălalt participant dintr-o conversație.
@@ -29,20 +29,20 @@ export function formatMessageTime(dateString: string): string {
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
   if (diffDays === 0) {
-    return date.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
+    return date.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
       hour12: false,
     });
   }
 
-  if (diffDays === 1) return 'Yesterday';
+  if (diffDays === 1) return "Yesterday";
 
   if (diffDays < 7) {
-    return date.toLocaleDateString('en-US', { weekday: 'short' });
+    return date.toLocaleDateString("en-US", { weekday: "short" });
   }
 
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
 /**
@@ -57,17 +57,17 @@ export function formatChatTimestamp(dateString: string): string {
     date.getMonth() === now.getMonth() &&
     date.getFullYear() === now.getFullYear();
 
-  const time = date.toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
+  const time = date.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
     hour12: false,
   });
 
   if (isToday) return time;
 
-  const dateStr = date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
+  const dateStr = date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
   });
 
   return `${dateStr}, ${time}`;
@@ -78,7 +78,7 @@ export function formatChatTimestamp(dateString: string): string {
  */
 export function truncateMessage(message: string, maxLength = 45): string {
   if (message.length <= maxLength) return message;
-  return message.slice(0, maxLength).trimEnd() + '…';
+  return message.slice(0, maxLength).trimEnd() + "…";
 }
 
 /**
@@ -96,15 +96,13 @@ export function filterConversations(
 
   return conversations.filter((conv) => {
     const other = getOtherParticipant(conv, currentUserId);
-    const otherName = other.username?.toLowerCase() ?? '';
+    const otherName = other.username?.toLowerCase() ?? "";
     const vehicleInfo =
-      `${conv.vehicle?.make ?? ''} ${conv.vehicle?.model ?? ''}`.toLowerCase();
-    const lastMsg = conv.lastMessage?.toLowerCase() ?? '';
+      `${conv.vehicle?.make ?? ""} ${conv.vehicle?.model ?? ""}`.toLowerCase();
+    const lastMsg = conv.lastMessage?.toLowerCase() ?? "";
 
     return (
-      otherName.includes(q) ||
-      vehicleInfo.includes(q) ||
-      lastMsg.includes(q)
+      otherName.includes(q) || vehicleInfo.includes(q) || lastMsg.includes(q)
     );
   });
 }
@@ -140,7 +138,7 @@ export function getDateSeparatorLabel(dateString: string): string {
     date.getMonth() === now.getMonth() &&
     date.getFullYear() === now.getFullYear();
 
-  if (isToday) return 'Today';
+  if (isToday) return "Today";
 
   const yesterday = new Date(now);
   yesterday.setDate(yesterday.getDate() - 1);
@@ -149,11 +147,11 @@ export function getDateSeparatorLabel(dateString: string): string {
     date.getMonth() === yesterday.getMonth() &&
     date.getFullYear() === yesterday.getFullYear();
 
-  if (isYesterday) return 'Yesterday';
+  if (isYesterday) return "Yesterday";
 
-  return date.toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
+  return date.toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
   });
 }
