@@ -1,31 +1,31 @@
-import type { User } from './user.interface';
+import type { User } from "./user.interface";
 
 // ─── Enums ───────────────────────────────────────────────────────────────────
 
 export type VehicleType =
-  | 'car'
-  | 'suv'
-  | 'truck'
-  | 'van'
-  | 'motorcycle'
-  | 'sports_car';
+  | "car"
+  | "suv"
+  | "truck"
+  | "van"
+  | "motorcycle"
+  | "sports_car";
 
-export type VehicleCondition = 'new' | 'used' | 'certified_pre_owned';
+export type VehicleCondition = "new" | "used" | "certified_pre_owned";
 
-export type VehicleStatus = 'available' | 'pending' | 'sold' | 'reserved';
+export type VehicleStatus = "available" | "pending" | "sold" | "reserved";
 
 export type FuelType =
-  | 'gasoline'
-  | 'diesel'
-  | 'electric'
-  | 'hybrid'
-  | 'plugin_hybrid';
+  | "gasoline"
+  | "diesel"
+  | "electric"
+  | "hybrid"
+  | "plugin_hybrid";
 
-export type Transmission = 'manual' | 'automatic' | 'semi_automatic';
+export type Transmission = "manual" | "automatic" | "semi_automatic";
 
-export type DriveType = 'fwd' | 'rwd' | 'awd' | '4wd';
+export type DriveType = "fwd" | "rwd" | "awd" | "4wd";
 
-export type VehicleSortBy = 'price' | 'year' | 'mileage' | 'createdAt';
+export type VehicleSortBy = "price" | "year" | "mileage" | "createdAt";
 
 // ─── Vehicle entity ───────────────────────────────────────────────────────────
 
@@ -182,7 +182,7 @@ export interface FilterVehicleParams {
   page?: number;
   limit?: number;
   sortBy?: VehicleSortBy;
-  sortOrder?: 'ASC' | 'DESC';
+  sortOrder?: "ASC" | "DESC";
 }
 
 // ─── Generic paginated response (reused by all list endpoints) ─────────────────
@@ -192,4 +192,78 @@ export interface PaginatedResponse<T> {
   total: number;
   page: number;
   limit: number;
+}
+
+// ─── Backend response shape for GET /vehicles/my/listings ──────────────────────
+
+export interface MyListingsApiResponse {
+  vehicles: Vehicle[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
+// ─── My Listings page ──────────────────────────────────────────────────────────
+
+/** All statuses the user can filter by in the My Listings view */
+export type ListingStatusFilter =
+  | "all"
+  | "active"
+  | "pending"
+  | "sold"
+  | "inactive";
+
+/** Sort options available in the My Listings view */
+export type ListingSortOption =
+  | "newest"
+  | "oldest"
+  | "price-high"
+  | "price-low"
+  | "most-views";
+
+/** Summary counters shown above the listings table */
+export interface ListingStats {
+  total: number;
+  active: number;
+  pending: number;
+  sold: number;
+  inactive: number;
+}
+
+/** Props passed from the route's clientLoader to the MyListings component */
+export interface MyListingsPageData {
+  vehicles: Vehicle[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+  error: boolean;
+}
+
+// ─── Sub-component props ──────────────────────────────────────────────────────
+
+/** Props for a single listing row in the table */
+export interface ListingRowProps {
+  vehicle: Vehicle;
+  isLoading: boolean;
+  isMenuOpen: boolean;
+  onToggleMenu: () => void;
+  onDeactivate: () => void;
+  onReactivate: () => void;
+  onMarkSold: () => void;
+  onDelete: () => void;
+}
+
+/** Props for the contextual action dropdown menu */
+export interface ActionMenuProps {
+  vehicle: Vehicle;
+  onDeactivate: () => void;
+  onReactivate: () => void;
+  onMarkSold: () => void;
+  onDelete: () => void;
 }

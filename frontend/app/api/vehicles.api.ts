@@ -1,11 +1,12 @@
-import { httpClient } from './http.api';
+import { httpClient } from "./http.api";
 import type {
   Vehicle,
   CreateVehiclePayload,
   UpdateVehiclePayload,
   FilterVehicleParams,
   PaginatedResponse,
-} from '~/interface/vehicle.interface';
+  MyListingsApiResponse,
+} from "~/interface/vehicle.interface";
 
 // ─── Public endpoints ─────────────────────────────────────────────────────────
 
@@ -13,12 +14,12 @@ import type {
 export async function getVehicles(
   params?: FilterVehicleParams,
 ): Promise<PaginatedResponse<Vehicle>> {
-  return httpClient.get<PaginatedResponse<Vehicle>>('/vehicles', { params });
+  return httpClient.get<PaginatedResponse<Vehicle>>("/vehicles", { params });
 }
 
 /** GET /vehicles/featured — vehicule promovate */
 export async function getFeaturedVehicles(limit = 10): Promise<Vehicle[]> {
-  return httpClient.get<Vehicle[]>('/vehicles/featured', { params: { limit } });
+  return httpClient.get<Vehicle[]>("/vehicles/featured", { params: { limit } });
 }
 
 /** GET /vehicles/:id — detalii vehicul */
@@ -27,8 +28,13 @@ export async function getVehicleById(id: number): Promise<Vehicle> {
 }
 
 /** GET /vehicles/:id/similar — vehicule similare */
-export async function getSimilarVehicles(id: number, limit = 5): Promise<Vehicle[]> {
-  return httpClient.get<Vehicle[]>(`/vehicles/${id}/similar`, { params: { limit } });
+export async function getSimilarVehicles(
+  id: number,
+  limit = 5,
+): Promise<Vehicle[]> {
+  return httpClient.get<Vehicle[]>(`/vehicles/${id}/similar`, {
+    params: { limit },
+  });
 }
 
 // ─── Authenticated endpoints ──────────────────────────────────────────────────
@@ -37,15 +43,17 @@ export async function getSimilarVehicles(id: number, limit = 5): Promise<Vehicle
 export async function getMyListings(
   page = 1,
   limit = 20,
-): Promise<PaginatedResponse<Vehicle>> {
-  return httpClient.get<PaginatedResponse<Vehicle>>('/vehicles/my/listings', {
+): Promise<MyListingsApiResponse> {
+  return httpClient.get<MyListingsApiResponse>("/vehicles/my/listings", {
     params: { page, limit },
   });
 }
 
 /** POST /vehicles — creare anunț nou */
-export async function createVehicle(payload: CreateVehiclePayload): Promise<Vehicle> {
-  return httpClient.post<Vehicle>('/vehicles', payload);
+export async function createVehicle(
+  payload: CreateVehiclePayload,
+): Promise<Vehicle> {
+  return httpClient.post<Vehicle>("/vehicles", payload);
 }
 
 /** PATCH /vehicles/:id — actualizare anunț */

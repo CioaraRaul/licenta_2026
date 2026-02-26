@@ -15,7 +15,7 @@ export async function clientLoader() {
         getSellerStats(),
         getMyListings(1, 5),
       ]);
-      return { stats, isSeller, user, listings: listingsResult.data ?? [], savedVehicles: [], error: false };
+      return { stats, isSeller, user, listings: listingsResult.vehicles ?? [], savedVehicles: [], error: false };
     } else {
       const [stats, savedResult] = await Promise.all([
         getBuyerStats(),
