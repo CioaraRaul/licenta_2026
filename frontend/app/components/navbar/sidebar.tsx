@@ -1,14 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router";
 import { useAuthStore } from "~/store/auth.store";
+import { getConversations } from "~/api/messages.api";
 
 export default function Sidebar() {
   const location = useLocation();
   const user = useAuthStore((s) => s.user);
   const [collapsed, setCollapsed] = useState(false);
 
+  const [unreadCount, setUnreadCount] = useState(0);
+
   const isSeller = user?.role === "seller" || user?.role === "admin";
   const isActive = (href: string) => location.pathname === href;
+
+  useEffect(() => {
+    if (!user) return;
+    getConversations()
+      .then((convs) => {
+        const total = convs.reduce((sum, c) => sum + (c.unreadCount ?? 0), 0);
+        setUnreadCount(total);
+      })
+      .catch(() => {});
+  }, [user, location.pathname]);
 
   const mainNav = [
     {
@@ -49,7 +62,7 @@ export default function Sidebar() {
           <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
         </svg>
       ),
-      badge: 3,
+      badge: unreadCount || undefined,
     },
     ...(isSeller
       ? [
