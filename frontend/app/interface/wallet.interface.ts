@@ -1,17 +1,17 @@
 // ─── Enums ───────────────────────────────────────────────────────────────────
 
 export type TransactionType =
-  | 'deposit'
-  | 'withdrawal'
-  | 'payment'
-  | 'refund'
-  | 'commission';
+  | "deposit"
+  | "withdrawal"
+  | "payment"
+  | "refund"
+  | "commission";
 
 export type TransactionStatus =
-  | 'pending'
-  | 'completed'
-  | 'failed'
-  | 'cancelled';
+  | "pending"
+  | "completed"
+  | "failed"
+  | "cancelled";
 
 // ─── Wallet entity ────────────────────────────────────────────────────────────
 
@@ -46,4 +46,42 @@ export interface Transaction {
 
 export interface DepositPayload {
   amount: number;
+}
+
+// ─── Component props ──────────────────────────────────────────────────────────
+
+export interface WalletPageData {
+  wallet: Wallet | null;
+  transactions: Transaction[];
+  totalTransactions: number;
+  error: boolean;
+}
+
+export interface BalanceCardProps {
+  wallet: Wallet;
+  onDeposit: (amount: number) => Promise<void>;
+}
+
+export interface TransactionListProps {
+  transactions: Transaction[];
+  total: number;
+  page: number;
+  onPageChange: (page: number) => void;
+  isLoading: boolean;
+}
+
+export interface TransactionRowProps {
+  transaction: Transaction;
+}
+
+export interface QuickDepositProps {
+  onDeposit: (amount: number) => Promise<void>;
+  isProcessing: boolean;
+}
+
+export interface DepositModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onDeposit: (amount: number) => Promise<void>;
+  isProcessing: boolean;
 }
