@@ -14,7 +14,22 @@ import type {
 export async function getVehicles(
   params?: FilterVehicleParams,
 ): Promise<PaginatedResponse<Vehicle>> {
-  return httpClient.get<PaginatedResponse<Vehicle>>("/vehicles", { params });
+  const raw = await httpClient.get<{
+    vehicles: Vehicle[];
+    pagination: {
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    };
+  }>("/vehicles", { params });
+
+  return {
+    data: raw.vehicles,
+    total: raw.pagination.total,
+    page: raw.pagination.page,
+    limit: raw.pagination.limit,
+  };
 }
 
 /** GET /vehicles/featured — vehicule promovate */

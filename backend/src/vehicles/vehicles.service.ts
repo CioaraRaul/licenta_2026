@@ -65,7 +65,7 @@ export class VehiclesService {
     const query = this.vehicleRepo
       .createQueryBuilder('vehicle')
       .leftJoinAndSelect('vehicle.seller', 'seller')
-      .where('vehicle.isActive = :isActive')
+      .where('vehicle.isActive = :isActive', { isActive: true })
       .andWhere('vehicle.status = :status', {
         status: VehicleStatus.AVAILABLE,
       });

@@ -6,6 +6,7 @@ import {
   Max,
   Min,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { VehicleType } from '../enums/vehicle-type.enum';
 import { VehicleCondition } from '../enums/vehicle-condition.enum';
 import { FuelType } from '../enums/fuel-type.enum';
@@ -26,11 +27,13 @@ export class FilterVehicleDto {
   model?: string;
 
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   @Min(1900)
   yearFrom?: number;
 
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   @Max(new Date().getFullYear() + 1)
   yearTo?: number;
@@ -44,20 +47,24 @@ export class FilterVehicleDto {
   condition?: VehicleCondition;
 
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   @Min(0)
   priceFrom?: number;
 
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   priceTo?: number;
 
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   @Min(0)
   mileageFrom?: number;
 
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   mileageTo?: number;
 
@@ -83,11 +90,13 @@ export class FilterVehicleDto {
 
   // Pagination
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   @Min(1)
   page?: number = 1;
 
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   @Min(1)
   @Max(100)

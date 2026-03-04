@@ -267,3 +267,85 @@ export interface ActionMenuProps {
   onMarkSold: () => void;
   onDelete: () => void;
 }
+
+// ─── Find Vehicle page ────────────────────────────────────────────────────────
+
+export type ViewMode = "grid" | "list";
+
+/** Data returned from the route's clientLoader for the Find Vehicle page */
+export interface FindVehiclePageData {
+  vehicles: Vehicle[];
+  total: number;
+  page: number;
+  savedIds: Set<number>;
+  error: boolean;
+}
+
+/** Props for the main FindVehicles orchestrator */
+export interface FindVehicleProps {
+  vehicles: Vehicle[];
+  total: number;
+  page: number;
+  savedIds: Set<number>;
+  error: boolean;
+}
+
+/** Props for the filter sidebar */
+export interface FilterSidebarProps {
+  filters: FilterVehicleParams;
+  onFilterChange: (filters: FilterVehicleParams) => void;
+  onReset: () => void;
+  isOpen: boolean;
+  onClose: () => void;
+  totalResults: number;
+}
+
+/** Props for a single vehicle card in grid view */
+export interface VehicleCardProps {
+  vehicle: Vehicle;
+  isSaved: boolean;
+  onToggleSave: (vehicleId: number) => void;
+  onQuickView: (vehicle: Vehicle) => void;
+}
+
+/** Props for a single vehicle row in list view */
+export interface VehicleRowProps {
+  vehicle: Vehicle;
+  isSaved: boolean;
+  onToggleSave: (vehicleId: number) => void;
+  onQuickView: (vehicle: Vehicle) => void;
+}
+
+/** Props for the results header (count + sort + view toggle) */
+export interface ResultsHeaderProps {
+  total: number;
+  sortBy: string;
+  sortOrder: string;
+  viewMode: ViewMode;
+  onSortChange: (sortKey: string) => void;
+  onViewModeChange: (mode: ViewMode) => void;
+  onToggleSidebar: () => void;
+}
+
+/** Props for the active-filter chip bar */
+export interface ActiveFiltersProps {
+  filters: FilterVehicleParams;
+  onRemoveFilter: (key: string) => void;
+  onClearAll: () => void;
+}
+
+/** Props for the quick-view modal */
+export interface QuickViewModalProps {
+  vehicle: Vehicle | null;
+  isOpen: boolean;
+  onClose: () => void;
+  isSaved: boolean;
+  onToggleSave: (vehicleId: number) => void;
+}
+
+/** Props for the pagination footer */
+export interface FindVehiclePaginationProps {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}
