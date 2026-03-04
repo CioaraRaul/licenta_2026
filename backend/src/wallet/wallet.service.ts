@@ -1,10 +1,16 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { Wallet } from './entities/wallet.entity';
 import { Transaction } from './entities/transaction.entity';
+import { Card } from './entities/card.entity';
 import { TransactionType } from './enums/transaction-type.enum';
 import { TransactionStatus } from './enums/transaction-status.enum';
+import type { CreateCardDto, TopUpCardDto } from './interfaces/card.dto';
 
 @Injectable()
 export class WalletService {
@@ -15,12 +21,14 @@ export class WalletService {
     @InjectRepository(Transaction)
     private readonly transactionRepo: Repository<Transaction>,
 
+    @InjectRepository(Card)
+    private readonly cardRepo: Repository<Card>,
+
     // DataSource pentru tranzacții atomice (deposit + transfer în același timp)
     private readonly dataSource: DataSource,
   ) {}
 
   // ─── Get or Create Wallet ──────────────────────────────────────────────────
-  // Creează wallet automat dacă nu există
 
   async getOrCreateWallet(userId: number): Promise<Wallet> {
     let wallet = await this.walletRepo.findOne({ where: { userId } });
@@ -37,7 +45,99 @@ export class WalletService {
     return this.getOrCreateWallet(userId);
   }
 
-  // ─── Deposit ───────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════════════
+  //  CARD OPERATIONS
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  async getCard(userId: number): Promise<Card | null> {
+    return this.cardRepo.findOne({ where: { userId } });
+  }
+
+  async addCard(userId: number, dto: CreateCardDto): Promise<Card> {
+    // Only one card per user
+    const existing = await this.cardRepo.findOne({ where: { userId } });
+    if (existing) {
+      throw new BadRequestException(
+        'You already have a card. Remove it first to add a new one.',
+      );
+    }
+
+    // Validate card number (16 digits)
+    const cleanNumber = dto.cardNumber.replace(/\s/g, '');
+    if (!/^\d{16}$/.test(cleanNumber)) {
+      throw new BadRequestException('Card number must be 16 digits');
+    }
+
+    // Validate expiry
+    const now = new Date();
+    const currentMonth = now.getMonth() + 1;
+    const currentYear = now.getFullYear();
+    if (
+      dto.expiryMonth < 1 ||
+      dto.expiryMonth > 12 ||
+      dto.expiryYear < currentYear ||
+      (dto.expiryYear === currentYear && dto.expiryMonth < currentMonth)
+    ) {
+      throw new BadRequestException(
+        'Card has expired or expiry date is invalid',
+      );
+    }
+
+    // Validate CVV (3 or 4 digits)
+    if (!/^\d{3,4}$/.test(dto.cvv)) {
+      throw new BadRequestException('CVV must be 3 or 4 digits');
+    }
+
+    // Validate cardholder name
+    if (!dto.cardHolderName || dto.cardHolderName.trim().length < 2) {
+      throw new BadRequestException('Cardholder name is required');
+    }
+
+    // Auto-detect card type from first digit
+    const cardType = cleanNumber.startsWith('4') ? 'visa' : 'mastercard';
+
+    const card = this.cardRepo.create({
+      userId,
+      last4: cleanNumber.slice(-4),
+      cardHolderName: dto.cardHolderName.trim(),
+      expiryMonth: dto.expiryMonth,
+      expiryYear: dto.expiryYear,
+      cvv: dto.cvv,
+      cardType,
+      balance: 0,
+    });
+
+    return this.cardRepo.save(card);
+  }
+
+  async deleteCard(userId: number): Promise<void> {
+    const card = await this.cardRepo.findOne({ where: { userId } });
+    if (!card) {
+      throw new NotFoundException('No card found');
+    }
+    await this.cardRepo.remove(card);
+  }
+
+  async topUpCard(userId: number, dto: TopUpCardDto): Promise<Card> {
+    if (dto.amount <= 0) {
+      throw new BadRequestException('Top-up amount must be greater than 0');
+    }
+    if (dto.amount > 1_000_000) {
+      throw new BadRequestException('Maximum top-up amount is 1,000,000');
+    }
+
+    const card = await this.cardRepo.findOne({ where: { userId } });
+    if (!card) {
+      throw new NotFoundException('No card found. Add a card first.');
+    }
+
+    card.balance = Number(card.balance) + Number(dto.amount);
+    return this.cardRepo.save(card);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  //  DEPOSIT (from card → wallet)
+  // ═══════════════════════════════════════════════════════════════════════════
 
   async deposit(userId: number, amount: number): Promise<Wallet> {
     if (amount <= 0)
@@ -48,13 +148,31 @@ export class WalletService {
 
     const wallet = await this.getOrCreateWallet(userId);
 
+    // Card is required for deposit
+    const card = await this.cardRepo.findOne({ where: { userId } });
+    if (!card) {
+      throw new BadRequestException(
+        'No card found. Add a card before depositing.',
+      );
+    }
+
+    if (Number(card.balance) < Number(amount)) {
+      throw new BadRequestException(
+        `Insufficient card balance. Available: $${Number(card.balance).toLocaleString()}`,
+      );
+    }
+
     // Folosim queryRunner pentru operații atomice
-    // Dacă una din operații eșuează, totul se rollback-ează
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
+      // Deduct from card
+      card.balance = Number(card.balance) - Number(amount);
+      await queryRunner.manager.save(card);
+
+      // Add to wallet
       wallet.balance = Number(wallet.balance) + Number(amount);
       await queryRunner.manager.save(wallet);
 
@@ -63,7 +181,7 @@ export class WalletService {
         amount,
         type: TransactionType.DEPOSIT,
         status: TransactionStatus.COMPLETED,
-        description: `Deposit of ${amount} RON`,
+        description: `Deposit of ${amount} RON from card ****${card.last4}`,
       });
       await queryRunner.manager.save(transaction);
 
@@ -78,7 +196,6 @@ export class WalletService {
   }
 
   // ─── Transfer (Buyer → Seller) ─────────────────────────────────────────────
-  // Apelat când un bid e acceptat
 
   async transfer(
     buyerId: number,

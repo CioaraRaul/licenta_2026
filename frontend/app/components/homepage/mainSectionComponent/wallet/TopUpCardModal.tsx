@@ -1,64 +1,69 @@
 import { useState } from "react";
-import { validateDepositAmount } from "~/utils/wallet.utils";
+import { topUpCard } from "~/api/wallet.api";
 import { formatCurrencyFull } from "~/utils/format.utils";
-import type { DepositModalProps } from "~/interface/wallet.interface";
+import type { TopUpCardModalProps } from "~/interface/wallet.interface";
 import { CloseIcon } from "./WalletIcons";
 
-export default function DepositModal({
+const QUICK_TOPUP_AMOUNTS = [500, 1000, 5000, 10000, 50000, 100000] as const;
+
+export default function TopUpCardModal({
   isOpen,
   onClose,
-  onDeposit,
-  isProcessing,
   card,
-}: DepositModalProps) {
+  onCardToppedUp,
+}: TopUpCardModalProps) {
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const result = validateDepositAmount(value);
-    if (!result.valid) {
-      setError(result.error);
-      return;
-    }
-
-    // Check card balance
-    if (!card) {
-      setError("No card found. Add a card first.");
-      return;
-    }
-    if (card.balance < result.amount) {
-      setError(
-        `Insufficient card balance (${formatCurrencyFull(card.balance)} available)`,
-      );
-      return;
-    }
-
     setError("");
+
+    const amount = Number(value);
+    if (!value || isNaN(amount)) {
+      setError("Enter a valid amount");
+      return;
+    }
+    if (amount <= 0) {
+      setError("Amount must be greater than $0");
+      return;
+    }
+    if (amount > 1_000_000) {
+      setError("Maximum top-up is $1,000,000");
+      return;
+    }
+    if (!/^\d+(\.\d{1,2})?$/.test(value)) {
+      setError("Max 2 decimal places");
+      return;
+    }
+
+    setIsSubmitting(true);
     try {
-      await onDeposit(result.amount);
+      const updatedCard = await topUpCard({ amount });
+      onCardToppedUp(updatedCard);
       setValue("");
-    } catch {
-      setError("Deposit failed. Please try again.");
+      onClose();
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Top-up failed";
+      setError(message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
 
-      {/* Modal */}
       <div className="relative bg-[#1a1a1f] border border-white/6 rounded-2xl p-6 w-full max-w-100 shadow-2xl">
         <div className="flex items-center justify-between mb-5">
-          <h3 className="text-lg font-semibold text-[#f5f5f7]">
-            Deposit Funds
-          </h3>
+          <h3 className="text-lg font-semibold text-[#f5f5f7]">Top Up Card</h3>
           <button
             onClick={onClose}
             title="Close"
@@ -68,31 +73,17 @@ export default function DepositModal({
           </button>
         </div>
 
-        {/* Card info banner */}
-        {card ? (
-          <div className="flex items-center justify-between bg-white/3 rounded-lg px-4 py-3 mb-4">
-            <div className="flex items-center gap-3">
-              <span className="text-[10px] font-bold text-[#8e8e9a] uppercase">
-                {card.cardType === "visa" ? "VISA" : "MC"}
-              </span>
-              <span className="text-sm text-[#c5c5c7] font-mono">
-                •••• {card.last4}
-              </span>
-            </div>
-            <span className="text-sm font-semibold text-[#f5f5f7]">
-              {formatCurrencyFull(card.balance)}
-            </span>
-          </div>
-        ) : (
-          <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3 mb-4">
-            <p className="text-xs text-red-400">
-              No card linked. Add a payment card to deposit funds.
-            </p>
-          </div>
-        )}
+        {/* Current card balance */}
+        <div className="bg-white/3 rounded-lg px-4 py-3 mb-4">
+          <p className="text-[10px] text-[#8e8e9a] uppercase tracking-wider mb-0.5">
+            Current Card Balance
+          </p>
+          <p className="text-lg font-bold text-[#f5f5f7]">
+            {formatCurrencyFull(card.balance)}
+          </p>
+        </div>
 
         <form onSubmit={handleSubmit}>
-          {/* Amount input */}
           <div className="mb-4">
             <label className="text-xs text-[#8e8e9a] font-medium uppercase tracking-wider mb-1.5 block">
               Amount (USD)
@@ -110,8 +101,7 @@ export default function DepositModal({
                   setError("");
                 }}
                 placeholder="0.00"
-                disabled={!card}
-                className="w-full bg-white/4 border border-white/6 rounded-xl pl-8 pr-4 py-3 text-lg text-[#f5f5f7] placeholder-[#555] outline-none focus:border-[#e63946]/40 transition-colors disabled:opacity-40"
+                className="w-full bg-white/4 border border-white/6 rounded-xl pl-8 pr-4 py-3 text-lg text-[#f5f5f7] placeholder-[#555] outline-none focus:border-[#e63946]/40 transition-colors"
                 autoFocus
               />
             </div>
@@ -120,29 +110,27 @@ export default function DepositModal({
 
           {/* Quick amount chips */}
           <div className="flex flex-wrap gap-2 mb-5">
-            {[100, 250, 500, 1000].map((amt) => (
+            {QUICK_TOPUP_AMOUNTS.map((amt) => (
               <button
                 key={amt}
                 type="button"
-                disabled={!card}
                 onClick={() => {
                   setValue(String(amt));
                   setError("");
                 }}
-                className="px-3 py-1.5 bg-white/4 border border-white/6 rounded-lg text-xs text-[#c5c5c7] hover:bg-white/8 hover:text-[#f5f5f7] transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                className="px-3 py-1.5 bg-white/4 border border-white/6 rounded-lg text-xs text-[#c5c5c7] hover:bg-white/8 hover:text-[#f5f5f7] transition-all cursor-pointer"
               >
                 ${amt.toLocaleString()}
               </button>
             ))}
           </div>
 
-          {/* Submit */}
           <button
             type="submit"
-            disabled={isProcessing || !value || !card}
+            disabled={isSubmitting || !value}
             className="w-full py-3 bg-[#e63946] hover:bg-[#d62836] disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-all cursor-pointer"
           >
-            {isProcessing ? "Processing..." : "Deposit"}
+            {isSubmitting ? "Processing..." : "Top Up Card"}
           </button>
         </form>
       </div>

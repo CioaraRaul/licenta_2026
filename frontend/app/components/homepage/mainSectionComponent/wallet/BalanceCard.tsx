@@ -4,7 +4,11 @@ import type { BalanceCardProps } from "~/interface/wallet.interface";
 import { WalletIcon, LockIcon, PlusIcon } from "./WalletIcons";
 import DepositModal from "./DepositModal";
 
-export default function BalanceCard({ wallet, onDeposit }: BalanceCardProps) {
+export default function BalanceCard({
+  wallet,
+  card,
+  onDeposit,
+}: BalanceCardProps) {
   const [showModal, setShowModal] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -22,7 +26,7 @@ export default function BalanceCard({ wallet, onDeposit }: BalanceCardProps) {
 
   return (
     <>
-      <div className="bg-[#141417] border border-white/[0.04] rounded-xl p-6 hover:border-white/[0.08] transition-all h-full">
+      <div className="bg-[#141417] border border-white/4 rounded-xl p-6 hover:border-white/8 transition-all h-full">
         <div className="flex items-start justify-between mb-6">
           <div>
             <p className="text-[#8e8e9a] text-xs font-medium uppercase tracking-wider mb-1">
@@ -39,7 +43,7 @@ export default function BalanceCard({ wallet, onDeposit }: BalanceCardProps) {
 
         {/* Frozen balance indicator */}
         {wallet.frozenBalance > 0 && (
-          <div className="flex items-center gap-2 mb-5 px-3 py-2 bg-amber-500/[0.06] border border-amber-500/10 rounded-lg">
+          <div className="flex items-center gap-2 mb-5 px-3 py-2 bg-amber-500/6 border border-amber-500/10 rounded-lg">
             <LockIcon />
             <span className="text-xs text-amber-400">
               {formatCurrencyFull(wallet.frozenBalance)} frozen in active bids
@@ -49,7 +53,7 @@ export default function BalanceCard({ wallet, onDeposit }: BalanceCardProps) {
 
         {/* Stat chips */}
         <div className="flex items-center gap-3">
-          <div className="flex-1 bg-white/[0.03] rounded-lg px-4 py-3">
+          <div className="flex-1 bg-white/3 rounded-lg px-4 py-3">
             <p className="text-[10px] text-[#8e8e9a] uppercase tracking-wider mb-0.5">
               Total
             </p>
@@ -57,7 +61,7 @@ export default function BalanceCard({ wallet, onDeposit }: BalanceCardProps) {
               {formatCurrencyFull(wallet.balance + wallet.frozenBalance)}
             </p>
           </div>
-          <div className="flex-1 bg-white/[0.03] rounded-lg px-4 py-3">
+          <div className="flex-1 bg-white/3 rounded-lg px-4 py-3">
             <p className="text-[10px] text-[#8e8e9a] uppercase tracking-wider mb-0.5">
               Frozen
             </p>
@@ -82,6 +86,7 @@ export default function BalanceCard({ wallet, onDeposit }: BalanceCardProps) {
         onClose={() => setShowModal(false)}
         onDeposit={handleDeposit}
         isProcessing={isProcessing}
+        card={card}
       />
     </>
   );

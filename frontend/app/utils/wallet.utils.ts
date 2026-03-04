@@ -1,6 +1,7 @@
 import type {
   TransactionType,
   TransactionStatus,
+  CardType,
 } from "~/interface/wallet.interface";
 import {
   TRANSACTION_TYPE_LABELS,
@@ -77,4 +78,16 @@ export function validateDepositAmount(
 
 export function getTotalPages(total: number): number {
   return Math.max(1, Math.ceil(total / 10));
+}
+
+/* ─── Card helpers ────────────────────────────────────────────────────────── */
+
+export function detectCardType(number: string): CardType {
+  const clean = number.replace(/\s/g, "");
+  return clean.startsWith("4") ? "visa" : "mastercard";
+}
+
+export function formatCardNumber(value: string): string {
+  const digits = value.replace(/\D/g, "").slice(0, 16);
+  return digits.replace(/(\d{4})(?=\d)/g, "$1 ");
 }

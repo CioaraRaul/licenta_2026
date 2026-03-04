@@ -1,33 +1,61 @@
 import { useState, useCallback } from "react";
-import { deposit as apiDeposit, getTransactions } from "~/api/wallet.api";
+import {
+  deposit as apiDeposit,
+  getTransactions,
+  getCard as apiGetCard,
+} from "~/api/wallet.api";
 import { TRANSACTIONS_PER_PAGE } from "~/constants/wallet.constants";
 import type {
   Wallet,
   Transaction,
+  Card,
   WalletPageData,
 } from "~/interface/wallet.interface";
 import { ErrorIcon } from "./WalletIcons";
 import BalanceCard from "./BalanceCard";
 import QuickDepositPanel from "./QuickDepositPanel";
 import TransactionList from "./TransactionList";
+import CardSection from "./CardSection";
 
 export default function WalletComponent({
   wallet: initialWallet,
   transactions: initialTransactions,
   totalTransactions: initialTotal,
+  card: initialCard,
   error,
 }: WalletPageData) {
   const [wallet, setWallet] = useState<Wallet | null>(initialWallet);
   const [transactions, setTransactions] =
     useState<Transaction[]>(initialTransactions);
   const [totalTransactions, setTotalTransactions] = useState(initialTotal);
+  const [card, setCard] = useState<Card | null>(initialCard);
   const [page, setPage] = useState(1);
   const [isLoadingTransactions, setIsLoadingTransactions] = useState(false);
+
+  /* ── Card handlers ──────────────────────────────────────────────────────── */
+  const handleCardAdded = useCallback((newCard: Card) => {
+    setCard(newCard);
+  }, []);
+
+  const handleCardDeleted = useCallback(() => {
+    setCard(null);
+  }, []);
+
+  const handleCardToppedUp = useCallback((updatedCard: Card) => {
+    setCard(updatedCard);
+  }, []);
 
   /* ── Deposit handler ───────────────────────────────────────────────────── */
   const handleDeposit = useCallback(async (amount: number) => {
     const updated = await apiDeposit({ amount });
     setWallet(updated);
+    // Refresh card balance (deposit deducts from card)
+    try {
+      const freshCard = await apiGetCard();
+      setCard(freshCard);
+    } catch {
+      /* keep current */
+    }
     // Refresh transactions to show the new deposit
     try {
       const result = await getTransactions(1, TRANSACTIONS_PER_PAGE);
@@ -86,10 +114,26 @@ export default function WalletComponent({
         {/* Balance + Quick Deposit row */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
           <div className="lg:col-span-2">
-            <BalanceCard wallet={wallet} onDeposit={handleDeposit} />
+            <BalanceCard
+              wallet={wallet}
+              card={card}
+              onDeposit={handleDeposit}
+            />
           </div>
-          <QuickDepositPanel onDeposit={handleDeposit} isProcessing={false} />
+          <QuickDepositPanel
+            card={card}
+            onDeposit={handleDeposit}
+            isProcessing={false}
+          />
         </div>
+
+        {/* Card Management */}
+        <CardSection
+          card={card}
+          onCardAdded={handleCardAdded}
+          onCardDeleted={handleCardDeleted}
+          onCardToppedUp={handleCardToppedUp}
+        />
 
         {/* Transaction History */}
         <TransactionList
