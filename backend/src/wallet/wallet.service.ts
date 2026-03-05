@@ -83,11 +83,6 @@ export class WalletService {
       );
     }
 
-    // Validate CVV (3 or 4 digits)
-    if (!/^\d{3,4}$/.test(dto.cvv)) {
-      throw new BadRequestException('CVV must be 3 or 4 digits');
-    }
-
     // Validate cardholder name
     if (!dto.cardHolderName || dto.cardHolderName.trim().length < 2) {
       throw new BadRequestException('Cardholder name is required');
@@ -102,7 +97,6 @@ export class WalletService {
       cardHolderName: dto.cardHolderName.trim(),
       expiryMonth: dto.expiryMonth,
       expiryYear: dto.expiryYear,
-      cvv: dto.cvv,
       cardType,
       balance: 0,
     });
@@ -146,28 +140,37 @@ export class WalletService {
     if (amount > 100000)
       throw new BadRequestException('Maximum deposit amount is 100,000');
 
-    const wallet = await this.getOrCreateWallet(userId);
-
-    // Card is required for deposit
-    const card = await this.cardRepo.findOne({ where: { userId } });
-    if (!card) {
-      throw new BadRequestException(
-        'No card found. Add a card before depositing.',
-      );
-    }
-
-    if (Number(card.balance) < Number(amount)) {
-      throw new BadRequestException(
-        `Insufficient card balance. Available: $${Number(card.balance).toLocaleString()}`,
-      );
-    }
-
-    // Folosim queryRunner pentru operații atomice
+    // Use queryRunner with pessimistic locking for atomicity
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
+      // Lock wallet and card rows to prevent race conditions
+      const wallet = await queryRunner.manager.findOne(Wallet, {
+        where: { userId },
+        lock: { mode: 'pessimistic_write' },
+      });
+      if (!wallet) {
+        throw new BadRequestException('Wallet not found');
+      }
+
+      const card = await queryRunner.manager.findOne(Card, {
+        where: { userId },
+        lock: { mode: 'pessimistic_write' },
+      });
+      if (!card) {
+        throw new BadRequestException(
+          'No card found. Add a card before depositing.',
+        );
+      }
+
+      if (Number(card.balance) < Number(amount)) {
+        throw new BadRequestException(
+          `Insufficient card balance. Available: $${Number(card.balance).toLocaleString()}`,
+        );
+      }
+
       // Deduct from card
       card.balance = Number(card.balance) - Number(amount);
       await queryRunner.manager.save(card);
@@ -181,7 +184,7 @@ export class WalletService {
         amount,
         type: TransactionType.DEPOSIT,
         status: TransactionStatus.COMPLETED,
-        description: `Deposit of ${amount} RON from card ****${card.last4}`,
+        description: `Deposit of $${amount} from card ****${card.last4}`,
       });
       await queryRunner.manager.save(transaction);
 
@@ -204,22 +207,37 @@ export class WalletService {
     referenceId: number,
     description: string,
   ): Promise<void> {
-    const buyerWallet = await this.getOrCreateWallet(buyerId);
-    const sellerWallet = await this.getOrCreateWallet(sellerId);
-
-    if (Number(buyerWallet.balance) < Number(amount))
-      throw new BadRequestException('Insufficient funds in wallet');
-
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      // Scădem din buyer
+      // Lock both wallets with pessimistic write to prevent race conditions
+      const buyerWallet = await queryRunner.manager.findOne(Wallet, {
+        where: { userId: buyerId },
+        lock: { mode: 'pessimistic_write' },
+      });
+      if (!buyerWallet) {
+        throw new BadRequestException('Buyer wallet not found');
+      }
+
+      const sellerWallet = await queryRunner.manager.findOne(Wallet, {
+        where: { userId: sellerId },
+        lock: { mode: 'pessimistic_write' },
+      });
+      if (!sellerWallet) {
+        throw new BadRequestException('Seller wallet not found');
+      }
+
+      if (Number(buyerWallet.balance) < Number(amount)) {
+        throw new BadRequestException('Insufficient funds in wallet');
+      }
+
+      // Deduct from buyer
       buyerWallet.balance = Number(buyerWallet.balance) - Number(amount);
       await queryRunner.manager.save(buyerWallet);
 
-      // Adăugăm la seller
+      // Add to seller
       sellerWallet.balance = Number(sellerWallet.balance) + Number(amount);
       await queryRunner.manager.save(sellerWallet);
 

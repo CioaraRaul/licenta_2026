@@ -37,7 +37,7 @@ export default function EmptyState({ hasFilters }: { hasFilters: boolean }) {
             Create your first listing to start selling.
           </p>
           <Link
-            to="/find-vehicle"
+            to="/my-listings"
             className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-[#e63946] hover:bg-[#d62b39] text-white text-[13px] font-semibold rounded-lg transition-colors no-underline"
           >
             <svg

@@ -15,13 +15,23 @@ export default function Sidebar() {
 
   useEffect(() => {
     if (!user) return;
-    getConversations()
-      .then((convs) => {
-        const total = convs.reduce((sum, c) => sum + (c.unreadCount ?? 0), 0);
-        setUnreadCount(total);
-      })
-      .catch(() => {});
-  }, [user, location.pathname]);
+
+    const fetchUnread = () => {
+      getConversations()
+        .then((convs) => {
+          const total = convs.reduce((sum, c) => sum + (c.unreadCount ?? 0), 0);
+          setUnreadCount(total);
+        })
+        .catch(() => {});
+    };
+
+    fetchUnread();
+
+    // Refresh unread count when the user returns to the tab
+    const handleFocus = () => fetchUnread();
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
+  }, [user]);
 
   const mainNav = [
     {
@@ -193,7 +203,7 @@ export default function Sidebar() {
   const bottomNav = [
     {
       label: "Help & Support",
-      href: "/support",
+      href: "/dashboard",
       icon: (
         <svg
           width="18"
@@ -213,7 +223,7 @@ export default function Sidebar() {
     },
     {
       label: "Settings",
-      href: "/settings",
+      href: "/dashboard",
       icon: (
         <svg
           width="18"

@@ -78,7 +78,7 @@ export default function ListingRow({
         {(vehicle.viewsCount ?? 0).toLocaleString()}
       </div>
 
-      {/* Bids — placeholder count from saves/contacts */}
+      {/* Saves count */}
       <div className="text-[13px] text-[#8e8e9a]">
         {vehicle.savesCount ?? 0}
       </div>

@@ -34,7 +34,6 @@ export interface Card {
   cardHolderName: string;
   expiryMonth: number;
   expiryYear: number;
-  cvv: string;
   cardType: CardType;
   balance: number;
   userId: number;
