@@ -1,8 +1,9 @@
-import React from "react";
-import Dashboard from "~/components/homepage/dashboard";
+import { redirect } from "react-router";
 
-function Index() {
-  return <Dashboard />;
+export function clientLoader() {
+  return redirect("/dashboard");
 }
 
-export default Index;
+export default function Index() {
+  return null;
+}

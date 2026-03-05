@@ -1,98 +1,85 @@
 // app/api/http.ts
+import axios, {
+  type AxiosRequestConfig,
+  type AxiosResponse,
+  type InternalAxiosRequestConfig,
+} from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-interface HttpOptions extends RequestInit {
-  headers?: Record<string, string>;
-}
+// ─── Axios instance ───────────────────────────────────────────────────────────
 
-class HttpError extends Error {
+export const axiosInstance = axios.create({
+  baseURL: API_BASE_URL,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+// ─── Request interceptor — injectează Bearer token din Zustand store ──────────
+
+axiosInstance.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    try {
+      const raw = localStorage.getItem('auth-storage');
+      if (raw) {
+        const { state } = JSON.parse(raw) as { state?: { accessToken?: string } };
+        if (state?.accessToken) {
+          config.headers['Authorization'] = `Bearer ${state.accessToken}`;
+        }
+      }
+    } catch {
+      // localStorage invalid — continuă fără token
+    }
+    return config;
+  },
+);
+
+// ─── Error class ──────────────────────────────────────────────────────────────
+
+export class HttpError extends Error {
   constructor(
     public status: number,
     public statusText: string,
-    public data?: any,
+    public data?: unknown,
   ) {
     super(`HTTP Error ${status}: ${statusText}`);
-    this.name = "HttpError";
+    this.name = 'HttpError';
   }
 }
 
-export async function http<T>(
-  endpoint: string,
-  options: HttpOptions = {},
-): Promise<T> {
-  const url = `${API_BASE_URL}${endpoint}`;
+// ─── Generic request wrapper ──────────────────────────────────────────────────
 
-  // Default headers
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-    ...options.headers,
-  };
-
-  // Add auth token if available
-  const token = localStorage.getItem("auth-storage");
-  if (token) {
-    try {
-      const authData = JSON.parse(token);
-      if (authData.state?.accessToken) {
-        headers["Authorization"] = `Bearer ${authData.state.accessToken}`;
-      }
-    } catch (e) {
-      // Invalid token format
-    }
-  }
-
-  const config: RequestInit = {
-    ...options,
-    headers,
-  };
-
+export async function http<T>(config: AxiosRequestConfig): Promise<T> {
   try {
-    const response = await fetch(url, config);
-
-    // Parse response
-    let data: any;
-    const contentType = response.headers.get("content-type");
-    if (contentType && contentType.includes("application/json")) {
-      data = await response.json();
-    } else {
-      data = await response.text();
-    }
-
-    // Handle errors
-    if (!response.ok) {
-      throw new HttpError(response.status, response.statusText, data);
-    }
-
-    return data as T;
+    const response: AxiosResponse<T> = await axiosInstance(config);
+    return response.data;
   } catch (error) {
-    if (error instanceof HttpError) {
-      throw error;
+    if (axios.isAxiosError(error) && error.response) {
+      throw new HttpError(
+        error.response.status,
+        error.response.statusText ?? '',
+        error.response.data,
+      );
     }
-    // Network error or other issues
-    throw new Error("Network error. Please try again.");
+    throw new Error('Network error. Please try again.');
   }
 }
 
-// Convenience methods
+// ─── Convenience methods ──────────────────────────────────────────────────────
+
 export const httpClient = {
-  get: <T>(endpoint: string, options?: HttpOptions) =>
-    http<T>(endpoint, { ...options, method: "GET" }),
+  /** GET request — params sunt serializați automat de axios ca query string */
+  get: <T>(endpoint: string, options?: AxiosRequestConfig) =>
+    http<T>({ ...options, method: 'GET', url: endpoint }),
 
-  post: <T>(endpoint: string, body?: any, options?: HttpOptions) =>
-    http<T>(endpoint, {
-      ...options,
-      method: "POST",
-      body: body ? JSON.stringify(body) : undefined,
-    }),
+  /** POST request — data se serializează automat ca JSON */
+  post: <T>(endpoint: string, data?: unknown, options?: AxiosRequestConfig) =>
+    http<T>({ ...options, method: 'POST', url: endpoint, data }),
 
-  patch: <T>(endpoint: string, body?: any, options?: HttpOptions) =>
-    http<T>(endpoint, {
-      ...options,
-      method: "PATCH",
-      body: body ? JSON.stringify(body) : undefined,
-    }),
+  /** PATCH request */
+  patch: <T>(endpoint: string, data?: unknown, options?: AxiosRequestConfig) =>
+    http<T>({ ...options, method: 'PATCH', url: endpoint, data }),
 
-  delete: <T>(endpoint: string, options?: HttpOptions) =>
-    http<T>(endpoint, { ...options, method: "DELETE" }),
+  /** DELETE request */
+  delete: <T>(endpoint: string, options?: AxiosRequestConfig) =>
+    http<T>({ ...options, method: 'DELETE', url: endpoint }),
 };
