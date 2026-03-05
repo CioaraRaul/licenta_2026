@@ -76,7 +76,7 @@ export class AuthService {
         verificationCode,
       );
     } catch (error) {
-      console.error('FAiled to send verification email: ', error);
+      // Verification email failed — account is still created
     }
 
     const tokens = await this.getTokens(user.id, user.username);
@@ -105,8 +105,6 @@ export class AuthService {
     }
 
     await this.usersService.verifyUserEmail(user.id);
-
-    console.log('Email verified successfully for user: ', user.email);
 
     return {
       message: 'Email verified successfully! You can now all features',
@@ -173,7 +171,7 @@ export class AuthService {
           username: username,
         },
         {
-          secret: process.env.JWT_ACCESS_SECRET || 'access-secret-key',
+          secret: this.configService.getOrThrow<string>('JWT_ACCESS_SECRET'),
           expiresIn: '15m',
         },
       ),
@@ -183,7 +181,7 @@ export class AuthService {
           username: username,
         },
         {
-          secret: process.env.JWT_REFRESH_SECRET || 'refresh-secret-key',
+          secret: this.configService.getOrThrow<string>('JWT_REFRESH_SECRET'),
           expiresIn: '1h',
         },
       ),
@@ -326,10 +324,6 @@ export class AuthService {
       console.error('Error sending reset password email:', error);
     }
 
-    console.log('PASSWORD RESET REQUEST');
-    console.log('Email:', email);
-    console.log('Reset URL:', resetUrl);
-
     return {
       message:
         'If your email is registered, you will receive a password reset link.',
@@ -358,8 +352,6 @@ export class AuthService {
     await this.usersService.updatePassword(user.id, hashedPassword);
     await this.usersService.clearResetToken(user.id);
 
-    console.log('Password reset successfully for user:', user.email);
-
     return {
       message: 'Password has been reset successfully',
     };
@@ -387,7 +379,7 @@ export class AuthService {
     }
 
     const verificationToken = randomBytes(32).toString('hex');
-    const verificationExpires = new Date(Date.now() + 24 + 3600000);
+    const verificationExpires = new Date(Date.now() + 24 * 3600000);
 
     await this.usersService.updateVerificationToken(
       user.id,
@@ -406,8 +398,6 @@ export class AuthService {
       console.error('Failed to send verification email: ', error);
       throw new BadRequestException('Failed to send verification email');
     }
-
-    console.log('verification send to', email);
 
     return {
       message: 'Verification email sent! Please check your inbox.',
@@ -430,10 +420,8 @@ export class AuthService {
       expiresAt,
     );
 
-    console.log(` User ${userId} logged out successfully`);
-
     return {
-      message: 'Logged out succesfully',
+      message: 'Logged out successfully',
     };
   }
 
@@ -467,8 +455,6 @@ export class AuthService {
 
     await this.usersService.updatePassword(user.id, newHashedPassword);
 
-    console.log(`Password changed successfully for user ${user.email}`);
-
     return {
       message: 'Password changed successfully',
     };
@@ -482,8 +468,6 @@ export class AuthService {
     }
 
     await this.tokenBlackListService.blacklistAllUserTokens(userId);
-
-    console.log(`All sessions revoked for user ${user.email}`);
 
     return {
       message: 'All sessions revoked successfully',
@@ -544,8 +528,6 @@ export class AuthService {
     await this.usersService.deactivateAccount(userId);
     await this.tokenBlackListService.blacklistAllUserTokens(userId);
 
-    console.log(`Account deactivated for user ${user.email}`);
-
     return {
       message: 'Account deactivated successfully',
     };
@@ -563,8 +545,6 @@ export class AuthService {
     }
 
     await this.usersService.reactivateAccount(user.id);
-
-    console.log(`Account reactivated for user ${user.email}`);
 
     return {
       message: 'Account reactivated successfully',
@@ -585,8 +565,6 @@ export class AuthService {
     }
 
     await this.usersService.reactivateAccount(userId);
-
-    console.log(`✅ Account reactivated for user: ${user.email}`);
 
     return {
       message: 'Account reactivated successfully',
@@ -609,8 +587,6 @@ export class AuthService {
 
     await this.tokenBlackListService.blacklistAllUserTokens(userId);
     await this.usersService.deleteAccount(userId);
-
-    console.log(`Account deleted for user ${user.email}`);
 
     return {
       message: 'Account deleted successfully',

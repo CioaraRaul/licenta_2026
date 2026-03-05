@@ -424,7 +424,7 @@ export default function LoginComponent() {
             <button
               type="button"
               onClick={() =>
-                (window.location.href = "http://localhost:3000/auth/google")
+                (window.location.href = `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/auth/google`)
               }
               className={s.btnOauth}
             >
@@ -452,7 +452,7 @@ export default function LoginComponent() {
             <button
               type="button"
               onClick={() =>
-                (window.location.href = "http://localhost:3000/auth/facebook")
+                (window.location.href = `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/auth/facebook`)
               }
               className={s.btnOauth}
             >

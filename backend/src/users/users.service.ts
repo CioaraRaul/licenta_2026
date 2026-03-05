@@ -20,14 +20,14 @@ export class UsersService {
   ) {}
 
   async createUserAccount(createUserDto: CreateUserDto): Promise<User> {
-    const exitingUser = await this.userRepo.findOne({
+    const existingUser = await this.userRepo.findOne({
       where: [
         { email: createUserDto.email },
         { username: createUserDto.username },
       ],
     });
 
-    if (exitingUser) {
+    if (existingUser) {
       throw new Error('User with given email or username already exists');
     }
 

@@ -20,7 +20,6 @@ export class SavedVehiclesController {
   @Post(':vehicleId')
   @UseGuards(JwtAuthGuard)
   save(@Request() req, @Param('vehicleId', ParseIntPipe) vehicleId: number) {
-    console.log('req.user:', req.user);
     return this.savedVehiclesService.save(req.user.userId, vehicleId);
   }
 

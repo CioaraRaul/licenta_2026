@@ -38,6 +38,16 @@ export class VehiclesController {
     return this.vehiclesService.getFeaturedVehicles(limit);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('my/listings')
+  getMyListings(
+    @Request() req,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
+    @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit = 10,
+  ) {
+    return this.vehiclesService.getMyListings(req.user.userId, page, limit);
+  }
+
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.vehiclesService.findOne(id);
@@ -49,16 +59,6 @@ export class VehiclesController {
     @Query('limit', ParseIntPipe) limit = 5,
   ) {
     return this.vehiclesService.getSimilarVehicles(id, limit);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('my/listings')
-  getMyListings(
-    @Request() req,
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
-    @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit = 10,
-  ) {
-    return this.vehiclesService.getMyListings(req.user.userId, page, limit);
   }
 
   @UseGuards(JwtAuthGuard)

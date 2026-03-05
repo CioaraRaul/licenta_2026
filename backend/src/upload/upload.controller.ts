@@ -29,7 +29,7 @@ export class UploadController {
 
   @UseGuards(JwtAuthGuard)
   @Post('images')
-  @UseInterceptors(FilesInterceptor('images', 20, { storage: memoryStorage }))
+  @UseInterceptors(FilesInterceptor('images', 20, { storage: memoryStorage() }))
   async uploadMultiple(@UploadedFiles() files: Express.Multer.File[]) {
     if (!files?.length) throw new BadRequestException('no files provided');
 

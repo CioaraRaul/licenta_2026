@@ -31,6 +31,8 @@ export class BidsService {
       where: { id: vehicleId },
     });
 
+    if (!vehicle) throw new NotFoundException('Vehicle not found');
+
     if (vehicle.sellerId === buyerId)
       throw new BadRequestException('Cannot bid on your own vehicle');
 
@@ -128,7 +130,7 @@ export class BidsService {
 
     // Marcăm vehiculul ca pending (rezervat)
     await this.vehicleRepo.update(bid.vehicleId, {
-      status: VehicleStatus.PENDING as unknown as VehicleStatus,
+      status: VehicleStatus.PENDING,
     });
 
     return bid;
