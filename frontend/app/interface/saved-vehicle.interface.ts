@@ -1,4 +1,4 @@
-import type { Vehicle } from './vehicle.interface';
+import type { Vehicle, ViewMode } from './vehicle.interface';
 
 // ─── SavedVehicle entity ──────────────────────────────────────────────────────
 
@@ -17,4 +17,20 @@ export interface SavedVehicle {
 
 export interface IsSavedResponse {
   isSaved: boolean;
+}
+
+// ─── Saved vehicles page ──────────────────────────────────────────────────────
+
+export interface SavedVehiclesPageData {
+  vehicles: Vehicle[];
+  total: number;
+  page: number;
+  error: boolean;
+}
+
+export interface SavedVehiclesProps {
+  vehicles: Vehicle[];
+  total: number;
+  page: number;
+  error: boolean;
 }
