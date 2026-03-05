@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Delete,
   Body,
   Request,
   UseGuards,
@@ -12,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { WalletService } from './wallet.service';
 import { JwtAuthGuard } from 'src/users/auth/guards/jwt-auth.guard';
+import type { CreateCardDto, TopUpCardDto } from './interfaces/card.dto';
 
 @Controller('wallet')
 export class WalletController {
@@ -25,7 +27,7 @@ export class WalletController {
     return this.walletService.getWallet(req.user.userId);
   }
 
-  // ─── Deposit ───────────────────────────────────────────────────────────────
+  // ─── Deposit (from card → wallet) ──────────────────────────────────────────
 
   @Post('deposit')
   @UseGuards(JwtAuthGuard)
@@ -44,5 +46,33 @@ export class WalletController {
     @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number,
   ) {
     return this.walletService.getTransactions(req.user.userId, page, limit);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  //  CARD ENDPOINTS
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  @Get('card')
+  @UseGuards(JwtAuthGuard)
+  getCard(@Request() req) {
+    return this.walletService.getCard(req.user.userId);
+  }
+
+  @Post('card')
+  @UseGuards(JwtAuthGuard)
+  addCard(@Request() req, @Body() dto: CreateCardDto) {
+    return this.walletService.addCard(req.user.userId, dto);
+  }
+
+  @Delete('card')
+  @UseGuards(JwtAuthGuard)
+  deleteCard(@Request() req) {
+    return this.walletService.deleteCard(req.user.userId);
+  }
+
+  @Post('card/topup')
+  @UseGuards(JwtAuthGuard)
+  topUpCard(@Request() req, @Body() dto: TopUpCardDto) {
+    return this.walletService.topUpCard(req.user.userId, dto);
   }
 }

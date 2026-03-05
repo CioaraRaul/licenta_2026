@@ -1,14 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router";
 import { useAuthStore } from "~/store/auth.store";
+import { getConversations } from "~/api/messages.api";
 
 export default function Sidebar() {
   const location = useLocation();
   const user = useAuthStore((s) => s.user);
   const [collapsed, setCollapsed] = useState(false);
 
+  const [unreadCount, setUnreadCount] = useState(0);
+
   const isSeller = user?.role === "seller" || user?.role === "admin";
   const isActive = (href: string) => location.pathname === href;
+
+  useEffect(() => {
+    if (!user) return;
+    getConversations()
+      .then((convs) => {
+        const total = convs.reduce((sum, c) => sum + (c.unreadCount ?? 0), 0);
+        setUnreadCount(total);
+      })
+      .catch(() => {});
+  }, [user, location.pathname]);
 
   const mainNav = [
     {
@@ -34,7 +47,7 @@ export default function Sidebar() {
     },
     {
       label: "Messages",
-      href: "/dashboard/messages",
+      href: "/messages",
       icon: (
         <svg
           width="18"
@@ -49,13 +62,13 @@ export default function Sidebar() {
           <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
         </svg>
       ),
-      badge: 3,
+      badge: unreadCount || undefined,
     },
     ...(isSeller
       ? [
           {
             label: "My Listings",
-            href: "/dashboard/my-listings",
+            href: "/my-listings",
             icon: (
               <svg
                 width="18"
@@ -79,7 +92,7 @@ export default function Sidebar() {
       : []),
     {
       label: "Wallet",
-      href: "/dashboard/wallet",
+      href: "/wallet",
       icon: (
         <svg
           width="18"
@@ -101,7 +114,7 @@ export default function Sidebar() {
   const vehicleNav = [
     {
       label: "Find Vehicle",
-      href: "/dashboard/find-vehicle",
+      href: "/find-vehicle",
       icon: (
         <svg
           width="18"
@@ -120,7 +133,7 @@ export default function Sidebar() {
     },
     {
       label: "Saved",
-      href: "/dashboard/saved",
+      href: "/saved",
       icon: (
         <svg
           width="18"
@@ -138,7 +151,7 @@ export default function Sidebar() {
     },
     {
       label: "My Bids",
-      href: "/dashboard/bids",
+      href: "/bids",
       icon: (
         <svg
           width="18"
@@ -157,7 +170,7 @@ export default function Sidebar() {
     },
     {
       label: "Compare",
-      href: "/dashboard/compare",
+      href: "/compare",
       icon: (
         <svg
           width="18"
@@ -180,7 +193,7 @@ export default function Sidebar() {
   const bottomNav = [
     {
       label: "Help & Support",
-      href: "/dashboard/support",
+      href: "/support",
       icon: (
         <svg
           width="18"
@@ -200,7 +213,7 @@ export default function Sidebar() {
     },
     {
       label: "Settings",
-      href: "/dashboard/settings",
+      href: "/settings",
       icon: (
         <svg
           width="18"
@@ -335,7 +348,7 @@ export default function Sidebar() {
             Reach thousands of verified buyers.
           </p>
           <Link
-            to="/dashboard/my-listings/new"
+            to="/my-listings/new"
             className="block w-full py-2 bg-[#e63946] rounded-lg text-white text-[12px] font-semibold text-center no-underline hover:shadow-[0_4px_12px_rgba(230,57,70,0.3)] transition-all duration-300"
           >
             + New Listing

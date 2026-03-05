@@ -1,9 +1,12 @@
 export interface User {
   userId: number;
   username: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  password: string;
+  role: 'buyer' | 'seller' | 'admin' | 'guest';
+  bio?: string;
   isEmailVerified: boolean;
-  role: string;
   isActive: boolean;
+  createdAt: string;
 }

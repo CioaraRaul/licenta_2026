@@ -4,9 +4,10 @@ import { WalletService } from './wallet.service';
 import { WalletController } from './wallet.controller';
 import { Wallet } from './entities/wallet.entity';
 import { Transaction } from './entities/transaction.entity';
+import { Card } from './entities/card.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Wallet, Transaction])],
+  imports: [TypeOrmModule.forFeature([Wallet, Transaction, Card])],
   controllers: [WalletController],
   providers: [WalletService],
   exports: [WalletService], // Export pentru BidsModule (transfer la accept bid)

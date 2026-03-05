@@ -40,7 +40,7 @@ export class SavedVehiclesController {
     return this.savedVehiclesService.getSaved(req.user.userId, page, limit);
   }
 
-  @Get()
+  @Get('check/:vehicleId')
   @UseGuards(JwtAuthGuard)
   isSaved(@Request() req, @Param('vehicleId', ParseIntPipe) vehicleId: number) {
     return this.savedVehiclesService.isSaved(req.user.userId, vehicleId);
