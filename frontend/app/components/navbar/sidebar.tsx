@@ -369,7 +369,16 @@ export default function Sidebar() {
       {/* Bottom nav */}
       <div className="px-3 pb-2 flex flex-col gap-0.5 border-t border-white/[0.04] pt-2">
         {bottomNav.map((item) => (
-          <NavLink key={item.href} item={item} />
+          <Link
+            key={item.label}
+            to={item.href}
+            className="group flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-200 no-underline text-[#8e8e9a] hover:text-[#c5c5ca] hover:bg-white/[0.03]"
+          >
+            <span className="flex-shrink-0 w-5 h-5 flex items-center justify-center opacity-50 group-hover:opacity-70 transition-opacity">
+              {item.icon}
+            </span>
+            {!collapsed && <span className="truncate">{item.label}</span>}
+          </Link>
         ))}
       </div>
 

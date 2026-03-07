@@ -1,6 +1,10 @@
-import { httpClient } from './http.api';
-import type { Bid, CreateBidPayload } from '~/interface/bid.interface';
-import type { PaginatedResponse } from '~/interface/vehicle.interface';
+import { httpClient } from "./http.api";
+import type {
+  Bid,
+  BidStatus,
+  CreateBidPayload,
+} from "~/interface/bid.interface";
+import type { PaginatedResponse } from "~/interface/vehicle.interface";
 
 // ─── Buyer endpoints ──────────────────────────────────────────────────────────
 
@@ -17,7 +21,9 @@ export async function getMyBids(
   page = 1,
   limit = 20,
 ): Promise<PaginatedResponse<Bid>> {
-  return httpClient.get<PaginatedResponse<Bid>>('/bids/my', { params: { page, limit } });
+  return httpClient.get<PaginatedResponse<Bid>>("/bids/my", {
+    params: { page, limit },
+  });
 }
 
 /** PATCH /bids/:bidId/withdraw — retrage o ofertă plasată */
@@ -40,4 +46,15 @@ export async function acceptBid(bidId: number): Promise<Bid> {
 /** PATCH /bids/:bidId/reject — respinge o ofertă cu motiv opțional */
 export async function rejectBid(bidId: number, reason?: string): Promise<Bid> {
   return httpClient.patch<Bid>(`/bids/${bidId}/reject`, { reason });
+}
+
+/** GET /bids/received — toate bid-urile primite pe vehiculele seller-ului */
+export async function getReceivedBids(
+  page = 1,
+  limit = 20,
+  status?: BidStatus,
+): Promise<PaginatedResponse<Bid>> {
+  const params: Record<string, string | number> = { page, limit };
+  if (status) params.status = status;
+  return httpClient.get<PaginatedResponse<Bid>>("/bids/received", { params });
 }
