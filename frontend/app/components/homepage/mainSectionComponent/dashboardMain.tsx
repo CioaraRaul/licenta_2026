@@ -388,7 +388,7 @@ export default function DashboardMainComponent({
                   <div className="py-10 text-center">
                     <p className="text-sm text-[#8e8e9a]">No listings yet.</p>
                     <Link
-                      to="/create"
+                      to="/my-listings/new"
                       className="text-[13px] text-[#e63946] font-medium hover:underline no-underline mt-2 inline-block"
                     >
                       Create your first listing →
@@ -713,7 +713,7 @@ export default function DashboardMainComponent({
                 {isSeller ? (
                   <>
                     <Link
-                      to="/create"
+                      to="/my-listings/new"
                       className="w-full py-2.5 bg-[#e63946] rounded-lg text-white text-[13px] font-semibold hover:shadow-[0_4px_12px_rgba(230,57,70,0.3)] transition-all flex items-center justify-center gap-2 no-underline"
                     >
                       <svg

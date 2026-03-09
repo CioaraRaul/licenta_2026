@@ -1,4 +1,4 @@
-import type { CompareEmptySlotProps } from "~/interface/compare.interface";
+import type { CompareEmptySlotProps } from "~/interface/compare-props.interface";
 import { PlusIcon } from "./CompareIcons";
 
 export default function CompareEmptySlot({

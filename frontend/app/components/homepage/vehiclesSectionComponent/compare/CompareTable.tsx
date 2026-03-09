@@ -1,10 +1,12 @@
 import { useMemo } from "react";
 import type { Vehicle } from "~/interface/vehicle.interface";
-import type { CompareSpecRow } from "~/interface/compare.interface";
+import type { CompareSpecRow } from "~/interface/compare-spec.interface";
 import {
   PRICING_SPECS,
   PERFORMANCE_SPECS,
-  GENERAL_SPECS,
+  IDENTITY_SPECS,
+  APPEARANCE_SPECS,
+  DETAILS_SPECS,
   HISTORY_SPECS,
   LOCATION_SPECS,
   FEATURES_SPECS,
@@ -21,13 +23,16 @@ import { findWinnerIndex, getVehicleTitle } from "~/utils/compare.utils";
 import {
   DollarIcon,
   EngineIcon,
-  InfoIcon,
+  CarIcon,
+  PaletteIcon,
+  ClipboardIcon,
   ShieldIcon,
   MapIcon,
   TrophyIcon,
   StarIcon,
   ChartIcon,
 } from "./CompareIcons";
+import FeatureMatrix from "./FeatureMatrix";
 
 interface CompareTableProps {
   vehicles: Vehicle[];
@@ -37,6 +42,11 @@ interface SpecGroupConfig {
   title: string;
   icon: React.ReactNode;
   rows: CompareSpecRow[];
+  /** Render feature matrices after the rows */
+  featureMatrices?: Array<{
+    featureKey: "features" | "safetyFeatures";
+    title: string;
+  }>;
 }
 
 export default function CompareTable({ vehicles }: CompareTableProps) {
@@ -44,14 +54,24 @@ export default function CompareTable({ vehicles }: CompareTableProps) {
     () => [
       { title: "Pricing", icon: <DollarIcon />, rows: PRICING_SPECS },
       { title: "Performance", icon: <EngineIcon />, rows: PERFORMANCE_SPECS },
-      { title: "General", icon: <InfoIcon />, rows: GENERAL_SPECS },
+      { title: "Identity", icon: <CarIcon />, rows: IDENTITY_SPECS },
+      { title: "Appearance", icon: <PaletteIcon />, rows: APPEARANCE_SPECS },
+      { title: "Details", icon: <ClipboardIcon />, rows: DETAILS_SPECS },
       {
         title: "History & Warranty",
         icon: <ShieldIcon />,
         rows: HISTORY_SPECS,
       },
       { title: "Location", icon: <MapIcon />, rows: LOCATION_SPECS },
-      { title: "Features & Media", icon: <StarIcon />, rows: FEATURES_SPECS },
+      {
+        title: "Features & Media",
+        icon: <StarIcon />,
+        rows: FEATURES_SPECS,
+        featureMatrices: [
+          { featureKey: "features", title: "Features Comparison" },
+          { featureKey: "safetyFeatures", title: "Safety Features Comparison" },
+        ],
+      },
       {
         title: "Analytics & Listing",
         icon: <ChartIcon />,
@@ -83,7 +103,7 @@ export default function CompareTable({ vehicles }: CompareTableProps) {
         </div>
       </div>
 
-      {groups.map((group, gi) => (
+      {groups.map((group) => (
         <div key={group.title}>
           {/* Group header */}
           <div className="flex items-center gap-2 px-5 py-3 bg-white/2 border-b border-white/6">
@@ -93,9 +113,19 @@ export default function CompareTable({ vehicles }: CompareTableProps) {
             </span>
           </div>
 
-          {/* Rows */}
+          {/* Spec rows */}
           {group.rows.map((row) => (
             <SpecRow key={row.key} row={row} vehicles={vehicles} />
+          ))}
+
+          {/* Feature matrices (only for Features & Media group) */}
+          {group.featureMatrices?.map((matrix) => (
+            <FeatureMatrix
+              key={matrix.featureKey}
+              vehicles={vehicles}
+              featureKey={matrix.featureKey}
+              title={matrix.title}
+            />
           ))}
         </div>
       ))}
@@ -114,7 +144,17 @@ function SpecRow({
 }) {
   const winnerIdx = useMemo(() => {
     if (!row.highlight) return -1;
-    return findWinnerIndex(vehicles, row.key as keyof Vehicle, row.highlight);
+    try {
+      return findWinnerIndex(
+        vehicles,
+        row.key as keyof Vehicle,
+        row.highlight,
+        row.rankMap,
+        row.countKey,
+      );
+    } catch {
+      return -1;
+    }
   }, [row, vehicles]);
 
   return (
@@ -129,7 +169,12 @@ function SpecRow({
         className={`flex-1 grid ${GRID_COLS[vehicles.length] ?? "grid-cols-2"}`}
       >
         {vehicles.map((vehicle, vi) => {
-          const value = row.getValue(vehicle);
+          let value: string;
+          try {
+            value = row.getValue(vehicle);
+          } catch {
+            value = "—";
+          }
           const isWinner = winnerIdx === vi;
 
           return (

@@ -203,7 +203,7 @@ export default function Sidebar() {
   const bottomNav = [
     {
       label: "Help & Support",
-      href: "/dashboard",
+      href: "/help-support",
       icon: (
         <svg
           width="18"
@@ -223,7 +223,7 @@ export default function Sidebar() {
     },
     {
       label: "Settings",
-      href: "/dashboard",
+      href: "/settings",
       icon: (
         <svg
           width="18"
@@ -336,7 +336,10 @@ export default function Sidebar() {
       {/* Sell CTA — seller only */}
       {isSeller && !collapsed && (
         <div className="mx-3 mb-3 p-4 bg-gradient-to-br from-[#1c1c21] to-[#141417] border border-white/[0.06] rounded-xl">
-          <div className="w-9 h-9 rounded-full bg-[rgba(230,57,70,0.12)] flex items-center justify-center mb-3">
+          <Link
+            to="/my-listings/new"
+            className="w-9 h-9 rounded-full bg-[rgba(230,57,70,0.12)] flex items-center justify-center mb-3 hover:bg-[rgba(230,57,70,0.2)] transition-colors no-underline"
+          >
             <svg
               width="16"
               height="16"
@@ -350,7 +353,7 @@ export default function Sidebar() {
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
-          </div>
+          </Link>
           <div className="text-[13px] font-semibold text-[#f5f5f7] mb-0.5">
             List a vehicle
           </div>

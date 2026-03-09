@@ -1,4 +1,4 @@
-import type { CompareCardProps } from "~/interface/compare.interface";
+import type { CompareCardProps } from "~/interface/compare-props.interface";
 import { getVehicleTitle } from "~/utils/compare.utils";
 import { formatCurrencyFull, formatMileage } from "~/utils/format.utils";
 import { getFuelTypeLabel, getTransmissionLabel } from "~/utils/vehicle.utils";

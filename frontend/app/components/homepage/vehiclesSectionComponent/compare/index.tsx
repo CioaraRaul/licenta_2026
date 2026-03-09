@@ -106,7 +106,7 @@ export default function CompareComponent() {
   // ─── Main compare view ────────────────────────────────────────────────────
 
   return (
-    <div className="flex-1 flex flex-col p-6 space-y-5 overflow-y-auto">
+    <div className="flex-1 flex flex-col p-6 space-y-5 overflow-y-auto min-h-0">
       {/* Header */}
       <CompareHeader
         vehicleCount={vehicles.length}

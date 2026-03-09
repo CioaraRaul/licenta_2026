@@ -1,6 +1,5 @@
-import type { CompareSpecRow } from "~/interface/compare.interface";
+import type { CompareSpecRow } from "~/interface/compare-spec.interface";
 import {
-  getSpecDisplayValue,
   getDriveTypeLabel,
   getConditionLabel,
   getVehicleTypeLabel,
@@ -82,7 +81,9 @@ export const PERFORMANCE_SPECS: CompareSpecRow[] = [
   },
 ];
 
-export const GENERAL_SPECS: CompareSpecRow[] = [
+// ─── Split from old "General" group ──────────────────────────────────────────
+
+export const IDENTITY_SPECS: CompareSpecRow[] = [
   {
     label: "Make",
     key: "make",
@@ -101,19 +102,15 @@ export const GENERAL_SPECS: CompareSpecRow[] = [
   {
     label: "Year",
     key: "year",
-    getValue: (v) => `${v.year}`,
+    getValue: (v) => `${v.year ?? "\u2014"}`,
     highlight: "highest",
-  },
-  {
-    label: "Mileage",
-    key: "mileage",
-    getValue: (v) => formatMileage(v.mileage),
-    highlight: "lowest",
   },
   {
     label: "Condition",
     key: "condition",
     getValue: (v) => getConditionLabel(v.condition),
+    highlight: "enum_rank",
+    rankMap: { new: 3, certified_pre_owned: 2, used: 1 },
   },
   {
     label: "Type",
@@ -123,8 +120,12 @@ export const GENERAL_SPECS: CompareSpecRow[] = [
   {
     label: "Status",
     key: "status",
-    getValue: (v) => getVehicleStatusBadge(v.status, v.isActive).label,
+    getValue: (v) =>
+      v.status ? getVehicleStatusBadge(v.status, v.isActive).label : "—",
   },
+];
+
+export const APPEARANCE_SPECS: CompareSpecRow[] = [
   {
     label: "Exterior Color",
     key: "exteriorColor",
@@ -138,12 +139,21 @@ export const GENERAL_SPECS: CompareSpecRow[] = [
   {
     label: "Doors",
     key: "doors",
-    getValue: (v) => `${v.doors}`,
+    getValue: (v) => `${v.doors ?? "\u2014"}`,
   },
   {
     label: "Seats",
     key: "seats",
-    getValue: (v) => `${v.seats}`,
+    getValue: (v) => `${v.seats ?? "\u2014"}`,
+  },
+];
+
+export const DETAILS_SPECS: CompareSpecRow[] = [
+  {
+    label: "Mileage",
+    key: "mileage",
+    getValue: (v) => formatMileage(v.mileage),
+    highlight: "lowest",
   },
   {
     label: "Description",
@@ -161,13 +171,14 @@ export const HISTORY_SPECS: CompareSpecRow[] = [
   {
     label: "Previous Owners",
     key: "previousOwners",
-    getValue: (v) => `${v.previousOwners}`,
+    getValue: (v) => `${v.previousOwners ?? 0}`,
     highlight: "lowest",
   },
   {
     label: "Accident History",
     key: "accidentHistory",
     getValue: (v) => (v.accidentHistory ? "Yes" : "No"),
+    highlight: "boolean_prefer_false",
   },
   {
     label: "Service History",
@@ -178,6 +189,7 @@ export const HISTORY_SPECS: CompareSpecRow[] = [
     label: "Warranty",
     key: "warrantyAvailable",
     getValue: (v) => (v.warrantyAvailable ? "Yes" : "No"),
+    highlight: "boolean_prefer_true",
   },
   {
     label: "Warranty Expiry",
@@ -221,23 +233,29 @@ export const LOCATION_SPECS: CompareSpecRow[] = [
 
 export const FEATURES_SPECS: CompareSpecRow[] = [
   {
-    label: "Features",
+    label: "Features Count",
     key: "features",
     getValue: (v) =>
-      v.features && v.features.length > 0 ? v.features.join(", ") : "—",
+      v.features && v.features.length > 0
+        ? `${v.features.length} feature${v.features.length > 1 ? "s" : ""}`
+        : "None",
+    highlight: "count",
+    countKey: "features",
   },
   {
-    label: "Safety Features",
+    label: "Safety Features Count",
     key: "safetyFeatures",
     getValue: (v) =>
       v.safetyFeatures && v.safetyFeatures.length > 0
-        ? v.safetyFeatures.join(", ")
-        : "—",
+        ? `${v.safetyFeatures.length} feature${v.safetyFeatures.length > 1 ? "s" : ""}`
+        : "None",
+    highlight: "count",
+    countKey: "safetyFeatures",
   },
   {
     label: "Photos",
     key: "images",
-    getValue: (v) => (v.images ? `${v.images.length}` : "0"),
+    getValue: (v) => `${v.images?.length ?? 0}`,
     highlight: "highest",
   },
   {
@@ -251,25 +269,25 @@ export const ANALYTICS_SPECS: CompareSpecRow[] = [
   {
     label: "Views",
     key: "viewsCount",
-    getValue: (v) => v.viewsCount.toLocaleString(),
+    getValue: (v) => (v.viewsCount ?? 0).toLocaleString(),
     highlight: "highest",
   },
   {
     label: "Saves",
     key: "savesCount",
-    getValue: (v) => v.savesCount.toLocaleString(),
+    getValue: (v) => (v.savesCount ?? 0).toLocaleString(),
     highlight: "highest",
   },
   {
     label: "Contacts",
     key: "contactsCount",
-    getValue: (v) => v.contactsCount.toLocaleString(),
+    getValue: (v) => (v.contactsCount ?? 0).toLocaleString(),
     highlight: "highest",
   },
   {
     label: "Listed",
     key: "createdAt",
-    getValue: (v) => formatRelativeTime(v.createdAt),
+    getValue: (v) => (v.createdAt ? formatRelativeTime(v.createdAt) : "—"),
   },
   {
     label: "Seller",
@@ -287,6 +305,6 @@ export const ANALYTICS_SPECS: CompareSpecRow[] = [
   {
     label: "Last Updated",
     key: "updatedAt",
-    getValue: (v) => formatRelativeTime(v.updatedAt),
+    getValue: (v) => (v.updatedAt ? formatRelativeTime(v.updatedAt) : "—"),
   },
 ];

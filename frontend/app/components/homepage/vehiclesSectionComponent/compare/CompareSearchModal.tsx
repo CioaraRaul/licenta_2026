@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import type { CompareSearchModalProps } from "~/interface/compare.interface";
+import type { CompareSearchModalProps } from "~/interface/compare-props.interface";
 import type { Vehicle } from "~/interface/vehicle.interface";
 import { getVehicles } from "~/api/vehicles.api";
 import { getVehicleTitle } from "~/utils/compare.utils";

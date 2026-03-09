@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { CompareState } from "~/interface/compare.interface";
+import type { CompareState } from "~/interface/compare-store.interface";
 import { MAX_COMPARE_VEHICLES } from "~/constants/compare.constants";
 
 export const useCompareStore = create<CompareState>()(

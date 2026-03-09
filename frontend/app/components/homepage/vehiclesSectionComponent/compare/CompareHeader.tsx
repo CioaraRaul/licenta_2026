@@ -1,4 +1,4 @@
-import type { CompareHeaderProps } from "~/interface/compare.interface";
+import type { CompareHeaderProps } from "~/interface/compare-props.interface";
 import { TrashIcon } from "./CompareIcons";
 
 export default function CompareHeader({
