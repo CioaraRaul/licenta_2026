@@ -21,6 +21,7 @@ export default [
     route("my-listings/new", "routes/homepage/main/newListing.tsx"),
     route("wallet", "routes/homepage/main/wallet.tsx"),
     route("find-vehicle", "routes/homepage/vehicles/findVehicle.tsx"),
+    route("find-vehicle/:id", "routes/homepage/vehicles/vehicleDetail.tsx"),
     route("saved", "routes/homepage/vehicles/saved.tsx"),
     route("compare", "routes/homepage/vehicles/compare.tsx"),
     route("bids", "routes/homepage/vehicles/myBids.tsx"),

@@ -1,3 +1,4 @@
+import { Link } from "react-router";
 import type { VehicleCardProps } from "~/interface/vehicle.interface";
 import {
   formatCurrencyFull,
@@ -7,7 +8,6 @@ import {
 import { getFuelTypeLabel, getTransmissionLabel } from "~/utils/vehicle.utils";
 import {
   HeartIcon,
-  EyeIcon,
   MapPinIcon,
   GaugeIcon,
   FuelIcon,
@@ -19,7 +19,6 @@ export default function VehicleCard({
   vehicle,
   isSaved,
   onToggleSave,
-  onQuickView,
 }: VehicleCardProps) {
   const thumbnail = vehicle.images?.[0] ?? null;
   const title = `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
@@ -27,9 +26,9 @@ export default function VehicleCard({
   return (
     <div className="group bg-[#141417] border border-white/6 rounded-xl overflow-hidden hover:border-white/12 transition-all duration-200">
       {/* Image area */}
-      <div
-        className="relative aspect-16/10 bg-[#0c0c0e] cursor-pointer overflow-hidden"
-        onClick={() => onQuickView(vehicle)}
+      <Link
+        to={`/find-vehicle/${vehicle.id}`}
+        className="relative block aspect-16/10 bg-[#0c0c0e] cursor-pointer overflow-hidden"
       >
         {thumbnail ? (
           <img
@@ -64,10 +63,10 @@ export default function VehicleCard({
           <HeartIcon filled={isSaved} />
         </button>
 
-        {/* Quick view overlay */}
+        {/* View overlay */}
         <div className="absolute inset-0 z-10 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
           <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur-sm text-[12px] text-white font-medium">
-            <EyeIcon /> Quick View
+            View Details
           </span>
         </div>
 
@@ -89,19 +88,19 @@ export default function VehicleCard({
             </span>
           )}
         </div>
-      </div>
+      </Link>
 
       {/* Details */}
       <div className="p-4 space-y-2.5">
         {/* Title */}
         <div>
-          <h3
-            className="text-[14px] font-semibold text-[#f5f5f7] truncate cursor-pointer hover:text-[#e63946] transition-colors"
-            onClick={() => onQuickView(vehicle)}
+          <Link
+            to={`/find-vehicle/${vehicle.id}`}
+            className="block text-[14px] font-semibold text-[#f5f5f7] truncate cursor-pointer hover:text-[#e63946] transition-colors"
             title={title}
           >
             {title}
-          </h3>
+          </Link>
           {vehicle.trim && (
             <p className="text-[11px] text-[#8e8e9a] truncate">
               {vehicle.trim}

@@ -1,3 +1,4 @@
+import { Link } from "react-router";
 import type { VehicleRowProps } from "~/interface/vehicle.interface";
 import {
   formatCurrencyFull,
@@ -7,7 +8,6 @@ import {
 import { getFuelTypeLabel, getTransmissionLabel } from "~/utils/vehicle.utils";
 import {
   HeartIcon,
-  EyeIcon,
   MapPinIcon,
   GaugeIcon,
   FuelIcon,
@@ -19,7 +19,6 @@ export default function VehicleRow({
   vehicle,
   isSaved,
   onToggleSave,
-  onQuickView,
 }: VehicleRowProps) {
   const thumbnail = vehicle.images?.[0] ?? null;
   const title = `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
@@ -27,9 +26,9 @@ export default function VehicleRow({
   return (
     <div className="group bg-[#141417] border border-white/6 rounded-xl overflow-hidden hover:border-white/12 transition-all duration-200 flex">
       {/* Thumbnail */}
-      <div
+      <Link
+        to={`/find-vehicle/${vehicle.id}`}
         className="relative w-[220px] shrink-0 bg-[#0c0c0e] cursor-pointer overflow-hidden"
-        onClick={() => onQuickView(vehicle)}
       >
         {thumbnail ? (
           <img
@@ -56,7 +55,7 @@ export default function VehicleRow({
             </span>
           )}
         </div>
-      </div>
+      </Link>
 
       {/* Details */}
       <div className="flex-1 p-4 flex flex-col justify-between min-w-0">
@@ -64,13 +63,13 @@ export default function VehicleRow({
           {/* Title row */}
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <h3
-                className="text-[14px] font-semibold text-[#f5f5f7] truncate cursor-pointer hover:text-[#e63946] transition-colors"
-                onClick={() => onQuickView(vehicle)}
+              <Link
+                to={`/find-vehicle/${vehicle.id}`}
+                className="block text-[14px] font-semibold text-[#f5f5f7] truncate cursor-pointer hover:text-[#e63946] transition-colors"
                 title={title}
               >
                 {title}
-              </h3>
+              </Link>
               {vehicle.trim && (
                 <p className="text-[11px] text-[#8e8e9a] truncate">
                   {vehicle.trim}
@@ -112,13 +111,24 @@ export default function VehicleRow({
           </span>
 
           <div className="flex items-center gap-2 shrink-0">
-            <button
-              onClick={() => onQuickView(vehicle)}
+            <Link
+              to={`/find-vehicle/${vehicle.id}`}
               className="p-2 rounded-lg hover:bg-white/6 text-[#8e8e9a] hover:text-[#f5f5f7] transition-colors"
-              title="Quick view"
+              title="View details"
             >
-              <EyeIcon />
-            </button>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="m9 18 6-6-6-6" />
+              </svg>
+            </Link>
             <button
               onClick={() => onToggleSave(vehicle.id)}
               className={`p-2 rounded-lg transition-colors ${
