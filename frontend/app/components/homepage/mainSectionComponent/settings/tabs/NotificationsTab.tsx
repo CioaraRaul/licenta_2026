@@ -1,14 +1,13 @@
-import { useState } from "react";
 import { NOTIFICATION_SETTINGS } from "~/constants/settings.constants";
 import Toggle from "../ui/Toggle";
+import { useNotificationsStore } from "~/store/notifications.store";
+import type { NotificationPrefs } from "~/interface/notification.interface";
 
 export default function NotificationsTab() {
-  const [notifications, setNotifications] = useState<Record<string, boolean>>(
-    () => Object.fromEntries(NOTIFICATION_SETTINGS.map((n) => [n.key, true])),
-  );
+  const { prefs, updatePrefs } = useNotificationsStore();
 
-  const toggleNotification = (key: string) =>
-    setNotifications((prev) => ({ ...prev, [key]: !prev[key] }));
+  const toggle = (key: keyof NotificationPrefs) =>
+    updatePrefs({ [key]: !prefs[key] });
 
   return (
     <div className="space-y-6">
@@ -37,8 +36,8 @@ export default function NotificationsTab() {
                 </p>
               </div>
               <Toggle
-                enabled={notifications[key]}
-                onToggle={() => toggleNotification(key)}
+                enabled={prefs[key as keyof NotificationPrefs] ?? true}
+                onToggle={() => toggle(key as keyof NotificationPrefs)}
               />
             </div>
           ))}
@@ -56,7 +55,10 @@ export default function NotificationsTab() {
               Mute all notifications between 10 PM and 7 AM.
             </p>
           </div>
-          <Toggle enabled={false} onToggle={() => {}} />
+          <Toggle
+            enabled={prefs.quietHours}
+            onToggle={() => toggle("quietHours")}
+          />
         </div>
       </div>
     </div>
