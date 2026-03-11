@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './auth/dtos/create-user.dto';
+import { UpdateProfileDto } from './dtos/update-profile.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/users.entity';
 import { FindOptionsWhere, MoreThan, Repository } from 'typeorm';
@@ -126,7 +127,7 @@ export class UsersService {
     return this.findById(id);
   }
 
-  update(id: number, updateUserDto: any) {
+  update(id: number, updateUserDto: UpdateProfileDto) {
     return this.userRepo.update(id, updateUserDto);
   }
 
