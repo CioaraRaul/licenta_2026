@@ -79,7 +79,7 @@ export default function DashboardMainComponent({
               {/* Active Listings */}
               <div className="bg-[#141417] border border-white/[0.04] rounded-xl p-4 hover:border-white/[0.08] transition-all group">
                 <div
-                  className={`flex items-center justify-between ${collapsedCards.listings ? "" : "mb-3"}`}
+                  className={`flex items-center justify-between transition-all duration-300 ${collapsedCards.listings ? "mb-0" : "mb-3"}`}
                 >
                   <div className="w-9 h-9 rounded-lg bg-white/[0.04] flex items-center justify-center group-hover:scale-105 transition-transform">
                     <svg
@@ -117,7 +117,7 @@ export default function DashboardMainComponent({
                   </button>
                 </div>
                 <div
-                  className={`grid transition-all duration-200 ${collapsedCards.listings ? "grid-rows-[0fr]" : "grid-rows-[1fr]"}`}
+                  className={`grid transition-all duration-300 ${collapsedCards.listings ? "grid-rows-[0fr] opacity-0" : "grid-rows-[1fr] opacity-100"}`}
                 >
                   <div className="overflow-hidden">
                     <div className="text-[22px] font-bold text-[#f5f5f7] tracking-tight">
@@ -136,7 +136,7 @@ export default function DashboardMainComponent({
               {/* Total Views */}
               <div className="bg-[#141417] border border-white/[0.04] rounded-xl p-4 hover:border-white/[0.08] transition-all group">
                 <div
-                  className={`flex items-center justify-between ${collapsedCards.views ? "" : "mb-3"}`}
+                  className={`flex items-center justify-between transition-all duration-300 ${collapsedCards.views ? "mb-0" : "mb-3"}`}
                 >
                   <div className="w-9 h-9 rounded-lg bg-white/[0.04] flex items-center justify-center group-hover:scale-105 transition-transform">
                     <svg
@@ -174,7 +174,7 @@ export default function DashboardMainComponent({
                   </button>
                 </div>
                 <div
-                  className={`grid transition-all duration-200 ${collapsedCards.views ? "grid-rows-[0fr]" : "grid-rows-[1fr]"}`}
+                  className={`grid transition-all duration-300 ${collapsedCards.views ? "grid-rows-[0fr] opacity-0" : "grid-rows-[1fr] opacity-100"}`}
                 >
                   <div className="overflow-hidden">
                     <div className="text-[22px] font-bold text-[#f5f5f7] tracking-tight">
@@ -193,7 +193,7 @@ export default function DashboardMainComponent({
               {/* Cars Sold */}
               <div className="bg-[#141417] border border-white/[0.04] rounded-xl p-4 hover:border-white/[0.08] transition-all group">
                 <div
-                  className={`flex items-center justify-between ${collapsedCards.sold ? "" : "mb-3"}`}
+                  className={`flex items-center justify-between transition-all duration-300 ${collapsedCards.sold ? "mb-0" : "mb-3"}`}
                 >
                   <div className="w-9 h-9 rounded-lg bg-white/[0.04] flex items-center justify-center group-hover:scale-105 transition-transform">
                     <svg
@@ -231,7 +231,7 @@ export default function DashboardMainComponent({
                   </button>
                 </div>
                 <div
-                  className={`grid transition-all duration-200 ${collapsedCards.sold ? "grid-rows-[0fr]" : "grid-rows-[1fr]"}`}
+                  className={`grid transition-all duration-300 ${collapsedCards.sold ? "grid-rows-[0fr] opacity-0" : "grid-rows-[1fr] opacity-100"}`}
                 >
                   <div className="overflow-hidden">
                     <div className="text-[22px] font-bold text-[#f5f5f7] tracking-tight">
@@ -250,7 +250,7 @@ export default function DashboardMainComponent({
               {/* Revenue */}
               <div className="bg-[#141417] border border-white/[0.04] rounded-xl p-4 hover:border-white/[0.08] transition-all group">
                 <div
-                  className={`flex items-center justify-between ${collapsedCards.revenue ? "" : "mb-3"}`}
+                  className={`flex items-center justify-between transition-all duration-300 ${collapsedCards.revenue ? "mb-0" : "mb-3"}`}
                 >
                   <div className="w-9 h-9 rounded-lg bg-white/[0.04] flex items-center justify-center group-hover:scale-105 transition-transform">
                     <svg
@@ -288,7 +288,7 @@ export default function DashboardMainComponent({
                   </button>
                 </div>
                 <div
-                  className={`grid transition-all duration-200 ${collapsedCards.revenue ? "grid-rows-[0fr]" : "grid-rows-[1fr]"}`}
+                  className={`grid transition-all duration-300 ${collapsedCards.revenue ? "grid-rows-[0fr] opacity-0" : "grid-rows-[1fr] opacity-100"}`}
                 >
                   <div className="overflow-hidden">
                     <div className="text-[22px] font-bold text-[#f5f5f7] tracking-tight">

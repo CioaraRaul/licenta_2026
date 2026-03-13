@@ -269,13 +269,13 @@ export class AuthService {
   }
 
   async storeResetCode(resetToken: string): Promise<string> {
-    const code = randomBytes(32).toString('hex');
+    const code = (await randomBytesAsync(32)).toString('hex');
     this.oauthCodes.set(`reset_${code}`, resetToken);
     setTimeout(() => this.oauthCodes.delete(`reset_${code}`), 5 * 60 * 1000);
     return code;
   }
 
-  async exchangeResetCode(code: string): Promise<string> {
+  exchangeResetCode(code: string): string {
     const cleanCode = code.replace(/:[0-9]+$/, '');
     const resetToken = this.oauthCodes.get(`reset_${cleanCode}`);
     if (!resetToken) {
@@ -285,7 +285,7 @@ export class AuthService {
     return resetToken;
   }
 
-  async exchangeEmailVerifcationCode(code: string): Promise<string> {
+  exchangeEmailVerifcationCode(code: string): string {
     const cleanCode = code.replace(/:[0-9]+$/, '');
     const token = this.oauthCodes.get(`verify_${cleanCode}`);
     if (!token) throw new BadRequestException('Invalid or expired code');
@@ -597,15 +597,15 @@ export class AuthService {
   }
 
   async storeOAuthResult(result: any): Promise<string> {
-    const code = randomBytes(32).toString('hex');
+    const code = (await randomBytesAsync(32)).toString('hex');
     this.oauthCodes.set(code, result);
     setTimeout(() => this.oauthCodes.delete(code), 5 * 60 * 1000);
     return code;
   }
 
-  async getOAuthResult(code: string): Promise<any> {
+  getOAuthResult(code: string): any {
     const cleanCode = code.replace(/:[0-9]+$/, '');
-    const result = await this.oauthCodes.get(cleanCode);
+    const result = this.oauthCodes.get(cleanCode);
     if (!result) {
       throw new BadRequestException('Invalid or expired code');
     }
