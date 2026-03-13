@@ -26,12 +26,12 @@ import { TokenBlacklistService } from './token-blacklist.service';
 import { ChangePasswordDto } from '../dtos/change-password.dto';
 
 const scrypt = promisify(_scrypt);
-
-// Module-level map so codes survive NestJS hot-module replacement during development
-const oauthCodes = new Map<string, any>();
+const randomBytesAsync = promisify(randomBytes);
 
 @Injectable()
 export class AuthService {
+  private readonly oauthCodes = new Map<string, any>();
+
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
@@ -44,14 +44,14 @@ export class AuthService {
   ) {}
 
   async storeEmailVerificationCode(verificationToken: string): Promise<string> {
-    const code = randomBytes(32).toString('hex');
+    const code = (await randomBytesAsync(32)).toString('hex');
     this.oauthCodes.set(`verify_${code}`, verificationToken);
     setTimeout(() => this.oauthCodes.delete(`verify_${code}`), 5 * 60 * 1000);
     return code;
   }
 
   async signUp(createUserDto: CreateUserDto) {
-    const salt = randomBytes(8).toString('hex');
+    const salt = (await randomBytesAsync(8)).toString('hex');
     const hash = (await scrypt(createUserDto.password, salt, 32)) as Buffer;
     const result = salt + '.' + hash.toString('hex');
 
@@ -60,7 +60,7 @@ export class AuthService {
       password: result,
     });
 
-    const verificationToken = randomBytes(32).toString('hex');
+    const verificationToken = (await randomBytesAsync(32)).toString('hex');
     const verificationExpires = new Date(Date.now() + 24 * 3600000);
 
     await this.usersService.updateVerificationToken(
