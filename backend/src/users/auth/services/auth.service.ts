@@ -27,10 +27,11 @@ import { ChangePasswordDto } from '../dtos/change-password.dto';
 
 const scrypt = promisify(_scrypt);
 
+// Module-level map so codes survive NestJS hot-module replacement during development
+const oauthCodes = new Map<string, any>();
+
 @Injectable()
 export class AuthService {
-  private oauthCodes = new Map<string, any>();
-
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
@@ -275,18 +276,20 @@ export class AuthService {
   }
 
   async exchangeResetCode(code: string): Promise<string> {
-    const resetToken = this.oauthCodes.get(`reset_${code}`);
+    const cleanCode = code.replace(/:[0-9]+$/, '');
+    const resetToken = this.oauthCodes.get(`reset_${cleanCode}`);
     if (!resetToken) {
       throw new BadRequestException('Invalid or expired code');
     }
-    this.oauthCodes.delete(`reset_${code}`);
+    this.oauthCodes.delete(`reset_${cleanCode}`);
     return resetToken;
   }
 
   async exchangeEmailVerifcationCode(code: string): Promise<string> {
-    const token = this.oauthCodes.get(`verify_${code}`);
+    const cleanCode = code.replace(/:[0-9]+$/, '');
+    const token = this.oauthCodes.get(`verify_${cleanCode}`);
     if (!token) throw new BadRequestException('Invalid or expired code');
-    this.oauthCodes.delete(`verify_${code}`);
+    this.oauthCodes.delete(`verify_${cleanCode}`);
     return token;
   }
 
@@ -601,11 +604,12 @@ export class AuthService {
   }
 
   async getOAuthResult(code: string): Promise<any> {
-    const result = await this.oauthCodes.get(code);
+    const cleanCode = code.replace(/:[0-9]+$/, '');
+    const result = await this.oauthCodes.get(cleanCode);
     if (!result) {
       throw new BadRequestException('Invalid or expired code');
     }
-    this.oauthCodes.delete(code);
+    this.oauthCodes.delete(cleanCode);
     return result;
   }
 }
