@@ -65,6 +65,10 @@ export interface DepositPayload {
   amount: number;
 }
 
+export interface WithdrawPayload {
+  amount: number;
+}
+
 export interface AddCardPayload {
   cardNumber: string;
   cardHolderName: string;
@@ -91,6 +95,7 @@ export interface BalanceCardProps {
   wallet: Wallet;
   card: Card | null;
   onDeposit: (amount: number) => Promise<void>;
+  onWithdraw: (amount: number) => Promise<void>;
 }
 
 export interface TransactionListProps {
@@ -116,6 +121,15 @@ export interface DepositModalProps {
   onClose: () => void;
   onDeposit: (amount: number) => Promise<void>;
   isProcessing: boolean;
+  card: Card | null;
+}
+
+export interface WithdrawalModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onWithdraw: (amount: number) => Promise<void>;
+  isProcessing: boolean;
+  walletBalance: number;
   card: Card | null;
 }
 

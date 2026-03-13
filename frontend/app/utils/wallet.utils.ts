@@ -8,6 +8,7 @@ import {
   TRANSACTION_TYPE_COLORS,
   TRANSACTION_STATUS_STYLES,
 } from "~/constants/wallet.constants";
+import { formatCurrencyFull } from "~/utils/format.utils";
 
 /* ─── Transaction type → human-readable label ────────────────────────────── */
 
@@ -71,6 +72,29 @@ export function validateDepositAmount(
     return { valid: false, error: "Maximum deposit is $100,000" };
   if (!/^\d+(\.\d{1,2})?$/.test(value))
     return { valid: false, error: "Max 2 decimal places" };
+  return { valid: true, amount: num };
+}
+
+/* ─── Validate a custom withdrawal amount ────────────────────────────────── */
+
+export function validateWithdrawalAmount(
+  value: string,
+  availableBalance: number,
+): { valid: true; amount: number } | { valid: false; error: string } {
+  const num = Number(value);
+  if (!value || isNaN(num))
+    return { valid: false, error: "Enter a valid amount" };
+  if (num <= 0)
+    return { valid: false, error: "Amount must be greater than $0" };
+  if (!/^\d+(\.\d{1,2})?$/.test(value))
+    return { valid: false, error: "Max 2 decimal places" };
+  if (num > availableBalance)
+    return {
+      valid: false,
+      error: `Insufficient balance (${formatCurrencyFull(availableBalance)} available)`,
+    };
+  if (num > 100_000)
+    return { valid: false, error: "Maximum withdrawal is $100,000" };
   return { valid: true, amount: num };
 }
 
