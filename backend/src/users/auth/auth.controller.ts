@@ -13,6 +13,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { Request as ExpressRequest, Response } from 'express';
+import { ConfigService } from '@nestjs/config';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { AuthService } from './services/auth.service';
 import { LoginDTO } from './dtos/login.dto';
@@ -31,7 +32,10 @@ import { Throttle } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private configService: ConfigService,
+  ) {}
 
   @Post('signup')
   async createUser(@Body() createUserDto: CreateUserDto) {
@@ -63,7 +67,11 @@ export class AuthController {
   async googleAuthRedirect(@Request() req, @Res() res: Response) {
     const result = await this.authService.googleLogin(req);
     const code = await this.authService.storeOAuthResult(result);
-    res.redirect(`http://localhost:5173/auth/callback?code=${code}`);
+    const frontendUrl = this.configService.get(
+      'FRONTEND_URL',
+      'http://localhost:5173',
+    );
+    res.redirect(`${frontendUrl}/auth/callback?code=${code}`);
   }
 
   @Get('oauth/exchange')
@@ -80,7 +88,11 @@ export class AuthController {
   async facebookAuthRedirect(@Request() req, @Res() res: Response) {
     const result = await this.authService.facebookLogin(req);
     const code = await this.authService.storeOAuthResult(result);
-    res.redirect(`http://localhost:5173/auth/callback?code=${code}`);
+    const frontendUrl = this.configService.get(
+      'FRONTEND_URL',
+      'http://localhost:5173',
+    );
+    res.redirect(`${frontendUrl}/auth/callback?code=${code}`);
   }
 
   @Post('forgot-password')
@@ -187,7 +199,8 @@ export class AuthController {
     return this.authService.reactivateAccountByEmail(email);
   }
 
-  @Post('account/reactivate')
+  @UseGuards(JwtAuthGuard)
+  @Patch('account/reactivate')
   async reactivateAccountAuthenticated(@Request() req) {
     return this.authService.reactivateAccountByUserId(req.user.userId);
   }

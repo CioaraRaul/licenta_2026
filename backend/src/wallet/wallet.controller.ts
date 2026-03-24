@@ -36,6 +36,15 @@ export class WalletController {
     return this.walletService.deposit(req.user.userId, amount);
   }
 
+  // ─── Withdraw (from wallet → card) ────────────────────────────────────────
+
+  @Post('withdraw')
+  @UseGuards(JwtAuthGuard)
+  withdraw(@Request() req, @Body('amount') amount: number) {
+    if (!amount) throw new BadRequestException('Amount is required');
+    return this.walletService.withdraw(req.user.userId, amount);
+  }
+
   // ─── Get Transaction History ───────────────────────────────────────────────
 
   @Get('transactions')

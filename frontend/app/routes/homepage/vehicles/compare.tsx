@@ -1,12 +1,9 @@
-import React from "react";
 import CompareComponent from "~/components/homepage/vehiclesSectionComponent/compare";
 
-function Compare() {
+export default function Compare() {
   return (
-    <div>
+    <div className="flex-1 flex flex-col h-full w-full min-h-0 overflow-hidden">
       <CompareComponent />
     </div>
   );
 }
-
-export default Compare;

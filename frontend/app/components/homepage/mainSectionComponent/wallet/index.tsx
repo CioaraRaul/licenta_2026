@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import {
   deposit as apiDeposit,
+  withdraw as apiWithdraw,
   getTransactions,
   getCard as apiGetCard,
 } from "~/api/wallet.api";
@@ -67,6 +68,28 @@ export default function WalletComponent({
     }
   }, []);
 
+  /* ── Withdraw handler ──────────────────────────────────────────────────── */
+  const handleWithdraw = useCallback(async (amount: number) => {
+    const updated = await apiWithdraw({ amount });
+    setWallet(updated);
+    // Refresh card balance (withdrawal adds to card)
+    try {
+      const freshCard = await apiGetCard();
+      setCard(freshCard);
+    } catch {
+      /* keep current */
+    }
+    // Refresh transactions to show the new withdrawal
+    try {
+      const result = await getTransactions(1, TRANSACTIONS_PER_PAGE);
+      setTransactions(result.data);
+      setTotalTransactions(result.total);
+      setPage(1);
+    } catch {
+      /* keep existing list */
+    }
+  }, []);
+
   /* ── Pagination ────────────────────────────────────────────────────────── */
   const handlePageChange = useCallback(async (newPage: number) => {
     setIsLoadingTransactions(true);
@@ -118,6 +141,7 @@ export default function WalletComponent({
               wallet={wallet}
               card={card}
               onDeposit={handleDeposit}
+              onWithdraw={handleWithdraw}
             />
           </div>
           <QuickDepositPanel

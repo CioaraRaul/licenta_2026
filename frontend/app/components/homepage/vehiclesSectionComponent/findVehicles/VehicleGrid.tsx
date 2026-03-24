@@ -8,7 +8,6 @@ interface VehicleGridProps {
   viewMode: ViewMode;
   savedIds: Set<number>;
   onToggleSave: (vehicleId: number) => void;
-  onQuickView: (vehicle: Vehicle) => void;
 }
 
 export default function VehicleGrid({
@@ -16,7 +15,6 @@ export default function VehicleGrid({
   viewMode,
   savedIds,
   onToggleSave,
-  onQuickView,
 }: VehicleGridProps) {
   if (vehicles.length === 0) {
     return (
@@ -28,8 +26,8 @@ export default function VehicleGrid({
           No vehicles available
         </h3>
         <p className="text-sm text-[#8e8e9a] max-w-md mx-auto leading-relaxed mb-6">
-          We couldn&apos;t find any vehicles matching your current filters.
-          Try broadening your search criteria or removing some filters.
+          We couldn&apos;t find any vehicles matching your current filters. Try
+          broadening your search criteria or removing some filters.
         </p>
         <div className="flex items-center justify-center gap-6 text-xs text-[#55555e]">
           <span className="flex items-center gap-1.5">
@@ -58,7 +56,6 @@ export default function VehicleGrid({
             vehicle={v}
             isSaved={savedIds.has(v.id)}
             onToggleSave={onToggleSave}
-            onQuickView={onQuickView}
           />
         ))}
       </div>
@@ -73,7 +70,6 @@ export default function VehicleGrid({
           vehicle={v}
           isSaved={savedIds.has(v.id)}
           onToggleSave={onToggleSave}
-          onQuickView={onQuickView}
         />
       ))}
     </div>

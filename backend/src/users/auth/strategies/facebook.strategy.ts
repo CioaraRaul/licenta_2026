@@ -33,7 +33,6 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
       facebookId: id,
     };
 
-    console.log('Facebook User:', user);
     done(null, user);
   }
 }

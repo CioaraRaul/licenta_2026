@@ -243,7 +243,7 @@ export default function MyListingsComponent({
                 <span>Vehicle</span>
                 <span>Price</span>
                 <span>Views</span>
-                <span>Bids</span>
+                <span>Saves</span>
                 <span>Status</span>
                 <span />
               </div>

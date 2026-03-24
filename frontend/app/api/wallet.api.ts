@@ -3,6 +3,7 @@ import type {
   Wallet,
   Transaction,
   DepositPayload,
+  WithdrawPayload,
   Card,
   AddCardPayload,
   TopUpCardPayload,
@@ -17,6 +18,11 @@ export async function getWallet(): Promise<Wallet> {
 /** POST /wallet/deposit — depune fonduri din card în portofel */
 export async function deposit(payload: DepositPayload): Promise<Wallet> {
   return httpClient.post<Wallet>("/wallet/deposit", payload);
+}
+
+/** POST /wallet/withdraw — retrage fonduri din portofel în card */
+export async function withdraw(payload: WithdrawPayload): Promise<Wallet> {
+  return httpClient.post<Wallet>("/wallet/withdraw", payload);
 }
 
 /** GET /wallet/transactions — istoricul tranzacțiilor cu paginare */

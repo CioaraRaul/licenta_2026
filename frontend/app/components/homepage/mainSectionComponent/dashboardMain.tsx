@@ -1,12 +1,10 @@
+import { useState } from "react";
 import { Link } from "react-router";
 import type {
   SellerStats,
   BuyerStats,
   DashboardMainProps,
 } from "~/interface/dashboard.interface";
-import type { Vehicle } from "~/interface/vehicle.interface";
-import type { SavedVehicle } from "~/interface/saved-vehicle.interface";
-import type { User } from "~/interface/user.interface";
 import {
   formatCurrency,
   formatCurrencyFull,
@@ -22,6 +20,12 @@ export default function DashboardMainComponent({
   savedVehicles,
   error,
 }: DashboardMainProps) {
+  const [collapsedCards, setCollapsedCards] = useState<Record<string, boolean>>(
+    {},
+  );
+  const toggleCard = (key: string) =>
+    setCollapsedCards((prev) => ({ ...prev, [key]: !prev[key] }));
+
   if (error || !stats) {
     return (
       <div className="flex-1 overflow-y-auto p-6 font-['DM_Sans',sans-serif]">
@@ -75,7 +79,9 @@ export default function DashboardMainComponent({
             <>
               {/* Active Listings */}
               <div className="bg-[#141417] border border-white/[0.04] rounded-xl p-4 hover:border-white/[0.08] transition-all group">
-                <div className="flex items-center justify-between mb-3">
+                <div
+                  className={`flex items-center justify-between transition-all duration-300 ${collapsedCards.listings ? "mb-0" : "mb-3"}`}
+                >
                   <div className="w-9 h-9 rounded-lg bg-white/[0.04] flex items-center justify-center group-hover:scale-105 transition-transform">
                     <svg
                       width="18"
@@ -91,33 +97,48 @@ export default function DashboardMainComponent({
                       <polyline points="14 2 14 8 20 8" />
                     </svg>
                   </div>
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#10b981"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                  <button
+                    onClick={() => toggleCard("listings")}
+                    className="w-7 h-7 rounded-md bg-white/[0.03] hover:bg-white/[0.07] flex items-center justify-center transition-all cursor-pointer"
+                    title={collapsedCards.listings ? "Expand" : "Collapse"}
                   >
-                    <polyline points="18 15 12 9 6 15" />
-                  </svg>
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#10b981"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className={`transition-transform duration-200 ${collapsedCards.listings ? "rotate-180" : ""}`}
+                    >
+                      <polyline points="18 15 12 9 6 15" />
+                    </svg>
+                  </button>
                 </div>
-                <div className="text-[22px] font-bold text-[#f5f5f7] tracking-tight">
-                  {ss.listings.active}
-                </div>
-                <div className="text-[12px] text-[#8e8e9a] mt-0.5">
-                  Active Listings
-                </div>
-                <div className="text-[11px] text-[#8e8e9a]/60 mt-1">
-                  {ss.listings.total} total
+                <div
+                  className={`grid transition-all duration-300 ${collapsedCards.listings ? "grid-rows-[0fr] opacity-0" : "grid-rows-[1fr] opacity-100"}`}
+                >
+                  <div className="overflow-hidden">
+                    <div className="text-[22px] font-bold text-[#f5f5f7] tracking-tight">
+                      {ss.listings.active}
+                    </div>
+                    <div className="text-[12px] text-[#8e8e9a] mt-0.5">
+                      Active Listings
+                    </div>
+                    <div className="text-[11px] text-[#8e8e9a]/60 mt-1">
+                      {ss.listings.total} total
+                    </div>
+                  </div>
                 </div>
               </div>
 
               {/* Total Views */}
               <div className="bg-[#141417] border border-white/[0.04] rounded-xl p-4 hover:border-white/[0.08] transition-all group">
-                <div className="flex items-center justify-between mb-3">
+                <div
+                  className={`flex items-center justify-between transition-all duration-300 ${collapsedCards.views ? "mb-0" : "mb-3"}`}
+                >
                   <div className="w-9 h-9 rounded-lg bg-white/[0.04] flex items-center justify-center group-hover:scale-105 transition-transform">
                     <svg
                       width="18"
@@ -133,33 +154,48 @@ export default function DashboardMainComponent({
                       <circle cx="12" cy="12" r="3" />
                     </svg>
                   </div>
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#10b981"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                  <button
+                    onClick={() => toggleCard("views")}
+                    className="w-7 h-7 rounded-md bg-white/[0.03] hover:bg-white/[0.07] flex items-center justify-center transition-all cursor-pointer"
+                    title={collapsedCards.views ? "Expand" : "Collapse"}
                   >
-                    <polyline points="18 15 12 9 6 15" />
-                  </svg>
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#10b981"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className={`transition-transform duration-200 ${collapsedCards.views ? "rotate-180" : ""}`}
+                    >
+                      <polyline points="18 15 12 9 6 15" />
+                    </svg>
+                  </button>
                 </div>
-                <div className="text-[22px] font-bold text-[#f5f5f7] tracking-tight">
-                  {(ss.views.total ?? 0).toLocaleString()}
-                </div>
-                <div className="text-[12px] text-[#8e8e9a] mt-0.5">
-                  Total Views
-                </div>
-                <div className="text-[11px] text-[#8e8e9a]/60 mt-1">
-                  {ss.bids.total} bids received
+                <div
+                  className={`grid transition-all duration-300 ${collapsedCards.views ? "grid-rows-[0fr] opacity-0" : "grid-rows-[1fr] opacity-100"}`}
+                >
+                  <div className="overflow-hidden">
+                    <div className="text-[22px] font-bold text-[#f5f5f7] tracking-tight">
+                      {(ss.views.total ?? 0).toLocaleString()}
+                    </div>
+                    <div className="text-[12px] text-[#8e8e9a] mt-0.5">
+                      Total Views
+                    </div>
+                    <div className="text-[11px] text-[#8e8e9a]/60 mt-1">
+                      {ss.bids.total} bids received
+                    </div>
+                  </div>
                 </div>
               </div>
 
               {/* Cars Sold */}
               <div className="bg-[#141417] border border-white/[0.04] rounded-xl p-4 hover:border-white/[0.08] transition-all group">
-                <div className="flex items-center justify-between mb-3">
+                <div
+                  className={`flex items-center justify-between transition-all duration-300 ${collapsedCards.sold ? "mb-0" : "mb-3"}`}
+                >
                   <div className="w-9 h-9 rounded-lg bg-white/[0.04] flex items-center justify-center group-hover:scale-105 transition-transform">
                     <svg
                       width="18"
@@ -175,21 +211,48 @@ export default function DashboardMainComponent({
                       <polyline points="22 4 12 14.01 9 11.01" />
                     </svg>
                   </div>
+                  <button
+                    onClick={() => toggleCard("sold")}
+                    className="w-7 h-7 rounded-md bg-white/[0.03] hover:bg-white/[0.07] flex items-center justify-center transition-all cursor-pointer"
+                    title={collapsedCards.sold ? "Expand" : "Collapse"}
+                  >
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#10b981"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className={`transition-transform duration-200 ${collapsedCards.sold ? "rotate-180" : ""}`}
+                    >
+                      <polyline points="18 15 12 9 6 15" />
+                    </svg>
+                  </button>
                 </div>
-                <div className="text-[22px] font-bold text-[#f5f5f7] tracking-tight">
-                  {ss.listings.sold}
-                </div>
-                <div className="text-[12px] text-[#8e8e9a] mt-0.5">
-                  Cars Sold
-                </div>
-                <div className="text-[11px] text-[#8e8e9a]/60 mt-1">
-                  {ss.bids.pending} pending bids
+                <div
+                  className={`grid transition-all duration-300 ${collapsedCards.sold ? "grid-rows-[0fr] opacity-0" : "grid-rows-[1fr] opacity-100"}`}
+                >
+                  <div className="overflow-hidden">
+                    <div className="text-[22px] font-bold text-[#f5f5f7] tracking-tight">
+                      {ss.listings.sold}
+                    </div>
+                    <div className="text-[12px] text-[#8e8e9a] mt-0.5">
+                      Cars Sold
+                    </div>
+                    <div className="text-[11px] text-[#8e8e9a]/60 mt-1">
+                      {ss.bids.pending} pending bids
+                    </div>
+                  </div>
                 </div>
               </div>
 
               {/* Revenue */}
               <div className="bg-[#141417] border border-white/[0.04] rounded-xl p-4 hover:border-white/[0.08] transition-all group">
-                <div className="flex items-center justify-between mb-3">
+                <div
+                  className={`flex items-center justify-between transition-all duration-300 ${collapsedCards.revenue ? "mb-0" : "mb-3"}`}
+                >
                   <div className="w-9 h-9 rounded-lg bg-white/[0.04] flex items-center justify-center group-hover:scale-105 transition-transform">
                     <svg
                       width="18"
@@ -205,27 +268,40 @@ export default function DashboardMainComponent({
                       <line x1="1" y1="10" x2="23" y2="10" />
                     </svg>
                   </div>
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#10b981"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                  <button
+                    onClick={() => toggleCard("revenue")}
+                    className="w-7 h-7 rounded-md bg-white/[0.03] hover:bg-white/[0.07] flex items-center justify-center transition-all cursor-pointer"
+                    title={collapsedCards.revenue ? "Expand" : "Collapse"}
                   >
-                    <polyline points="18 15 12 9 6 15" />
-                  </svg>
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#10b981"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className={`transition-transform duration-200 ${collapsedCards.revenue ? "rotate-180" : ""}`}
+                    >
+                      <polyline points="18 15 12 9 6 15" />
+                    </svg>
+                  </button>
                 </div>
-                <div className="text-[22px] font-bold text-[#f5f5f7] tracking-tight">
-                  {formatCurrency(ss.revenue.total)}
-                </div>
-                <div className="text-[12px] text-[#8e8e9a] mt-0.5">
-                  Total Revenue
-                </div>
-                <div className="text-[11px] text-[#8e8e9a]/60 mt-1">
-                  {formatCurrency(ss.revenue.total)} pending
+                <div
+                  className={`grid transition-all duration-300 ${collapsedCards.revenue ? "grid-rows-[0fr] opacity-0" : "grid-rows-[1fr] opacity-100"}`}
+                >
+                  <div className="overflow-hidden">
+                    <div className="text-[22px] font-bold text-[#f5f5f7] tracking-tight">
+                      {formatCurrency(ss.revenue.total)}
+                    </div>
+                    <div className="text-[12px] text-[#8e8e9a] mt-0.5">
+                      Total Revenue
+                    </div>
+                    <div className="text-[11px] text-[#8e8e9a]/60 mt-1">
+                      {formatCurrency(ss.revenue.total)} pending
+                    </div>
+                  </div>
                 </div>
               </div>
             </>
@@ -263,7 +339,9 @@ export default function DashboardMainComponent({
 
               {/* Saved Vehicles */}
               <div className="bg-[#141417] border border-white/[0.04] rounded-xl p-4 hover:border-white/[0.08] transition-all group">
-                <div className="flex items-center justify-between mb-3">
+                <div
+                  className={`flex items-center justify-between ${collapsedCards.saved ? "" : "mb-3"}`}
+                >
                   <div className="w-9 h-9 rounded-lg bg-white/[0.04] flex items-center justify-center group-hover:scale-105 transition-transform">
                     <svg
                       width="18"
@@ -278,27 +356,40 @@ export default function DashboardMainComponent({
                       <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
                     </svg>
                   </div>
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#10b981"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                  <button
+                    onClick={() => toggleCard("saved")}
+                    className="w-7 h-7 rounded-md bg-white/[0.03] hover:bg-white/[0.07] flex items-center justify-center transition-all cursor-pointer"
+                    title={collapsedCards.saved ? "Expand" : "Collapse"}
                   >
-                    <polyline points="18 15 12 9 6 15" />
-                  </svg>
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#10b981"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className={`transition-transform duration-200 ${collapsedCards.saved ? "rotate-180" : ""}`}
+                    >
+                      <polyline points="18 15 12 9 6 15" />
+                    </svg>
+                  </button>
                 </div>
-                <div className="text-[22px] font-bold text-[#f5f5f7] tracking-tight">
-                  {bs.saved.total}
-                </div>
-                <div className="text-[12px] text-[#8e8e9a] mt-0.5">
-                  Saved Vehicles
-                </div>
-                <div className="text-[11px] text-[#8e8e9a]/60 mt-1">
-                  {bs.bids.total} total bids
+                <div
+                  className={`grid transition-all duration-200 ${collapsedCards.saved ? "grid-rows-[0fr]" : "grid-rows-[1fr]"}`}
+                >
+                  <div className="overflow-hidden">
+                    <div className="text-[22px] font-bold text-[#f5f5f7] tracking-tight">
+                      {bs.saved.total}
+                    </div>
+                    <div className="text-[12px] text-[#8e8e9a] mt-0.5">
+                      Saved Vehicles
+                    </div>
+                    <div className="text-[11px] text-[#8e8e9a]/60 mt-1">
+                      {bs.bids.total} total bids
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -388,7 +479,7 @@ export default function DashboardMainComponent({
                   <div className="py-10 text-center">
                     <p className="text-sm text-[#8e8e9a]">No listings yet.</p>
                     <Link
-                      to="/create"
+                      to="/my-listings/new"
                       className="text-[13px] text-[#e63946] font-medium hover:underline no-underline mt-2 inline-block"
                     >
                       Create your first listing →
@@ -713,7 +804,7 @@ export default function DashboardMainComponent({
                 {isSeller ? (
                   <>
                     <Link
-                      to="/create"
+                      to="/my-listings/new"
                       className="w-full py-2.5 bg-[#e63946] rounded-lg text-white text-[13px] font-semibold hover:shadow-[0_4px_12px_rgba(230,57,70,0.3)] transition-all flex items-center justify-center gap-2 no-underline"
                     >
                       <svg

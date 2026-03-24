@@ -1,4 +1,5 @@
 import type { JSX } from "react";
+import { Link } from "react-router";
 import { useAuthStore } from "~/store/auth.store";
 
 const sellerStats = [
@@ -621,7 +622,10 @@ export default function Dashboard() {
               <div className="flex flex-col gap-2">
                 {isSeller ? (
                   <>
-                    <button className="w-full py-2.5 bg-[#e63946] rounded-lg text-white text-[13px] font-semibold hover:shadow-[0_4px_12px_rgba(230,57,70,0.3)] transition-all flex items-center justify-center gap-2">
+                    <Link
+                      to="/my-listings/new"
+                      className="w-full py-2.5 bg-[#e63946] rounded-lg text-white text-[13px] font-semibold hover:shadow-[0_4px_12px_rgba(230,57,70,0.3)] transition-all flex items-center justify-center gap-2 no-underline"
+                    >
                       <svg
                         width="14"
                         height="14"
@@ -636,7 +640,7 @@ export default function Dashboard() {
                         <line x1="5" y1="12" x2="19" y2="12" />
                       </svg>
                       New Listing
-                    </button>
+                    </Link>
                     <button className="w-full py-2.5 bg-white/[0.04] border border-white/[0.06] rounded-lg text-[#bbbbc6] text-[13px] font-medium hover:bg-white/[0.06] transition-all">
                       Edit Profile
                     </button>
