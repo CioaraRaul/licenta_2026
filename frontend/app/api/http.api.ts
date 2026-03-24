@@ -28,6 +28,9 @@ axiosInstance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   } catch {
     // localStorage invalid — continuă fără token
   }
+  if (config.data instanceof FormData) {
+    delete config.headers["Content-Type"];
+  }
   return config;
 });
 

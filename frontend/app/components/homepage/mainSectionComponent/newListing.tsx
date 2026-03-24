@@ -16,7 +16,7 @@ import {
   COMMON_FEATURES,
   COMMON_SAFETY_FEATURES,
   MAX_IMAGES,
-  DEFAULT_FORM,
+  DEV_FORM,
   type NewListingForm,
 } from "~/constants/newListing.constants";
 import { Input, Select, Toggle } from "./newListing/FormFields";
@@ -32,7 +32,8 @@ export default function NewListingComponent() {
   const [error, setError] = useState<string | null>(null);
 
   // ── Form state ──────────────────────────────────────────────────────────
-  const [form, setForm] = useState<NewListingForm>(DEFAULT_FORM);
+  // TODO: Switch back to DEFAULT_FORM after testing
+  const [form, setForm] = useState<NewListingForm>(DEV_FORM);
 
   const [features, setFeatures] = useState<string[]>([]);
   const [safetyFeatures, setSafetyFeatures] = useState<string[]>([]);
@@ -125,25 +126,65 @@ export default function NewListingComponent() {
       return;
     }
 
+    if (form.vin.length !== 17) {
+      setError("VIN must be exactly 17 characters.");
+      return;
+    }
+    if (form.description.length < 10) {
+      setError("Description must be at least 10 characters.");
+      return;
+    }
+
     setSubmitting(true);
     try {
       const payload: CreateVehiclePayload = {
-        ...form,
+        make: form.make,
+        model: form.model,
+        year: form.year,
+        type: form.type,
+        condition: form.condition,
+        trim: form.trim || undefined,
+        price: form.price,
+        originalPrice: form.originalPrice || undefined,
+        negotiable: form.negotiable,
+        mileage: form.mileage,
+        city: form.city,
+        country: form.country,
+        zipCode: form.zipCode || undefined,
+        engineSize: form.engineSize,
+        engineType: form.engineType || undefined,
+        horsepower: form.horsepower || undefined,
+        torque: form.torque || undefined,
+        fuelType: form.fuelType,
+        transmission: form.transmission,
+        driveType: form.driveType,
+        exteriorColor: form.exteriorColor,
+        interiorColor: form.interiorColor || undefined,
+        doors: form.doors,
+        seats: form.seats,
+        vin: form.vin,
+        licensePlate: form.licensePlate || undefined,
         features,
         safetyFeatures,
+        description: form.description,
         images: images.map((img) => img.url),
-        originalPrice: form.originalPrice || undefined,
-        trim: form.trim || undefined,
-        engineType: form.engineType || undefined,
-        interiorColor: form.interiorColor || undefined,
-        zipCode: form.zipCode || undefined,
-        licensePlate: form.licensePlate || undefined,
+        previousOwners: form.previousOwners || undefined,
+        accidentHistory: form.accidentHistory,
         serviceHistory: form.serviceHistory || undefined,
+        warrantyAvailable: form.warrantyAvailable,
       };
       await createVehicle(payload);
       navigate("/my-listings");
-    } catch {
-      setError("Failed to create listing. Please try again.");
+    } catch (err) {
+      if (err instanceof Error && "data" in err) {
+        const data = (err as { data?: { message?: string | string[] } }).data;
+        const msg = Array.isArray(data?.message)
+          ? data.message.join(", ")
+          : data?.message;
+        setError(msg || "Failed to create listing. Please try again.");
+      } else {
+        setError("Failed to create listing. Please try again.");
+      }
     } finally {
       setSubmitting(false);
     }
@@ -154,9 +195,9 @@ export default function NewListingComponent() {
   const canProceed = () => {
     switch (step) {
       case 0:
-        return Boolean(form.make && form.model && form.year && form.vin);
+        return Boolean(form.make && form.model && form.year && form.vin && form.vin.length === 17);
       case 1:
-        return Boolean(form.city && form.country && form.engineSize > 0);
+        return Boolean(form.city && form.country && form.engineSize > 0 && form.description.length >= 10);
       case 2:
         return true;
       case 3:

@@ -41,6 +41,26 @@ export class UploadController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Post('images/:vehicleId')
+  @UseInterceptors(FilesInterceptor('images', 20, { storage: memoryStorage() }))
+  async uploadMultipleForVehicle(
+    @Param('vehicleId') vehicleId: string,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
+    if (!files?.length) throw new BadRequestException('no files provided');
+
+    const folder = `autovault/vehicles/${vehicleId}`;
+    const results = await this.uploadService.uploadMultipleImages(
+      files,
+      folder,
+    );
+    return {
+      message: `${results.length} images uploaded successfully`,
+      images: results,
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Delete('*publicId')
   async deleteImage(@Param('publicId') publicId: string) {
     await this.uploadService.deleteImage(publicId);

@@ -20,6 +20,12 @@ export default function DashboardMainComponent({
   savedVehicles,
   error,
 }: DashboardMainProps) {
+  const [collapsedCards, setCollapsedCards] = useState<Record<string, boolean>>(
+    {},
+  );
+  const toggleCard = (key: string) =>
+    setCollapsedCards((prev) => ({ ...prev, [key]: !prev[key] }));
+
   if (error || !stats) {
     return (
       <div className="flex-1 overflow-y-auto p-6 font-['DM_Sans',sans-serif]">
@@ -51,11 +57,6 @@ export default function DashboardMainComponent({
 
   const ss = stats as SellerStats;
   const bs = stats as BuyerStats;
-  const [collapsedCards, setCollapsedCards] = useState<Record<string, boolean>>(
-    {},
-  );
-  const toggleCard = (key: string) =>
-    setCollapsedCards((prev) => ({ ...prev, [key]: !prev[key] }));
 
   return (
     <div className="flex-1 overflow-y-auto p-6 font-['DM_Sans',sans-serif]">
