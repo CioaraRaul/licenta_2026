@@ -12,7 +12,7 @@ import type { MyListingsPageData } from "~/interface/vehicle.interface";
  */
 export async function clientLoader(): Promise<MyListingsPageData> {
   try {
-    const result = await getMyListings(1, 999_999);
+    const result = await getMyListings(1, 100);
     return {
       vehicles: result.vehicles ?? [],
       pagination: result.pagination ?? {

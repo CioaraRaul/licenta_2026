@@ -1,9 +1,8 @@
 import { useAuthStore } from "~/store/auth.store";
-import { Link } from "react-router";
+import NotificationBell from "./NotificationBell";
 
 export default function Navbar() {
   const user = useAuthStore((s) => s.user);
-  const logout = useAuthStore((s) => s.logout);
 
   return (
     <header className="h-14 bg-[#111114] border-b border-white/[0.04] flex items-center justify-between px-5 flex-shrink-0">
@@ -34,23 +33,7 @@ export default function Navbar() {
 
       {/* Right actions */}
       <div className="flex items-center gap-3 ml-4">
-        {/* Notification bell */}
-        <button className="relative w-8 h-8 rounded-lg bg-[#1c1c21]/60 flex items-center justify-center hover:bg-[#26262d] transition-colors">
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="#8e8e9a"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
-            <path d="M13.73 21a2 2 0 01-3.46 0" />
-          </svg>
-          <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-[#e63946] ring-2 ring-[#111114]" />
-        </button>
+        <NotificationBell />
 
         {/* Divider */}
         <div className="w-px h-6 bg-white/[0.06]" />

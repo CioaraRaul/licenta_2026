@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { BidsService } from './bids.service';
 import { JwtAuthGuard } from 'src/users/auth/guards/jwt-auth.guard';
+import { BidStatus } from './enums/bid-status.enum';
 
 @Controller('bids')
 export class BidsController {
@@ -31,6 +32,22 @@ export class BidsController {
       vehicleId,
       amount,
       message,
+    );
+  }
+
+  @Get('received')
+  @UseGuards(JwtAuthGuard)
+  getReceivedBids(
+    @Request() req,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number,
+    @Query('status') status?: BidStatus,
+  ) {
+    return this.bidsService.getReceivedBids(
+      req.user.userId,
+      page,
+      limit,
+      status,
     );
   }
 

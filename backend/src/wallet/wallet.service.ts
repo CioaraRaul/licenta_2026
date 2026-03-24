@@ -83,11 +83,6 @@ export class WalletService {
       );
     }
 
-    // Validate CVV (3 or 4 digits)
-    if (!/^\d{3,4}$/.test(dto.cvv)) {
-      throw new BadRequestException('CVV must be 3 or 4 digits');
-    }
-
     // Validate cardholder name
     if (!dto.cardHolderName || dto.cardHolderName.trim().length < 2) {
       throw new BadRequestException('Cardholder name is required');
@@ -102,7 +97,6 @@ export class WalletService {
       cardHolderName: dto.cardHolderName.trim(),
       expiryMonth: dto.expiryMonth,
       expiryYear: dto.expiryYear,
-      cvv: dto.cvv,
       cardType,
       balance: 0,
     });
@@ -146,53 +140,83 @@ export class WalletService {
     if (amount > 100000)
       throw new BadRequestException('Maximum deposit amount is 100,000');
 
-    const wallet = await this.getOrCreateWallet(userId);
+    return this.dataSource.transaction(async (manager) => {
+      const wallet = await manager.findOne(Wallet, { where: { userId } });
+      if (!wallet) throw new BadRequestException('Wallet not found');
 
-    // Card is required for deposit
-    const card = await this.cardRepo.findOne({ where: { userId } });
-    if (!card) {
-      throw new BadRequestException(
-        'No card found. Add a card before depositing.',
-      );
-    }
+      const card = await manager.findOne(Card, { where: { userId } });
+      if (!card)
+        throw new BadRequestException(
+          'No card found. Add a card before depositing.',
+        );
 
-    if (Number(card.balance) < Number(amount)) {
-      throw new BadRequestException(
-        `Insufficient card balance. Available: $${Number(card.balance).toLocaleString()}`,
-      );
-    }
+      if (Number(card.balance) < Number(amount))
+        throw new BadRequestException(
+          `Insufficient card balance. Available: $${Number(card.balance).toLocaleString()}`,
+        );
 
-    // Folosim queryRunner pentru operații atomice
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
-    try {
-      // Deduct from card
       card.balance = Number(card.balance) - Number(amount);
-      await queryRunner.manager.save(card);
+      await manager.save(card);
 
-      // Add to wallet
       wallet.balance = Number(wallet.balance) + Number(amount);
-      await queryRunner.manager.save(wallet);
+      await manager.save(wallet);
 
-      const transaction = this.transactionRepo.create({
+      const transaction = manager.create(Transaction, {
         userId,
         amount,
         type: TransactionType.DEPOSIT,
         status: TransactionStatus.COMPLETED,
-        description: `Deposit of ${amount} RON from card ****${card.last4}`,
+        description: `Deposit of $${amount} from card ****${card.last4}`,
       });
-      await queryRunner.manager.save(transaction);
+      await manager.save(transaction);
 
-      await queryRunner.commitTransaction();
       return wallet;
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      throw error;
-    } finally {
-      await queryRunner.release();
-    }
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  //  WITHDRAWAL (from wallet → card)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  async withdraw(userId: number, amount: number): Promise<Wallet> {
+    if (amount <= 0)
+      throw new BadRequestException('Withdrawal amount must be greater than 0');
+
+    if (amount > 100000)
+      throw new BadRequestException('Maximum withdrawal amount is 100,000');
+
+    return this.dataSource.transaction(async (manager) => {
+      const wallet = await manager.findOne(Wallet, { where: { userId } });
+      if (!wallet) throw new BadRequestException('Wallet not found');
+
+      if (Number(wallet.balance) < Number(amount))
+        throw new BadRequestException(
+          `Insufficient wallet balance. Available: $${Number(wallet.balance).toLocaleString()}`,
+        );
+
+      const card = await manager.findOne(Card, { where: { userId } });
+      if (!card)
+        throw new BadRequestException(
+          'No card found. Add a card to withdraw funds.',
+        );
+
+      wallet.balance = Number(wallet.balance) - Number(amount);
+      await manager.save(wallet);
+
+      card.balance = Number(card.balance) + Number(amount);
+      await manager.save(card);
+
+      const transaction = manager.create(Transaction, {
+        userId,
+        amount,
+        type: TransactionType.WITHDRAWAL,
+        status: TransactionStatus.COMPLETED,
+        description: `Withdrawal of $${amount} to card ****${card.last4}`,
+      });
+      await manager.save(transaction);
+
+      return wallet;
+    });
   }
 
   // ─── Transfer (Buyer → Seller) ─────────────────────────────────────────────
@@ -204,27 +228,29 @@ export class WalletService {
     referenceId: number,
     description: string,
   ): Promise<void> {
-    const buyerWallet = await this.getOrCreateWallet(buyerId);
-    const sellerWallet = await this.getOrCreateWallet(sellerId);
+    await this.dataSource.transaction(async (manager) => {
+      const buyerWallet = await manager.findOne(Wallet, {
+        where: { userId: buyerId },
+      });
+      if (!buyerWallet) throw new BadRequestException('Buyer wallet not found');
 
-    if (Number(buyerWallet.balance) < Number(amount))
-      throw new BadRequestException('Insufficient funds in wallet');
+      const sellerWallet = await manager.findOne(Wallet, {
+        where: { userId: sellerId },
+      });
+      if (!sellerWallet)
+        throw new BadRequestException('Seller wallet not found');
 
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
+      if (Number(buyerWallet.balance) < Number(amount))
+        throw new BadRequestException('Insufficient funds in wallet');
 
-    try {
-      // Scădem din buyer
       buyerWallet.balance = Number(buyerWallet.balance) - Number(amount);
-      await queryRunner.manager.save(buyerWallet);
+      await manager.save(buyerWallet);
 
-      // Adăugăm la seller
       sellerWallet.balance = Number(sellerWallet.balance) + Number(amount);
-      await queryRunner.manager.save(sellerWallet);
+      await manager.save(sellerWallet);
 
       // Tranzacție buyer (payment)
-      const paymentTx = this.transactionRepo.create({
+      const paymentTx = manager.create(Transaction, {
         userId: buyerId,
         recipientId: sellerId,
         amount,
@@ -233,10 +259,10 @@ export class WalletService {
         description,
         referenceId,
       });
-      await queryRunner.manager.save(paymentTx);
+      await manager.save(paymentTx);
 
       // Tranzacție seller (refund invers — primire bani)
-      const receiveTx = this.transactionRepo.create({
+      const receiveTx = manager.create(Transaction, {
         userId: sellerId,
         recipientId: buyerId,
         amount,
@@ -245,15 +271,8 @@ export class WalletService {
         description: `Received payment: ${description}`,
         referenceId,
       });
-      await queryRunner.manager.save(receiveTx);
-
-      await queryRunner.commitTransaction();
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      throw error;
-    } finally {
-      await queryRunner.release();
-    }
+      await manager.save(receiveTx);
+    });
   }
 
   // ─── Get Transaction History ───────────────────────────────────────────────

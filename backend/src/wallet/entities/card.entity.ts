@@ -29,10 +29,6 @@ export class Card {
   @Column()
   expiryYear: number;
 
-  // Stored for display in this simulated system
-  @Column({ length: 4 })
-  cvv: string;
-
   @Column({ type: 'text', default: 'visa' })
   cardType: CardType;
 

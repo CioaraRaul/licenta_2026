@@ -15,13 +15,23 @@ export default function Sidebar() {
 
   useEffect(() => {
     if (!user) return;
-    getConversations()
-      .then((convs) => {
-        const total = convs.reduce((sum, c) => sum + (c.unreadCount ?? 0), 0);
-        setUnreadCount(total);
-      })
-      .catch(() => {});
-  }, [user, location.pathname]);
+
+    const fetchUnread = () => {
+      getConversations()
+        .then((convs) => {
+          const total = convs.reduce((sum, c) => sum + (c.unreadCount ?? 0), 0);
+          setUnreadCount(total);
+        })
+        .catch(() => {});
+    };
+
+    fetchUnread();
+
+    // Refresh unread count when the user returns to the tab
+    const handleFocus = () => fetchUnread();
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
+  }, [user]);
 
   const mainNav = [
     {
@@ -193,7 +203,7 @@ export default function Sidebar() {
   const bottomNav = [
     {
       label: "Help & Support",
-      href: "/support",
+      href: "/help-support",
       icon: (
         <svg
           width="18"
@@ -326,7 +336,10 @@ export default function Sidebar() {
       {/* Sell CTA — seller only */}
       {isSeller && !collapsed && (
         <div className="mx-3 mb-3 p-4 bg-gradient-to-br from-[#1c1c21] to-[#141417] border border-white/[0.06] rounded-xl">
-          <div className="w-9 h-9 rounded-full bg-[rgba(230,57,70,0.12)] flex items-center justify-center mb-3">
+          <Link
+            to="/my-listings/new"
+            className="w-9 h-9 rounded-full bg-[rgba(230,57,70,0.12)] flex items-center justify-center mb-3 hover:bg-[rgba(230,57,70,0.2)] transition-colors no-underline"
+          >
             <svg
               width="16"
               height="16"
@@ -340,7 +353,7 @@ export default function Sidebar() {
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
-          </div>
+          </Link>
           <div className="text-[13px] font-semibold text-[#f5f5f7] mb-0.5">
             List a vehicle
           </div>
@@ -359,7 +372,16 @@ export default function Sidebar() {
       {/* Bottom nav */}
       <div className="px-3 pb-2 flex flex-col gap-0.5 border-t border-white/[0.04] pt-2">
         {bottomNav.map((item) => (
-          <NavLink key={item.href} item={item} />
+          <Link
+            key={item.label}
+            to={item.href}
+            className="group flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-200 no-underline text-[#8e8e9a] hover:text-[#c5c5ca] hover:bg-white/[0.03]"
+          >
+            <span className="flex-shrink-0 w-5 h-5 flex items-center justify-center opacity-50 group-hover:opacity-70 transition-opacity">
+              {item.icon}
+            </span>
+            {!collapsed && <span className="truncate">{item.label}</span>}
+          </Link>
         ))}
       </div>
 

@@ -31,6 +31,8 @@ export class BidsService {
       where: { id: vehicleId },
     });
 
+    if (!vehicle) throw new NotFoundException('Vehicle not found');
+
     if (vehicle.sellerId === buyerId)
       throw new BadRequestException('Cannot bid on your own vehicle');
 
@@ -128,7 +130,7 @@ export class BidsService {
 
     // Marcăm vehiculul ca pending (rezervat)
     await this.vehicleRepo.update(bid.vehicleId, {
-      status: VehicleStatus.PENDING as unknown as VehicleStatus,
+      status: VehicleStatus.PENDING,
     });
 
     return bid;
@@ -155,6 +157,33 @@ export class BidsService {
     bid.status = BidStatus.REJECTED;
     bid.rejectionReason = reason;
     return this.bidRepo.save(bid);
+  }
+
+  // ─── Received Bids (Seller — all vehicles) ─────────────────────────────────
+
+  async getReceivedBids(
+    sellerId: number,
+    page: number,
+    limit: number,
+    status?: BidStatus,
+  ): Promise<{ data: Bid[]; total: number; page: number; limit: number }> {
+    const qb = this.bidRepo
+      .createQueryBuilder('bid')
+      .innerJoinAndSelect('bid.vehicle', 'vehicle')
+      .leftJoinAndSelect('bid.buyer', 'buyer')
+      .where('vehicle.sellerId = :sellerId', { sellerId });
+
+    if (status) {
+      qb.andWhere('bid.status = :status', { status });
+    }
+
+    qb.orderBy('bid.createdAt', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit);
+
+    const [data, total] = await qb.getManyAndCount();
+
+    return { data, total, page, limit };
   }
 
   // ─── Withdraw Bid (Buyer) ──────────────────────────────────────────────────

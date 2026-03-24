@@ -17,7 +17,6 @@ import ActiveFilters from "./ActiveFilters";
 import ResultsHeader from "./ResultsHeader";
 import VehicleGrid from "./VehicleGrid";
 import Pagination from "./Pagination";
-import QuickViewModal from "./QuickViewModal";
 
 /* ── Component ───────────────────────────────────────────────────────────── */
 
@@ -38,9 +37,6 @@ export default function FindVehiclesComponent({
   const [isLoading, setIsLoading] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [quickViewVehicle, setQuickViewVehicle] = useState<Vehicle | null>(
-    null,
-  );
 
   const filters = paramsToFilters(searchParams);
 
@@ -261,7 +257,6 @@ export default function FindVehiclesComponent({
               viewMode={viewMode}
               savedIds={savedIds}
               onToggleSave={handleToggleSave}
-              onQuickView={setQuickViewVehicle}
             />
           </div>
 
@@ -273,15 +268,6 @@ export default function FindVehiclesComponent({
           />
         </div>
       </div>
-
-      {/* Quick view modal */}
-      <QuickViewModal
-        vehicle={quickViewVehicle}
-        isOpen={!!quickViewVehicle}
-        onClose={() => setQuickViewVehicle(null)}
-        isSaved={quickViewVehicle ? savedIds.has(quickViewVehicle.id) : false}
-        onToggleSave={handleToggleSave}
-      />
     </div>
   );
 }

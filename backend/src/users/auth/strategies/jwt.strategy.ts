@@ -2,6 +2,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { JwtPayload } from '../dtos/Jwt.dto';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { AuthService } from '../services/auth.service';
 import { TokenBlacklistService } from '../services/token-blacklist.service';
 import { UsersService } from 'src/users/users.service';
@@ -12,10 +13,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     private authService: AuthService,
     private tokenBlacklistService: TokenBlacklistService,
     private usersService: UsersService,
+    configService: ConfigService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: process.env.JWT_ACCESS_SECRET || 'access-secret-key',
+      secretOrKey: configService.getOrThrow<string>('JWT_ACCESS_SECRET'),
       passReqToCallback: true,
     });
   }

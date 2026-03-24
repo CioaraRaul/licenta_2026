@@ -26,10 +26,11 @@ import { TokenBlacklistService } from './token-blacklist.service';
 import { ChangePasswordDto } from '../dtos/change-password.dto';
 
 const scrypt = promisify(_scrypt);
+const randomBytesAsync = promisify(randomBytes);
 
 @Injectable()
 export class AuthService {
-  private oauthCodes = new Map<string, any>();
+  private readonly oauthCodes = new Map<string, any>();
 
   constructor(
     private usersService: UsersService,
@@ -43,14 +44,14 @@ export class AuthService {
   ) {}
 
   async storeEmailVerificationCode(verificationToken: string): Promise<string> {
-    const code = randomBytes(32).toString('hex');
+    const code = (await randomBytesAsync(32)).toString('hex');
     this.oauthCodes.set(`verify_${code}`, verificationToken);
     setTimeout(() => this.oauthCodes.delete(`verify_${code}`), 5 * 60 * 1000);
     return code;
   }
 
   async signUp(createUserDto: CreateUserDto) {
-    const salt = randomBytes(8).toString('hex');
+    const salt = (await randomBytesAsync(8)).toString('hex');
     const hash = (await scrypt(createUserDto.password, salt, 32)) as Buffer;
     const result = salt + '.' + hash.toString('hex');
 
@@ -59,7 +60,7 @@ export class AuthService {
       password: result,
     });
 
-    const verificationToken = randomBytes(32).toString('hex');
+    const verificationToken = (await randomBytesAsync(32)).toString('hex');
     const verificationExpires = new Date(Date.now() + 24 * 3600000);
 
     await this.usersService.updateVerificationToken(
@@ -76,7 +77,7 @@ export class AuthService {
         verificationCode,
       );
     } catch (error) {
-      console.error('FAiled to send verification email: ', error);
+      // Verification email failed — account is still created
     }
 
     const tokens = await this.getTokens(user.id, user.username);
@@ -105,8 +106,6 @@ export class AuthService {
     }
 
     await this.usersService.verifyUserEmail(user.id);
-
-    console.log('Email verified successfully for user: ', user.email);
 
     return {
       message: 'Email verified successfully! You can now all features',
@@ -173,7 +172,7 @@ export class AuthService {
           username: username,
         },
         {
-          secret: process.env.JWT_ACCESS_SECRET || 'access-secret-key',
+          secret: this.configService.getOrThrow<string>('JWT_ACCESS_SECRET'),
           expiresIn: '15m',
         },
       ),
@@ -183,7 +182,7 @@ export class AuthService {
           username: username,
         },
         {
-          secret: process.env.JWT_REFRESH_SECRET || 'refresh-secret-key',
+          secret: this.configService.getOrThrow<string>('JWT_REFRESH_SECRET'),
           expiresIn: '1h',
         },
       ),
@@ -270,25 +269,27 @@ export class AuthService {
   }
 
   async storeResetCode(resetToken: string): Promise<string> {
-    const code = randomBytes(32).toString('hex');
+    const code = (await randomBytesAsync(32)).toString('hex');
     this.oauthCodes.set(`reset_${code}`, resetToken);
     setTimeout(() => this.oauthCodes.delete(`reset_${code}`), 5 * 60 * 1000);
     return code;
   }
 
-  async exchangeResetCode(code: string): Promise<string> {
-    const resetToken = this.oauthCodes.get(`reset_${code}`);
+  exchangeResetCode(code: string): string {
+    const cleanCode = code.replace(/:[0-9]+$/, '');
+    const resetToken = this.oauthCodes.get(`reset_${cleanCode}`);
     if (!resetToken) {
       throw new BadRequestException('Invalid or expired code');
     }
-    this.oauthCodes.delete(`reset_${code}`);
+    this.oauthCodes.delete(`reset_${cleanCode}`);
     return resetToken;
   }
 
-  async exchangeEmailVerifcationCode(code: string): Promise<string> {
-    const token = this.oauthCodes.get(`verify_${code}`);
+  exchangeEmailVerifcationCode(code: string): string {
+    const cleanCode = code.replace(/:[0-9]+$/, '');
+    const token = this.oauthCodes.get(`verify_${cleanCode}`);
     if (!token) throw new BadRequestException('Invalid or expired code');
-    this.oauthCodes.delete(`verify_${code}`);
+    this.oauthCodes.delete(`verify_${cleanCode}`);
     return token;
   }
 
@@ -326,10 +327,6 @@ export class AuthService {
       console.error('Error sending reset password email:', error);
     }
 
-    console.log('PASSWORD RESET REQUEST');
-    console.log('Email:', email);
-    console.log('Reset URL:', resetUrl);
-
     return {
       message:
         'If your email is registered, you will receive a password reset link.',
@@ -358,8 +355,6 @@ export class AuthService {
     await this.usersService.updatePassword(user.id, hashedPassword);
     await this.usersService.clearResetToken(user.id);
 
-    console.log('Password reset successfully for user:', user.email);
-
     return {
       message: 'Password has been reset successfully',
     };
@@ -387,7 +382,7 @@ export class AuthService {
     }
 
     const verificationToken = randomBytes(32).toString('hex');
-    const verificationExpires = new Date(Date.now() + 24 + 3600000);
+    const verificationExpires = new Date(Date.now() + 24 * 3600000);
 
     await this.usersService.updateVerificationToken(
       user.id,
@@ -406,8 +401,6 @@ export class AuthService {
       console.error('Failed to send verification email: ', error);
       throw new BadRequestException('Failed to send verification email');
     }
-
-    console.log('verification send to', email);
 
     return {
       message: 'Verification email sent! Please check your inbox.',
@@ -430,10 +423,8 @@ export class AuthService {
       expiresAt,
     );
 
-    console.log(` User ${userId} logged out successfully`);
-
     return {
-      message: 'Logged out succesfully',
+      message: 'Logged out successfully',
     };
   }
 
@@ -467,8 +458,6 @@ export class AuthService {
 
     await this.usersService.updatePassword(user.id, newHashedPassword);
 
-    console.log(`Password changed successfully for user ${user.email}`);
-
     return {
       message: 'Password changed successfully',
     };
@@ -482,8 +471,6 @@ export class AuthService {
     }
 
     await this.tokenBlackListService.blacklistAllUserTokens(userId);
-
-    console.log(`All sessions revoked for user ${user.email}`);
 
     return {
       message: 'All sessions revoked successfully',
@@ -544,8 +531,6 @@ export class AuthService {
     await this.usersService.deactivateAccount(userId);
     await this.tokenBlackListService.blacklistAllUserTokens(userId);
 
-    console.log(`Account deactivated for user ${user.email}`);
-
     return {
       message: 'Account deactivated successfully',
     };
@@ -563,8 +548,6 @@ export class AuthService {
     }
 
     await this.usersService.reactivateAccount(user.id);
-
-    console.log(`Account reactivated for user ${user.email}`);
 
     return {
       message: 'Account reactivated successfully',
@@ -585,8 +568,6 @@ export class AuthService {
     }
 
     await this.usersService.reactivateAccount(userId);
-
-    console.log(`✅ Account reactivated for user: ${user.email}`);
 
     return {
       message: 'Account reactivated successfully',
@@ -610,26 +591,25 @@ export class AuthService {
     await this.tokenBlackListService.blacklistAllUserTokens(userId);
     await this.usersService.deleteAccount(userId);
 
-    console.log(`Account deleted for user ${user.email}`);
-
     return {
       message: 'Account deleted successfully',
     };
   }
 
   async storeOAuthResult(result: any): Promise<string> {
-    const code = randomBytes(32).toString('hex');
+    const code = (await randomBytesAsync(32)).toString('hex');
     this.oauthCodes.set(code, result);
     setTimeout(() => this.oauthCodes.delete(code), 5 * 60 * 1000);
     return code;
   }
 
-  async getOAuthResult(code: string): Promise<any> {
-    const result = await this.oauthCodes.get(code);
+  getOAuthResult(code: string): any {
+    const cleanCode = code.replace(/:[0-9]+$/, '');
+    const result = this.oauthCodes.get(cleanCode);
     if (!result) {
       throw new BadRequestException('Invalid or expired code');
     }
-    this.oauthCodes.delete(code);
+    this.oauthCodes.delete(cleanCode);
     return result;
   }
 }

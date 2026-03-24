@@ -22,7 +22,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
       type: 'better-sqlite3',
       database: 'database.sqlite',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true,
+      synchronize: process.env.NODE_ENV !== 'production',
       timeout: 5000,
       prepareDatabase: (db) => {
         db.pragma('journal_mode = WAL');

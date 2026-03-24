@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useAuthStore } from "~/store/auth.store";
 import { unsaveVehicle } from "~/api/saved-vehicles.api";
@@ -27,6 +27,12 @@ export default function SavedComponent({
   const { isAuthenticated, isTokenValid } = useAuthStore();
 
   const [vehicles, setVehicles] = useState(initialVehicles);
+
+  // Re-sync local state when loader data changes (e.g. pagination)
+  useEffect(() => {
+    setVehicles(initialVehicles);
+  }, [initialVehicles]);
+
   const [removingIds, setRemovingIds] = useState<Set<number>>(new Set());
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [quickViewVehicle, setQuickViewVehicle] = useState<Vehicle | null>(

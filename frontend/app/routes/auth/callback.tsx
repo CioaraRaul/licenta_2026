@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import { oauthExchange } from "~/api/auth.api";
 import { useAuthStore } from "~/store/auth.store";
@@ -7,14 +7,19 @@ function AuthCallback() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { setTokens, setUsers } = useAuthStore.getState();
+  const hasExchanged = useRef(false);
 
   useEffect(() => {
+    if (hasExchanged.current) return;
+
     const code = searchParams.get("code");
 
     if (!code) {
       navigate("/auth/login", { replace: true });
       return;
     }
+
+    hasExchanged.current = true;
 
     oauthExchange(code)
       .then((data) => {

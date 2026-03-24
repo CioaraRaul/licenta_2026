@@ -3,22 +3,33 @@ import { formatCurrencyFull } from "~/utils/format.utils";
 import type { BalanceCardProps } from "~/interface/wallet.interface";
 import { WalletIcon, LockIcon, PlusIcon } from "./WalletIcons";
 import DepositModal from "./DepositModal";
+import WithdrawalModal from "./WithdrawalModal";
 
 export default function BalanceCard({
   wallet,
   card,
   onDeposit,
+  onWithdraw,
 }: BalanceCardProps) {
-  const [showModal, setShowModal] = useState(false);
+  const [showDepositModal, setShowDepositModal] = useState(false);
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleDeposit = async (amount: number) => {
     setIsProcessing(true);
     try {
       await onDeposit(amount);
-      setShowModal(false);
-    } catch {
-      /* handled by modal */
+      setShowDepositModal(false);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleWithdraw = async (amount: number) => {
+    setIsProcessing(true);
+    try {
+      await onWithdraw(amount);
+      setShowWithdrawModal(false);
     } finally {
       setIsProcessing(false);
     }
@@ -71,7 +82,13 @@ export default function BalanceCard({
           </div>
 
           <button
-            onClick={() => setShowModal(true)}
+            onClick={() => setShowWithdrawModal(true)}
+            className="flex items-center gap-2 px-5 py-3 bg-white/6 hover:bg-white/10 border border-white/10 text-[#f5f5f7] text-sm font-semibold rounded-lg transition-all cursor-pointer"
+          >
+            Withdraw
+          </button>
+          <button
+            onClick={() => setShowDepositModal(true)}
             className="flex items-center gap-2 px-5 py-3 bg-[#e63946] hover:bg-[#d62836] text-white text-sm font-semibold rounded-lg transition-all cursor-pointer"
           >
             <PlusIcon />
@@ -82,10 +99,20 @@ export default function BalanceCard({
 
       {/* Deposit Modal */}
       <DepositModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
+        isOpen={showDepositModal}
+        onClose={() => setShowDepositModal(false)}
         onDeposit={handleDeposit}
         isProcessing={isProcessing}
+        card={card}
+      />
+
+      {/* Withdrawal Modal */}
+      <WithdrawalModal
+        isOpen={showWithdrawModal}
+        onClose={() => setShowWithdrawModal(false)}
+        onWithdraw={handleWithdraw}
+        isProcessing={isProcessing}
+        walletBalance={wallet.balance}
         card={card}
       />
     </>

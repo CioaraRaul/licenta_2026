@@ -45,8 +45,6 @@ export class TokenBlacklistService {
       userId,
       expiresAt: new Date(Date.now() + 7 * 24 * 3600000),
     });
-
-    console.log(` All sessions revoked for user ${userId}`);
   }
 
   async areAllUserSessionsRevoked(

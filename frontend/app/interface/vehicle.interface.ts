@@ -305,7 +305,6 @@ export interface VehicleCardProps {
   vehicle: Vehicle;
   isSaved: boolean;
   onToggleSave: (vehicleId: number) => void;
-  onQuickView: (vehicle: Vehicle) => void;
 }
 
 /** Props for a single vehicle row in list view */
@@ -313,7 +312,6 @@ export interface VehicleRowProps {
   vehicle: Vehicle;
   isSaved: boolean;
   onToggleSave: (vehicleId: number) => void;
-  onQuickView: (vehicle: Vehicle) => void;
 }
 
 /** Props for the results header (count + sort + view toggle) */
@@ -348,4 +346,12 @@ export interface FindVehiclePaginationProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+}
+
+/** Data returned by the vehicle detail route loader */
+export interface VehicleDetailPageData {
+  vehicle: Vehicle | null;
+  similarVehicles: Vehicle[];
+  isSaved: boolean;
+  error: boolean;
 }
