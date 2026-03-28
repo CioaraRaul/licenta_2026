@@ -124,11 +124,12 @@ app/
 - Quick actions: New Listing, Edit Profile
 
 ### Buyer View
-- Stats cards: active bids, saved vehicles, vehicles viewed, budget
-- Recently viewed vehicles carousel
-- Recent activity feed
-- Reviews section
-- Quick actions: Find Vehicles, View Saved
+- Stats cards (collapsible): active bids, saved vehicles, total spent, wallet balance (with frozen balance indicator)
+- Recent bids table with vehicle thumbnail, bid amount, status badge, relative date
+- Recently saved vehicles grid (2x2 cards with images, price, mileage)
+- Bid activity panel: total/pending/accepted/rejected counts with success rate progress bar
+- Spending summary: total spent, wallet balance, frozen balance
+- Quick actions: Find Vehicles, My Bids, View Saved, Messages
 
 ---
 
