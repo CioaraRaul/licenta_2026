@@ -29,6 +29,7 @@ export class BidsController {
   ) {
     return this.bidsService.placeBid(
       req.user.userId,
+      req.user.role,
       vehicleId,
       amount,
       message,

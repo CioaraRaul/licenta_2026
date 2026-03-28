@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router";
 import { useSaveVehicle } from "~/hooks/useSaveVehicle";
+import { useAuthStore } from "~/store/auth.store";
 import { formatCurrencyFull, formatMileage, formatRelativeTime } from "~/utils/format.utils";
 import { buildVehicleSpecs } from "~/utils/findVehicle.utils";
 import { getFuelTypeLabel, getTransmissionLabel } from "~/utils/vehicle.utils";
@@ -34,6 +35,8 @@ export default function VehicleDetailComponent({
   const navigate = useNavigate();
   const [imageIndex, setImageIndex] = useState(0);
   const { isSaved, toggleSave } = useSaveVehicle(vehicle?.id, initialIsSaved);
+  const user = useAuthStore((s) => s.user);
+  const isSeller = user?.role === "seller";
 
   /* ── Error state ────────────────────────────────────────────────────── */
   if (error || !vehicle) {
@@ -276,10 +279,20 @@ export default function VehicleDetailComponent({
                 </div>
                 <button
                   onClick={() => navigate("/messages")}
-                  className="mt-4 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#e63946] hover:bg-[#d32f3f] rounded-xl text-[13px] text-white font-medium transition-colors cursor-pointer"
+                  disabled={isSeller}
+                  className={`mt-4 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-medium transition-colors ${
+                    isSeller
+                      ? "bg-gray-600 text-gray-400 cursor-not-allowed"
+                      : "bg-[#e63946] hover:bg-[#d32f3f] text-white cursor-pointer"
+                  }`}
                 >
                   <MessageIcon /> Contact Seller
                 </button>
+                {isSeller && (
+                  <p className="mt-2 text-[13px] text-[#8e8e9a] text-center font-semibold">
+                    Only buyer accounts can contact sellers.
+                  </p>
+                )}
               </div>
             )}
 

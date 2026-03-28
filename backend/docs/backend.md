@@ -148,6 +148,10 @@ Search, make, model, type, year range, price range, mileage range, fuel type, tr
 
 `PENDING`, `ACCEPTED`, `REJECTED`, `WITHDRAWN`, `EXPIRED`
 
+### Role Restrictions
+
+- Seller accounts cannot place bids (returns 403 Forbidden)
+
 ---
 
 ## Messages (messages)

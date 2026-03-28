@@ -10,6 +10,7 @@ import { Repository } from 'typeorm';
 import { Vehicle } from 'src/vehicles/entities/vehicle.entity';
 import { VehicleStatus } from 'src/vehicles/enums/vehicle-status.enum';
 import { BidStatus } from './enums/bid-status.enum';
+import { UserRole } from 'src/users/enum/user-role.enum';
 
 @Injectable()
 export class BidsService {
@@ -23,10 +24,15 @@ export class BidsService {
 
   async placeBid(
     buyerId: number,
+    role: UserRole,
     vehicleId: number,
     amount: number,
     message?: string,
   ): Promise<Bid> {
+    if (role === UserRole.SELLER) {
+      throw new ForbiddenException('Seller accounts cannot place bids');
+    }
+
     const vehicle = await this.vehicleRepo.findOne({
       where: { id: vehicleId },
     });

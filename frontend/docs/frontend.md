@@ -150,7 +150,7 @@ app/
 - Similar vehicles carousel (4 vehicles)
 - Save/unsave toggle
 - Bid placement form (buyers)
-- Message seller button
+- Contact seller button (disabled with gray styling for seller accounts, with hint text: "Only buyer accounts can contact sellers.")
 - Owner information
 
 ### My Listings (`/my-listings`) - Seller Only
