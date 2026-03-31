@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import {
   getConversationMessages,
+  getConversations,
   replyToConversation,
+  startConversation,
 } from "~/api/messages.api";
 import type {
   MessagesPageData,
@@ -28,16 +30,22 @@ import { getAvatarColor, getAvatarInitials } from "~/utils/avatar.utils";
    ═══════════════════════════════════════════════════════════════════════════════ */
 
 export default function MessagesComponent({
-  conversations,
+  conversations: initialConversations,
   currentUserId,
   error,
+  openSellerId,
+  openVehicleId,
 }: MessagesPageData) {
+  const [conversations, setConversations] = useState(initialConversations);
   const [activeConversationId, setActiveConversationId] = useState<
     number | null
   >(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [shouldFocusInput, setShouldFocusInput] = useState(false);
+  const [pendingVehicleId, setPendingVehicleId] = useState<number | null>(null);
+  const [sendError, setSendError] = useState<string | null>(null);
 
   const activeConversation =
     conversations.find((c) => c.id === activeConversationId) ?? null;
@@ -57,15 +65,64 @@ export default function MessagesComponent({
 
   const handleSelectConversation = useCallback(
     (id: number) => {
+      setPendingVehicleId(null);
+      setSendError(null);
       setActiveConversationId(id);
       loadMessages(id);
     },
     [loadMessages],
   );
 
+  /* ── Auto-open conversation when navigated from vehicle detail ──────────── */
+  useEffect(() => {
+    if (!openSellerId) return;
+    // Match by both sellerId and vehicleId for precision, fall back to sellerId only
+    const match = openVehicleId
+      ? conversations.find(
+          (c) => c.sellerId === openSellerId && c.vehicleId === openVehicleId,
+        ) ?? conversations.find((c) => c.sellerId === openSellerId)
+      : conversations.find((c) => c.sellerId === openSellerId);
+    if (match) {
+      setActiveConversationId(match.id);
+      loadMessages(match.id);
+      setShouldFocusInput(true);
+    } else if (openVehicleId) {
+      setPendingVehicleId(openVehicleId);
+      setActiveConversationId(null);
+      setMessages([]);
+      setShouldFocusInput(true);
+    }
+  }, [openSellerId, openVehicleId, conversations, loadMessages]);
+
   /* ── Trimite un mesaj nou într-o conversație ────────────────────────────── */
   const handleSendMessage = useCallback(
     async (content: string) => {
+      setSendError(null);
+
+      // New conversation — use startConversation API
+      if (pendingVehicleId && !activeConversationId) {
+        try {
+          await startConversation(pendingVehicleId, { content });
+          const updated = await getConversations();
+          setConversations(updated);
+          const newConv = updated.find(
+            (c) => c.vehicleId === pendingVehicleId,
+          );
+          if (newConv) {
+            setActiveConversationId(newConv.id);
+            loadMessages(newConv.id);
+          }
+          setPendingVehicleId(null);
+        } catch (err: any) {
+          const msg =
+            err?.response?.data?.message ||
+            err?.message ||
+            "Failed to start conversation. Please try again.";
+          setSendError(msg);
+        }
+        return;
+      }
+
       if (!activeConversationId) return;
       try {
         const newMessage = await replyToConversation(activeConversationId, {
@@ -75,11 +132,15 @@ export default function MessagesComponent({
           ...prev,
           { ...newMessage, sender: { userId: currentUserId } as any },
         ]);
-      } catch {
-        // silently fail — TODO: toast notification
+      } catch (err: any) {
+        const msg =
+          err?.response?.data?.message ||
+          err?.message ||
+          "Failed to send message. Please try again.";
+        setSendError(msg);
       }
     },
-    [activeConversationId, currentUserId],
+    [activeConversationId, pendingVehicleId, currentUserId, loadMessages],
   );
 
   /* ── Error state ────────────────────────────────────────────────────────── */
@@ -128,6 +189,10 @@ export default function MessagesComponent({
             currentUserId={currentUserId}
             isLoading={isLoadingMessages}
             onSendMessage={handleSendMessage}
+            shouldFocusInput={shouldFocusInput}
+            onFocused={() => setShouldFocusInput(false)}
+            sendError={sendError}
+            isNewConversation={!!pendingVehicleId}
           />
         </div>
       </div>
@@ -285,14 +350,32 @@ function ChatPanel({
   currentUserId,
   isLoading,
   onSendMessage,
-}: ChatPanelProps) {
+  shouldFocusInput,
+  onFocused,
+  sendError,
+  isNewConversation,
+}: ChatPanelProps & {
+  shouldFocusInput?: boolean;
+  onFocused?: () => void;
+  sendError?: string | null;
+  isNewConversation?: boolean;
+}) {
   const [inputValue, setInputValue] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   /* Auto-scroll la ultimul mesaj */
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  /* Auto-focus input when opened from vehicle detail */
+  useEffect(() => {
+    if (shouldFocusInput && !isLoading) {
+      inputRef.current?.focus();
+      onFocused?.();
+    }
+  }, [shouldFocusInput, isLoading, onFocused]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -308,6 +391,58 @@ function ChatPanel({
       handleSubmit(e);
     }
   };
+
+  /* ── New conversation mode (no existing conversation yet) ──────────────── */
+  if (!conversation && isNewConversation) {
+    return (
+      <div className="flex-1 flex flex-col bg-[#141417] border border-white/[0.04] rounded-xl overflow-hidden">
+        <div className="flex items-center gap-3 px-5 py-3.5 border-b border-white/[0.04]">
+          <div className="w-9 h-9 rounded-full bg-[#e63946]/20 flex items-center justify-center text-sm font-semibold shrink-0 text-[#e63946]">
+            +
+          </div>
+          <h3 className="text-sm font-semibold text-[#f5f5f7]">
+            New Conversation
+          </h3>
+        </div>
+
+        <div className="flex-1 flex flex-col items-center justify-center px-4">
+          <ChatBubbleIcon size={32} className="text-[#8e8e9a] opacity-40 mb-3" />
+          <p className="text-[#8e8e9a] text-sm text-center">
+            Send your first message to the seller.
+          </p>
+        </div>
+
+        {sendError && (
+          <div className="mx-4 mb-2 px-4 py-2.5 bg-red-500/10 border border-red-500/20 rounded-lg text-[13px] text-red-400 font-medium">
+            {sendError}
+          </div>
+        )}
+
+        <form
+          onSubmit={handleSubmit}
+          className="px-4 py-3 border-t border-white/[0.04] flex items-end gap-3"
+        >
+          <textarea
+            ref={inputRef}
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Type a message..."
+            rows={1}
+            className="flex-1 bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2.5 text-sm text-[#f5f5f7] placeholder-[#555] outline-none resize-none min-h-[40px] max-h-[120px] focus:border-[#e63946]/40 transition-colors"
+          />
+          <button
+            type="submit"
+            disabled={!inputValue.trim()}
+            className="shrink-0 w-10 h-10 rounded-xl bg-[#e63946] hover:bg-[#d62836] disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-all"
+            title="Send message"
+          >
+            <SendIcon />
+          </button>
+        </form>
+      </div>
+    );
+  }
 
   /* ── Empty state (nicio conversație selectată) ──────────────────────────── */
   if (!conversation) {
@@ -401,12 +536,20 @@ function ChatPanel({
         <div ref={messagesEndRef} />
       </div>
 
+      {/* ── Error banner ────────────────────────────────────────────────────── */}
+      {sendError && (
+        <div className="mx-4 mt-2 px-4 py-2.5 bg-red-500/10 border border-red-500/20 rounded-lg text-[13px] text-red-400 font-medium">
+          {sendError}
+        </div>
+      )}
+
       {/* ── Input Area ───────────────────────────────────────────────────────── */}
       <form
         onSubmit={handleSubmit}
         className="px-4 py-3 border-t border-white/[0.04] flex items-end gap-3"
       >
         <textarea
+          ref={inputRef}
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}

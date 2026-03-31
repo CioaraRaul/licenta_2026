@@ -56,6 +56,8 @@ export interface MessagesPageData {
   conversations: Conversation[];
   currentUserId: number;
   error: boolean;
+  openSellerId?: number;
+  openVehicleId?: number;
 }
 
 export interface ConversationListProps {
