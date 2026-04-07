@@ -56,14 +56,14 @@ export class MessagesService {
         vehicleId,
         lastMessage: content,
         lastMessageAt: new Date(),
-        unreadCount: 1,
+        unreadByBuyer: 0,
+        unreadBySeller: 1,
       });
       await this.conversationRepo.save(conversation);
     } else {
-      // Actualizăm preview-ul conversației
       conversation.lastMessage = content;
       conversation.lastMessageAt = new Date();
-      conversation.unreadCount += 1;
+      conversation.unreadBySeller += 1;
       await this.conversationRepo.save(conversation);
     }
 
@@ -97,7 +97,11 @@ export class MessagesService {
 
     conversation.lastMessage = content;
     conversation.lastMessageAt = new Date();
-    conversation.unreadCount += 1;
+    if (senderId === conversation.buyerId) {
+      conversation.unreadBySeller += 1;
+    } else {
+      conversation.unreadByBuyer += 1;
+    }
     await this.conversationRepo.save(conversation);
 
     const message = this.messageRepo.create({
@@ -112,7 +116,7 @@ export class MessagesService {
   // ─── Get My Conversations ──────────────────────────────────────────────────
 
   async getMyConversations(userId: number): Promise<Conversation[]> {
-    return this.conversationRepo
+    const conversations = await this.conversationRepo
       .createQueryBuilder('conv')
       .leftJoinAndSelect('conv.vehicle', 'vehicle')
       .leftJoinAndSelect('conv.buyer', 'buyer')
@@ -120,6 +124,14 @@ export class MessagesService {
       .where('conv.buyerId = :userId OR conv.sellerId = :userId', { userId })
       .orderBy('conv.lastMessageAt', 'DESC')
       .getMany();
+
+    // Setăm unreadCount corect per utilizator
+    for (const conv of conversations) {
+      conv.unreadCount =
+        conv.buyerId === userId ? conv.unreadByBuyer : conv.unreadBySeller;
+    }
+
+    return conversations;
   }
 
   // ─── Get Messages in Conversation ─────────────────────────────────────────
@@ -149,8 +161,12 @@ export class MessagesService {
       )
       .execute();
 
-    // Resetăm unreadCount
-    await this.conversationRepo.update(conversationId, { unreadCount: 0 });
+    // Resetăm unreadCount doar pentru cel care citește
+    if (conversation.buyerId === userId) {
+      await this.conversationRepo.update(conversationId, { unreadByBuyer: 0 });
+    } else {
+      await this.conversationRepo.update(conversationId, { unreadBySeller: 0 });
+    }
 
     const [data, total] = await this.messageRepo.findAndCount({
       where: { conversationId },

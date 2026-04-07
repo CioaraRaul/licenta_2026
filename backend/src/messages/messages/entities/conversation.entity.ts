@@ -41,9 +41,15 @@ export class Conversation {
   @Column()
   vehicleId: number;
 
-  // Numărul de mesaje necitite — util pentru badge-uri în UI
+  // Mesaje necitite per participant
   @Column({ default: 0 })
-  unreadCount: number;
+  unreadByBuyer: number;
+
+  @Column({ default: 0 })
+  unreadBySeller: number;
+
+  // Câmp virtual — setat de service, nu e în DB
+  unreadCount?: number;
 
   // Ultimul mesaj pentru preview în lista de conversații
   @Column({ nullable: true })

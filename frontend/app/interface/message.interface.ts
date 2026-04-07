@@ -52,20 +52,17 @@ export interface SendMessagePayload {
 
 // ─── Component Props ──────────────────────────────────────────────────────────
 
-export interface MessagesPageData {
+export interface MessagesLayoutProps {
   conversations: Conversation[];
   currentUserId: number;
   error: boolean;
-  openSellerId?: number;
-  openVehicleId?: number;
 }
 
 export interface ConversationListProps {
   conversations: Conversation[];
   currentUserId: number;
-  activeConversationId: number | null;
+  activeUserId?: number;
   searchQuery: string;
-  onSelectConversation: (id: number) => void;
   onSearchChange: (query: string) => void;
 }
 
@@ -75,6 +72,8 @@ export interface ChatPanelProps {
   currentUserId: number;
   isLoading: boolean;
   onSendMessage: (content: string) => void;
+  sendError?: string | null;
+  isNewConversation?: boolean;
 }
 
 export interface MessageBubbleProps {
@@ -87,4 +86,22 @@ export interface ConversationItemProps {
   currentUserId: number;
   isActive: boolean;
   onClick: () => void;
+}
+
+export interface MessageInputProps {
+  onSendMessage: (content: string) => void;
+  autoFocus?: boolean;
+}
+
+export interface SendErrorBannerProps {
+  error: string | null | undefined;
+  className?: string;
+}
+
+// ─── Messages Outlet Context ─────────────────────────────────────────────────
+
+export interface MessagesOutletContext {
+  conversations: Conversation[];
+  currentUserId: number;
+  refreshConversations: () => Promise<void>;
 }
