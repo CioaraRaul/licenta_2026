@@ -1,6 +1,12 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
+import { Link } from "react-router";
 import type { ChatPanelProps } from "~/interface/message.interface";
-import { getOtherParticipant, shouldShowDateSeparator, getDateSeparatorLabel } from "~/utils/message.utils";
+import {
+  getOtherParticipant,
+  getOtherDisplayName,
+  shouldShowDateSeparator,
+  getDateSeparatorLabel,
+} from "~/utils/message.utils";
 import { getAvatarColor, getAvatarInitials } from "~/utils/avatar.utils";
 import { ChatBubbleIcon, InfoIcon } from "../icons";
 import MessageBubble from "./MessageBubble";
@@ -16,13 +22,34 @@ export default function ChatPanel({
   onSendMessage,
   sendError,
   isNewConversation,
+  onEditMessage,
+  onDeleteMessage,
+  onRenameOther,
+  onDeleteConversation,
 }: ChatPanelProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [renaming, setRenaming] = useState(false);
+  const [aliasDraft, setAliasDraft] = useState("");
+  const [busy, setBusy] = useState(false);
 
   /* Auto-scroll to last message */
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  /* Close menu on outside click */
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [menuOpen]);
 
   /* ── New conversation mode ───────────────────────────────────────────────── */
   if (!conversation && isNewConversation) {
@@ -68,8 +95,53 @@ export default function ChatPanel({
   }
 
   const other = getOtherParticipant(conversation, currentUserId);
-  const initials = getAvatarInitials(other.username);
+  const displayName = getOtherDisplayName(conversation, currentUserId);
+  const hasAlias = !!conversation.aliasForOther?.trim();
+  const initials = getAvatarInitials(displayName);
   const avatarBg = getAvatarColor(other.username);
+
+  const handleStartRename = () => {
+    setAliasDraft(conversation.aliasForOther || "");
+    setRenaming(true);
+    setMenuOpen(false);
+  };
+
+  const handleSaveAlias = async () => {
+    if (!onRenameOther) return;
+    try {
+      setBusy(true);
+      const next = aliasDraft.trim();
+      await onRenameOther(next || null);
+      setRenaming(false);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleClearAlias = async () => {
+    if (!onRenameOther) return;
+    try {
+      setBusy(true);
+      await onRenameOther(null);
+      setRenaming(false);
+      setMenuOpen(false);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleDeleteConv = async () => {
+    if (!onDeleteConversation) return;
+    if (!confirm(`Delete the entire conversation with ${displayName}? This cannot be undone.`))
+      return;
+    try {
+      setBusy(true);
+      await onDeleteConversation();
+      setMenuOpen(false);
+    } finally {
+      setBusy(false);
+    }
+  };
 
   return (
     <div className="flex-1 flex flex-col bg-[#141417] border border-white/[0.04] rounded-xl overflow-hidden">
@@ -82,13 +154,71 @@ export default function ChatPanel({
           {initials}
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-semibold text-[#f5f5f7] truncate">
-            {other.username}
-          </h3>
-          {conversation.vehicle && (
+          {renaming ? (
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                aria-label="Rename participant"
+                placeholder={other.username}
+                value={aliasDraft}
+                onChange={(e) => setAliasDraft(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSaveAlias();
+                  if (e.key === "Escape") setRenaming(false);
+                }}
+                autoFocus
+                disabled={busy}
+                className="flex-1 bg-white/[0.06] text-[#f5f5f7] text-sm font-semibold rounded-md px-2 py-1 outline-none border border-white/10 focus:border-[#e63946]/50"
+              />
+              <button
+                type="button"
+                onClick={handleSaveAlias}
+                disabled={busy}
+                className="text-[11px] bg-[#e63946] hover:bg-[#e63946]/80 text-white px-2.5 py-1 rounded disabled:opacity-50"
+              >
+                Save
+              </button>
+              {hasAlias && (
+                <button
+                  type="button"
+                  onClick={handleClearAlias}
+                  disabled={busy}
+                  className="text-[11px] text-[#8e8e9a] hover:text-[#f5f5f7] px-2 py-1 rounded disabled:opacity-50"
+                >
+                  Reset
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setRenaming(false)}
+                disabled={busy}
+                className="text-[11px] text-[#8e8e9a] hover:text-[#f5f5f7] px-2 py-1 rounded disabled:opacity-50"
+              >
+                Cancel
+              </button>
+            </div>
+          ) : (
+            <h3 className="text-sm font-semibold text-[#f5f5f7] truncate flex items-center gap-1.5">
+              {displayName}
+              {hasAlias && (
+                <span
+                  className="text-[10px] text-[#8e8e9a] font-normal"
+                  title={`Real username: ${other.username}`}
+                >
+                  ({other.username})
+                </span>
+              )}
+            </h3>
+          )}
+          {conversation.vehicle && !renaming && (
             <p className="text-[11px] text-[#8e8e9a] truncate">
-              {conversation.vehicle.make} {conversation.vehicle.model}{" "}
-              {conversation.vehicle.year}
+              <Link
+                to={`/find-vehicle/${conversation.vehicle.id}`}
+                className="hover:text-[#f5f5f7] hover:underline"
+              >
+                {conversation.vehicle.make} {conversation.vehicle.model}{" "}
+                {conversation.vehicle.year}
+              </Link>
               {conversation.vehicle.price && (
                 <span className="text-[#e63946]/70 ml-1.5">
                   ${conversation.vehicle.price.toLocaleString()}
@@ -97,10 +227,43 @@ export default function ChatPanel({
             </p>
           )}
         </div>
-        <div className="flex items-center gap-1">
-          <button className="w-8 h-8 rounded-lg hover:bg-white/[0.06] flex items-center justify-center transition-colors">
+        <div className="flex items-center gap-1 relative" ref={menuRef}>
+          <button
+            type="button"
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label="Conversation options"
+            className="w-8 h-8 rounded-lg hover:bg-white/[0.06] flex items-center justify-center transition-colors"
+          >
             <InfoIcon />
           </button>
+          {menuOpen && (
+            <div className="absolute right-0 top-full mt-1 w-52 bg-[#1a1a1f] border border-white/[0.08] rounded-lg shadow-xl py-1 z-10">
+              <button
+                type="button"
+                onClick={handleStartRename}
+                className="w-full flex items-center gap-2 px-3 py-2 text-left text-[13px] text-[#f5f5f7] hover:bg-white/[0.06] transition-colors"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+                Rename {hasAlias ? "alias" : other.username}
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteConv}
+                disabled={busy}
+                className="w-full flex items-center gap-2 px-3 py-2 text-left text-[13px] text-[#e63946] hover:bg-[#e63946]/10 transition-colors disabled:opacity-50"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                  <path d="M10 11v6M14 11v6" />
+                </svg>
+                Delete conversation
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -134,6 +297,8 @@ export default function ChatPanel({
                 <MessageBubble
                   message={msg}
                   isOwn={msg.senderId === currentUserId}
+                  onEdit={onEditMessage}
+                  onDelete={onDeleteMessage}
                 />
               </div>
             );

@@ -1,5 +1,11 @@
+import { Link } from "react-router";
 import type { ConversationItemProps } from "~/interface/message.interface";
-import { getOtherParticipant, formatMessageTime, truncateMessage } from "~/utils/message.utils";
+import {
+  getOtherParticipant,
+  getOtherDisplayName,
+  formatMessageTime,
+  truncateMessage,
+} from "~/utils/message.utils";
 import { getAvatarColor, getAvatarInitials } from "~/utils/avatar.utils";
 
 export default function ConversationItem({
@@ -9,13 +15,23 @@ export default function ConversationItem({
   onClick,
 }: ConversationItemProps) {
   const other = getOtherParticipant(conversation, currentUserId);
-  const initials = getAvatarInitials(other.username);
+  const displayName = getOtherDisplayName(conversation, currentUserId);
+  const initials = getAvatarInitials(displayName);
+  // Avatar color stays tied to the real username so alias rename doesn't shuffle colors
   const avatarBg = getAvatarColor(other.username);
   const hasUnread = conversation.unreadCount > 0;
 
   return (
-    <button
+    <div
+      role="button"
+      tabIndex={0}
       onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick();
+        }
+      }}
       className={`w-full flex items-start gap-3 px-4 py-3.5 text-left transition-all border-b border-white/[0.03] hover:bg-white/[0.03] cursor-pointer ${
         isActive ? "bg-white/[0.06] border-l-2 border-l-[#e63946]" : ""
       }`}
@@ -37,8 +53,13 @@ export default function ConversationItem({
                 ? "font-semibold text-[#f5f5f7]"
                 : "font-medium text-[#c5c5c7]"
             }`}
+            title={
+              displayName !== other.username
+                ? `Real username: ${other.username}`
+                : undefined
+            }
           >
-            {other.username}
+            {displayName}
           </span>
           {conversation.lastMessageAt && (
             <span className="text-[11px] text-[#555] shrink-0">
@@ -49,10 +70,14 @@ export default function ConversationItem({
 
         {/* Vehicle */}
         {conversation.vehicle && (
-          <p className="text-[11px] text-[#e63946]/70 truncate mt-0.5">
+          <Link
+            to={`/find-vehicle/${conversation.vehicle.id}`}
+            onClick={(e) => e.stopPropagation()}
+            className="block text-[11px] text-[#e63946]/70 hover:text-[#e63946] hover:underline truncate mt-0.5"
+          >
             {conversation.vehicle.make} {conversation.vehicle.model}{" "}
             {conversation.vehicle.year}
-          </p>
+          </Link>
         )}
 
         {/* Last message + unread badge */}
@@ -73,6 +98,6 @@ export default function ConversationItem({
           )}
         </div>
       </div>
-    </button>
+    </div>
   );
 }

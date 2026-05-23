@@ -2,9 +2,13 @@ import { useState, useCallback } from "react";
 import { useParams, useSearchParams, useOutletContext, useNavigate } from "react-router";
 import type { Message, MessagesOutletContext } from "~/interface/message.interface";
 import {
+  deleteConversation,
+  deleteMessage,
+  editMessage,
   getConversationMessages,
   getConversations,
   replyToConversation,
+  setConversationAlias,
   startConversation,
 } from "~/api/messages.api";
 import { getOtherParticipant } from "~/utils/message.utils";
@@ -95,6 +99,48 @@ export default function MessageUser() {
     [conversation, isNewConversation, vehicleId, currentUserId, navigate, refreshConversations],
   );
 
+  /* Edit own message */
+  const handleEditMessage = useCallback(
+    async (id: number, content: string) => {
+      const updated = await editMessage(id, content);
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === id ? { ...m, content: updated.content } : m,
+        ),
+      );
+      refreshConversations();
+    },
+    [refreshConversations],
+  );
+
+  /* Delete own message */
+  const handleDeleteMessage = useCallback(
+    async (id: number) => {
+      await deleteMessage(id);
+      setMessages((prev) => prev.filter((m) => m.id !== id));
+      refreshConversations();
+    },
+    [refreshConversations],
+  );
+
+  /* Rename other participant (set alias) */
+  const handleRenameOther = useCallback(
+    async (alias: string | null) => {
+      if (!conversation) return;
+      await setConversationAlias(conversation.id, alias);
+      await refreshConversations();
+    },
+    [conversation, refreshConversations],
+  );
+
+  /* Delete entire conversation */
+  const handleDeleteConversation = useCallback(async () => {
+    if (!conversation) return;
+    await deleteConversation(conversation.id);
+    await refreshConversations();
+    navigate("/messages", { replace: true });
+  }, [conversation, refreshConversations, navigate]);
+
   return (
     <ChatPanel
       conversation={conversation}
@@ -104,6 +150,10 @@ export default function MessageUser() {
       onSendMessage={handleSendMessage}
       sendError={sendError}
       isNewConversation={isNewConversation}
+      onEditMessage={conversation ? handleEditMessage : undefined}
+      onDeleteMessage={conversation ? handleDeleteMessage : undefined}
+      onRenameOther={conversation ? handleRenameOther : undefined}
+      onDeleteConversation={conversation ? handleDeleteConversation : undefined}
     />
   );
 }

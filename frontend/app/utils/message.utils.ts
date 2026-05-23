@@ -15,6 +15,18 @@ export function getOtherParticipant(
 }
 
 /**
+ * Numele afișat pentru celălalt participant — alias-ul setat de utilizatorul curent
+ * sau username-ul real dacă nu există alias.
+ */
+export function getOtherDisplayName(
+  conversation: Conversation,
+  currentUserId: number,
+): string {
+  const other = getOtherParticipant(conversation, currentUserId);
+  return conversation.aliasForOther?.trim() || other.username;
+}
+
+/**
  * Formatează timestamp-ul pentru lista de conversații.
  * - Azi    → "14:32"
  * - Ieri   → "Yesterday"
@@ -95,14 +107,13 @@ export function filterConversations(
   const q = query.toLowerCase();
 
   return conversations.filter((conv) => {
-    const other = getOtherParticipant(conv, currentUserId);
-    const otherName = other.username?.toLowerCase() ?? "";
+    const displayName = getOtherDisplayName(conv, currentUserId).toLowerCase();
     const vehicleInfo =
       `${conv.vehicle?.make ?? ""} ${conv.vehicle?.model ?? ""}`.toLowerCase();
     const lastMsg = conv.lastMessage?.toLowerCase() ?? "";
 
     return (
-      otherName.includes(q) || vehicleInfo.includes(q) || lastMsg.includes(q)
+      displayName.includes(q) || vehicleInfo.includes(q) || lastMsg.includes(q)
     );
   });
 }

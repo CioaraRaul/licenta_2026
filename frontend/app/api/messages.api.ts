@@ -38,3 +38,34 @@ export async function getConversationMessages(
     { params: { page, limit } },
   );
 }
+
+/** PATCH /messages/message/:id — editează conținutul propriului mesaj */
+export async function editMessage(
+  messageId: number,
+  content: string,
+): Promise<Message> {
+  return httpClient.patch<Message>(`/messages/message/${messageId}`, {
+    content,
+  });
+}
+
+/** DELETE /messages/message/:id — șterge propriul mesaj */
+export async function deleteMessage(messageId: number): Promise<void> {
+  return httpClient.delete<void>(`/messages/message/${messageId}`);
+}
+
+/** DELETE /messages/conversation/:id — șterge întreaga conversație */
+export async function deleteConversation(conversationId: number): Promise<void> {
+  return httpClient.delete<void>(`/messages/conversation/${conversationId}`);
+}
+
+/** PATCH /messages/conversation/:id/alias — setează un alias custom pentru celălalt participant */
+export async function setConversationAlias(
+  conversationId: number,
+  alias: string | null,
+): Promise<Conversation> {
+  return httpClient.patch<Conversation>(
+    `/messages/conversation/${conversationId}/alias`,
+    { alias },
+  );
+}

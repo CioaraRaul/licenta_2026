@@ -38,6 +38,12 @@ export interface Conversation {
   lastMessage?: string;
   lastMessageAt?: string;
 
+  // Alias-uri custom (peer renames)
+  aliasByBuyer?: string | null;
+  aliasBySeller?: string | null;
+  /** Virtual: aliasul setat de utilizatorul curent pentru cealaltă parte */
+  aliasForOther?: string | null;
+
   messages?: Message[];
 
   createdAt: string;
@@ -74,11 +80,17 @@ export interface ChatPanelProps {
   onSendMessage: (content: string) => void;
   sendError?: string | null;
   isNewConversation?: boolean;
+  onEditMessage?: (id: number, content: string) => Promise<void>;
+  onDeleteMessage?: (id: number) => Promise<void>;
+  onRenameOther?: (alias: string | null) => Promise<void>;
+  onDeleteConversation?: () => Promise<void>;
 }
 
 export interface MessageBubbleProps {
   message: Message;
   isOwn: boolean;
+  onEdit?: (id: number, content: string) => Promise<void>;
+  onDelete?: (id: number) => Promise<void>;
 }
 
 export interface ConversationItemProps {
