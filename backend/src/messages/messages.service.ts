@@ -57,6 +57,7 @@ export class MessagesService {
         vehicleId,
         lastMessage: content,
         lastMessageAt: new Date(),
+        lastMessageSenderId: senderId,
         unreadByBuyer: 0,
         unreadBySeller: 1,
       });
@@ -65,6 +66,7 @@ export class MessagesService {
       conversation.vehicleId = vehicleId;
       conversation.lastMessage = content;
       conversation.lastMessageAt = new Date();
+      conversation.lastMessageSenderId = senderId;
       conversation.unreadBySeller += 1;
       await this.conversationRepo.save(conversation);
     }
@@ -99,6 +101,7 @@ export class MessagesService {
 
     conversation.lastMessage = content;
     conversation.lastMessageAt = new Date();
+    conversation.lastMessageSenderId = senderId;
     if (senderId === conversation.buyerId) {
       conversation.unreadBySeller += 1;
     } else {
@@ -240,6 +243,7 @@ export class MessagesService {
     await this.conversationRepo.update(conversationId, {
       lastMessage: last ? last.content : null,
       lastMessageAt: last ? last.createdAt : null,
+      lastMessageSenderId: last ? last.senderId : null,
     });
   }
 

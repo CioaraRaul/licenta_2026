@@ -99,11 +99,11 @@ const FALLBACK_PHOTOS = [
 ];
 
 function pickPhotos(make, id) {
+  // One image per vehicle — multiple photos of different cars in the same
+  // listing would look like one ad is selling multiple cars. Run
+  // apply-model-images.js afterwards to upgrade curated models.
   const pool = PHOTOS[make] || FALLBACK_PHOTOS;
-  const a = pool[id % pool.length];
-  const b = pool[(id + 2) % pool.length];
-  const c = pool[(id + 4) % pool.length];
-  return [a, b, c].join(',');
+  return pool[id % pool.length];
 }
 
 async function hashPassword(password) {

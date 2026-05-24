@@ -69,6 +69,10 @@ export class Conversation {
   @Column({ nullable: true })
   lastMessageAt: Date;
 
+  // Cine a trimis ultimul mesaj — folosit pentru preview-ul „You sent" în sidebar
+  @Column({ nullable: true })
+  lastMessageSenderId?: number;
+
   @OneToMany(() => Message, (message) => message.conversation)
   messages: Message[];
 

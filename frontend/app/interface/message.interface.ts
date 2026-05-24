@@ -37,6 +37,8 @@ export interface Conversation {
   unreadCount: number;
   lastMessage?: string;
   lastMessageAt?: string;
+  /** Sender al ultimului mesaj (folosit pentru preview-ul „You sent" în sidebar) */
+  lastMessageSenderId?: number | null;
 
   // Alias-uri custom (peer renames)
   aliasByBuyer?: string | null;

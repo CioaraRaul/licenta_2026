@@ -21,6 +21,26 @@ export default function ConversationItem({
   const avatarBg = getAvatarColor(other.username);
   const hasUnread = conversation.unreadCount > 0;
 
+  // ── Preview text logic ────────────────────────────────────────────────────
+  // - If this conversation is currently open → show the actual last message
+  // - Else if I sent the last message → show "You sent"
+  // - Else if I have unread messages from them → show "+N new messages"
+  // - Else (read, from them) → show the last message text
+  const lastMsg = conversation.lastMessage
+    ? truncateMessage(conversation.lastMessage)
+    : "No messages yet";
+  const sentByMe = conversation.lastMessageSenderId === currentUserId;
+  let previewText: string;
+  if (isActive) {
+    previewText = lastMsg;
+  } else if (sentByMe) {
+    previewText = "You sent";
+  } else if (hasUnread) {
+    previewText = `+${conversation.unreadCount} new message${conversation.unreadCount === 1 ? "" : "s"}`;
+  } else {
+    previewText = lastMsg;
+  }
+
   return (
     <div
       role="button"
@@ -80,18 +100,22 @@ export default function ConversationItem({
           </Link>
         )}
 
-        {/* Last message + unread badge */}
+        {/* Last message preview + unread badge */}
         <div className="flex items-center justify-between gap-2 mt-0.5">
           <p
             className={`text-xs truncate ${
-              hasUnread ? "text-[#c5c5c7]" : "text-[#8e8e9a]"
+              hasUnread && !isActive && !sentByMe
+                ? "text-[#e63946] font-medium"
+                : sentByMe && !isActive
+                  ? "text-[#8e8e9a] italic"
+                  : hasUnread
+                    ? "text-[#c5c5c7]"
+                    : "text-[#8e8e9a]"
             }`}
           >
-            {conversation.lastMessage
-              ? truncateMessage(conversation.lastMessage)
-              : "No messages yet"}
+            {previewText}
           </p>
-          {hasUnread && (
+          {hasUnread && !isActive && !sentByMe && (
             <span className="shrink-0 min-w-[18px] h-[18px] rounded-full bg-[#e63946] text-[10px] text-white font-semibold flex items-center justify-center px-1">
               {conversation.unreadCount > 99 ? "99+" : conversation.unreadCount}
             </span>

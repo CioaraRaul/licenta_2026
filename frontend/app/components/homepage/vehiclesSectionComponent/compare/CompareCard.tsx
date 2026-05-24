@@ -1,7 +1,6 @@
 import type { CompareCardProps } from "~/interface/compare-props.interface";
 import { getVehicleTitle } from "~/utils/compare.utils";
-import { formatCurrencyFull, formatMileage } from "~/utils/format.utils";
-import { getFuelTypeLabel, getTransmissionLabel } from "~/utils/vehicle.utils";
+import { formatCurrencyFull } from "~/utils/format.utils";
 import { XIcon, ImagePlaceholderIcon } from "./CompareIcons";
 
 export default function CompareCard({ vehicle, onRemove }: CompareCardProps) {
@@ -9,7 +8,7 @@ export default function CompareCard({ vehicle, onRemove }: CompareCardProps) {
   const thumbnail = vehicle.images?.[0] ?? null;
 
   return (
-    <div className="relative group bg-[#141417] border border-white/6 rounded-xl overflow-hidden hover:border-white/12 transition-all duration-200">
+    <div className="relative group h-full flex flex-col bg-[#141417] border border-white/6 rounded-xl overflow-hidden hover:border-white/12 transition-all duration-200">
       {/* Remove button */}
       <button
         onClick={() => onRemove(vehicle.id)}
@@ -19,51 +18,31 @@ export default function CompareCard({ vehicle, onRemove }: CompareCardProps) {
         <XIcon />
       </button>
 
-      {/* Image */}
-      <div className="aspect-16/10 bg-[#0c0c0e] overflow-hidden">
+      {/* Image — fixed aspect, centered with object-cover */}
+      <div className="aspect-16/10 bg-[#0c0c0e] flex items-center justify-center overflow-hidden shrink-0">
         {thumbnail ? (
           <img
             src={thumbnail}
             alt={title}
             loading="lazy"
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <ImagePlaceholderIcon />
-          </div>
+          <ImagePlaceholderIcon />
         )}
       </div>
 
-      {/* Details */}
-      <div className="p-3.5 space-y-2">
+      {/* Title + price only — full specs live in the unified strip below */}
+      <div className="flex-1 flex flex-col items-center text-center p-3.5 gap-1">
         <h3
-          className="text-[13px] font-semibold text-[#f5f5f7] truncate"
+          className="text-[13px] font-semibold text-[#f5f5f7] truncate w-full"
           title={title}
         >
           {title}
         </h3>
-
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-bold text-[#e63946]">
-            {formatCurrencyFull(vehicle.price)}
-          </span>
-          <span className="text-[11px] text-[#8e8e9a]">
-            {formatMileage(vehicle.mileage)}
-          </span>
-        </div>
-
-        <div className="flex items-center gap-2 text-[10px] text-[#666]">
-          <span>{getFuelTypeLabel(vehicle.fuelType)}</span>
-          <span className="w-0.5 h-0.5 rounded-full bg-[#333]" />
-          <span>{getTransmissionLabel(vehicle.transmission)}</span>
-          {vehicle.trim && (
-            <>
-              <span className="w-0.5 h-0.5 rounded-full bg-[#333]" />
-              <span className="truncate">{vehicle.trim}</span>
-            </>
-          )}
-        </div>
+        <p className="text-[16px] font-bold text-[#e63946]">
+          {formatCurrencyFull(vehicle.price)}
+        </p>
       </div>
     </div>
   );
