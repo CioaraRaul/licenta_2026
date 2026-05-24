@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "PowerShell(pip show python-pptx 2>&1)",
+      "PowerShell(pip show Pillow 2>&1)",
+      "Bash(curl -s -X POST http://localhost:3000/auth/signup -H \"Content-Type: application/json\" -d '{\"username\":\"testbuyer\",\"firstName\":\"Test\",\"lastName\":\"Buyer\",\"email\":\"testbuyer@test.com\",\"password\":\"test123\",\"role\":\"buyer\"}' -w \"\\\\nHTTP %{http_code}\\\\n\")",
+      "Bash(curl -s -X POST http://localhost:3000/auth/signin -H \"Content-Type: application/json\" -d '{\"email\":\"testbuyer@test.com\",\"password\":\"test123\"}' -w \"\\\\nHTTP %{http_code}\\\\n\")",
+      "PowerShell(docker stop licenta_2026-backend-1)",
+      "PowerShell(docker exec licenta_2026-backend-1 node /app/inspect-state.js 2>&1)",
+      "PowerShell(docker cp c:\\\\licenta\\\\licenta_2026\\\\backend\\\\inspect-state.js licenta_2026-backend-1:/app/inspect-state.js)",
+      "PowerShell(docker exec licenta_2026-backend-1 node /app/inspect-state.js)",
+      "PowerShell(docker cp c:\\\\licenta\\\\licenta_2026\\\\backend\\\\seed-app-data.js licenta_2026-backend-1:/app/seed-app-data.js)",
+      "PowerShell(docker exec licenta_2026-backend-1 node /app/seed-app-data.js 2>&1)",
+      "PowerShell(Copy-Item c:\\\\licenta\\\\licenta_2026\\\\backend\\\\database.sqlite c:\\\\licenta\\\\licenta_2026\\\\backend\\\\database.sqlite.corrupt.bak -Force)",
+      "PowerShell(docker start licenta_2026-backend-1)",
+      "PowerShell(docker exec licenta_2026-backend-1 ls /app/node_modules/.bin/ts-node 2>&1)",
+      "PowerShell(docker cp c:\\\\licenta\\\\licenta_2026\\\\backend\\\\seed.ts licenta_2026-backend-1:/app/seed.ts)",
+      "PowerShell(docker exec -w /app licenta_2026-backend-1 node_modules/.bin/ts-node --transpile-only seed.ts 2>&1)",
+      "PowerShell(docker exec licenta_2026-backend-1 node -e \"const D = require\\('better-sqlite3'\\); const db = new D\\('/app/database.sqlite'\\); db.prepare\\('UPDATE users SET isEmailVerified = 1, emailVerificationToken = NULL, emailVerificationExpires = NULL WHERE email = ?'\\).run\\('testbuyer@test.com'\\); console.log\\('verified:', db.prepare\\('SELECT id, isEmailVerified FROM users WHERE email = ?'\\).get\\('testbuyer@test.com'\\)\\); db.close\\(\\);\")",
+      "Bash(curl -s -X POST http://localhost:3000/auth/signin -H \"Content-Type: application/json\" -d '{\"email\":\"testbuyer@test.com\",\"password\":\"test123\"}')",
+      "Bash(python -c \"import sys, json; d = json.load\\(sys.stdin\\); print\\(json.dumps\\(d, indent=2\\)[:1500]\\)\")",
+      "PowerShell(docker cp c:\\\\licenta\\\\licenta_2026\\\\backend\\\\merge-conversations.js licenta_2026-backend-1:/app/merge-conversations.js)",
+      "PowerShell(docker exec licenta_2026-backend-1 node /app/merge-conversations.js)",
+      "PowerShell(docker exec licenta_2026-backend-1 node -e \"const D=require\\('better-sqlite3'\\);const db=new D\\('/app/database.sqlite'\\);console.log\\('schema:',db.prepare\\(\\\\\"SELECT sql FROM sqlite_master WHERE name='conversations'\\\\\"\\).get\\(\\).sql\\);console.log\\('\\\\nindexes:',db.prepare\\(\\\\\"SELECT name, sql FROM sqlite_master WHERE type='index' AND tbl_name='conversations'\\\\\"\\).all\\(\\)\\);db.close\\(\\);\")",
+      "PowerShell(docker cp c:\\\\licenta\\\\licenta_2026\\\\backend\\\\inspect-conv.js licenta_2026-backend-1:/app/inspect-conv.js)",
+      "PowerShell(docker exec licenta_2026-backend-1 node /app/inspect-conv.js)",
+      "Bash(python -c \"import sys, json; convs=json.load\\(sys.stdin\\); print\\(json.dumps\\([{'id':c['id'],'seller':c['seller']['username'],'aliasForOther':c.get\\('aliasForOther'\\)} for c in convs], indent=2\\)\\)\")",
+      "WebFetch(domain:unsplash.com)",
+      "PowerShell(docker cp c:\\\\licenta\\\\licenta_2026\\\\backend\\\\apply-model-images.js licenta_2026-backend-1:/app/apply-model-images.js)",
+      "PowerShell(docker exec licenta_2026-backend-1 node /app/apply-model-images.js 2>&1)"
+    ]
+  }
+}

@@ -37,6 +37,14 @@ export interface Conversation {
   unreadCount: number;
   lastMessage?: string;
   lastMessageAt?: string;
+  /** Sender al ultimului mesaj (folosit pentru preview-ul „You sent" în sidebar) */
+  lastMessageSenderId?: number | null;
+
+  // Alias-uri custom (peer renames)
+  aliasByBuyer?: string | null;
+  aliasBySeller?: string | null;
+  /** Virtual: aliasul setat de utilizatorul curent pentru cealaltă parte */
+  aliasForOther?: string | null;
 
   messages?: Message[];
 
@@ -52,20 +60,17 @@ export interface SendMessagePayload {
 
 // ─── Component Props ──────────────────────────────────────────────────────────
 
-export interface MessagesPageData {
+export interface MessagesLayoutProps {
   conversations: Conversation[];
   currentUserId: number;
   error: boolean;
-  openSellerId?: number;
-  openVehicleId?: number;
 }
 
 export interface ConversationListProps {
   conversations: Conversation[];
   currentUserId: number;
-  activeConversationId: number | null;
+  activeUserId?: number;
   searchQuery: string;
-  onSelectConversation: (id: number) => void;
   onSearchChange: (query: string) => void;
 }
 
@@ -75,11 +80,19 @@ export interface ChatPanelProps {
   currentUserId: number;
   isLoading: boolean;
   onSendMessage: (content: string) => void;
+  sendError?: string | null;
+  isNewConversation?: boolean;
+  onEditMessage?: (id: number, content: string) => Promise<void>;
+  onDeleteMessage?: (id: number) => Promise<void>;
+  onRenameOther?: (alias: string | null) => Promise<void>;
+  onDeleteConversation?: () => Promise<void>;
 }
 
 export interface MessageBubbleProps {
   message: Message;
   isOwn: boolean;
+  onEdit?: (id: number, content: string) => Promise<void>;
+  onDelete?: (id: number) => Promise<void>;
 }
 
 export interface ConversationItemProps {
@@ -87,4 +100,22 @@ export interface ConversationItemProps {
   currentUserId: number;
   isActive: boolean;
   onClick: () => void;
+}
+
+export interface MessageInputProps {
+  onSendMessage: (content: string) => void;
+  autoFocus?: boolean;
+}
+
+export interface SendErrorBannerProps {
+  error: string | null | undefined;
+  className?: string;
+}
+
+// ─── Messages Outlet Context ─────────────────────────────────────────────────
+
+export interface MessagesOutletContext {
+  conversations: Conversation[];
+  currentUserId: number;
+  refreshConversations: () => Promise<void>;
 }

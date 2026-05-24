@@ -24,7 +24,7 @@ export default function VehicleCard({
   const title = `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
 
   return (
-    <div className="group bg-[#141417] border border-white/6 rounded-xl overflow-hidden hover:border-white/12 transition-all duration-200">
+    <div className="group h-full flex flex-col bg-[#141417] border border-white/6 rounded-xl overflow-hidden hover:border-white/12 transition-all duration-200">
       {/* Image area */}
       <Link
         to={`/find-vehicle/${vehicle.id}`}
@@ -91,7 +91,7 @@ export default function VehicleCard({
       </Link>
 
       {/* Details */}
-      <div className="p-4 space-y-2.5">
+      <div className="flex-1 flex flex-col p-4 space-y-2.5">
         {/* Title */}
         <div>
           <Link
@@ -101,11 +101,10 @@ export default function VehicleCard({
           >
             {title}
           </Link>
-          {vehicle.trim && (
-            <p className="text-[11px] text-[#8e8e9a] truncate">
-              {vehicle.trim}
-            </p>
-          )}
+          {/* Always reserve a line for trim so cards align even when trim is missing */}
+          <p className="text-[11px] text-[#8e8e9a] truncate">
+            {vehicle.trim || " "}
+          </p>
         </div>
 
         {/* Specs row */}
@@ -121,8 +120,8 @@ export default function VehicleCard({
           </span>
         </div>
 
-        {/* Location + time */}
-        <div className="flex items-center justify-between text-[11px] text-[#666]">
+        {/* Location + time — pinned to bottom so all cards align */}
+        <div className="mt-auto flex items-center justify-between text-[11px] text-[#666]">
           <span className="inline-flex items-center gap-1 truncate">
             <MapPinIcon /> {vehicle.city}, {vehicle.country}
           </span>
