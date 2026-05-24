@@ -220,11 +220,11 @@ export default function SavedComponent({
 
       {/* Grid / List */}
       {viewMode === "grid" ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 auto-rows-fr">
           {vehicles.map((v) => (
             <div
               key={v.id}
-              className={`transition-all duration-300 ${
+              className={`h-full transition-all duration-300 ${
                 removingIds.has(v.id)
                   ? "opacity-0 scale-95"
                   : "opacity-100 scale-100"

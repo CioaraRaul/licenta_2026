@@ -50,7 +50,7 @@ app/
 /                        (App layout - Sidebar + Navbar)
 ├── /                    Home (index)
 ├── /dashboard           Dashboard
-├── /messages            Messages
+├── /messages/:sellerId? Messages (optional seller deep-link)
 ├── /wallet              Wallet
 ├── /my-listings         My listings (seller)
 ├── /my-listings/new     Create new listing (seller)
@@ -151,7 +151,7 @@ app/
 - Similar vehicles carousel (4 vehicles)
 - Save/unsave toggle
 - Bid placement form (buyers)
-- Contact seller button (disabled with gray styling for seller accounts, with hint text: "Only buyer accounts can contact sellers.")
+- Contact seller button navigates to `/messages/{sellerId}?vehicleId={vehicleId}` (disabled with gray styling for seller accounts, with hint text: "Only buyer accounts can contact sellers.")
 - Owner information
 
 ### My Listings (`/my-listings`) - Seller Only
@@ -215,12 +215,15 @@ app/
 
 ---
 
-## Messages (`/messages`)
+## Messages (`/messages/:sellerId?`)
 
 - Conversation list with last message preview, vehicle info, unread badge
 - Message thread view (chronological, paginated 50/page)
 - Send message / reply form
-- Start conversation from vehicle detail page ("Message Seller")
+- Deep-link from vehicle detail: "Contact Seller" navigates to `/messages/{sellerId}?vehicleId={vehicleId}`
+  - Auto-selects matching conversation (by sellerId + vehicleId) and focuses the input
+  - If no existing conversation, shows "New Conversation" panel; first message creates the conversation via API
+  - Error banner displayed above input on send failure
 - Unread badge in sidebar
 - Refresh on window focus
 
@@ -254,6 +257,7 @@ app/
 
 ### Profile Tab
 - Edit: first name, last name, username, email, phone, address, bio
+- Personal information values displayed in original case (lowercase)
 - Save changes with validation
 
 ### Security Tab

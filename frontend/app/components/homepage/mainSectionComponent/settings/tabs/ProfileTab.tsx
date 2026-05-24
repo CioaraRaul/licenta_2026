@@ -230,7 +230,7 @@ export default function ProfileTab() {
                 className="flex items-center justify-between px-5 py-3.5"
               >
                 <span className="text-[13px] text-[#8e8e9a]">{label}</span>
-                <span className="text-[13px] text-[#f5f5f7] font-medium capitalize">
+                <span className="text-[13px] text-[#f5f5f7] font-medium">
                   {value}
                 </span>
               </div>

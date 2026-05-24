@@ -69,7 +69,16 @@ export function FilterSelect({
 }
 
 /* ── Range input pair ────────────────────────────────────────────────────── */
+import { useEffect, useRef } from "react";
 
+/**
+ * Debounced numeric range pair with optional min/max validation.
+ *
+ * The parent's onChange only fires when (a) the field was cleared, or
+ * (b) the parsed number falls within [min, max]. Combined with a 450ms
+ * debounce this prevents partial values (e.g. "2" while typing "2024")
+ * from hitting the API and triggering 400 Bad Request errors.
+ */
 export function RangeInputs({
   fromValue,
   toValue,
@@ -79,6 +88,9 @@ export function RangeInputs({
   toPlaceholder,
   fromLabel,
   toLabel,
+  min,
+  max,
+  debounceMs = 450,
 }: {
   fromValue: string;
   toValue: string;
@@ -88,22 +100,67 @@ export function RangeInputs({
   toPlaceholder: string;
   fromLabel: string;
   toLabel: string;
+  min?: number;
+  max?: number;
+  debounceMs?: number;
 }) {
+  // Local mirror of input value so the user can type freely while
+  // the committed value is debounced.
+  const [localFrom, setLocalFrom] = useState(fromValue);
+  const [localTo, setLocalTo] = useState(toValue);
+
+  // Sync from parent when external state changes (e.g. Clear all)
+  useEffect(() => setLocalFrom(fromValue), [fromValue]);
+  useEffect(() => setLocalTo(toValue), [toValue]);
+
+  const fromTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const toTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  const isValid = (s: string) => {
+    if (s === "") return true;
+    const n = Number(s);
+    if (!Number.isFinite(n)) return false;
+    if (min !== undefined && n < min) return false;
+    if (max !== undefined && n > max) return false;
+    return true;
+  };
+
+  const scheduleEmit = (
+    timerRef: typeof fromTimer,
+    value: string,
+    emit: (v: string) => void,
+  ) => {
+    clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      if (isValid(value)) emit(value);
+    }, debounceMs);
+  };
+
   return (
     <div className="flex gap-2">
       <input
         type="number"
         title={fromLabel}
-        value={fromValue}
-        onChange={(e) => onFromChange(e.target.value)}
+        value={localFrom}
+        min={min}
+        max={max}
+        onChange={(e) => {
+          setLocalFrom(e.target.value);
+          scheduleEmit(fromTimer, e.target.value, onFromChange);
+        }}
         placeholder={fromPlaceholder}
         className="w-1/2 bg-[#1c1c20] border border-white/6 rounded-lg px-3 py-2 text-[12px] text-[#f5f5f7] placeholder-[#555] outline-none focus:border-white/12 transition-colors"
       />
       <input
         type="number"
         title={toLabel}
-        value={toValue}
-        onChange={(e) => onToChange(e.target.value)}
+        value={localTo}
+        min={min}
+        max={max}
+        onChange={(e) => {
+          setLocalTo(e.target.value);
+          scheduleEmit(toTimer, e.target.value, onToChange);
+        }}
         placeholder={toPlaceholder}
         className="w-1/2 bg-[#1c1c20] border border-white/6 rounded-lg px-3 py-2 text-[12px] text-[#f5f5f7] placeholder-[#555] outline-none focus:border-white/12 transition-colors"
       />

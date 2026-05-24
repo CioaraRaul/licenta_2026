@@ -21,7 +21,7 @@ export default function DangerZone() {
     const data = {
       exportedAt: `${date} at ${time}`,
       profile: {
-        userId: user?.userId,
+        userId: user?.id,
         username: user?.username,
         email: user?.email,
         firstName: user?.firstName,

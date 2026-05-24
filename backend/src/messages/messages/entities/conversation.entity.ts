@@ -13,8 +13,9 @@ import {
 } from 'typeorm';
 import { Message } from './message.entity';
 
-// O singură conversație per buyer-seller-vehicle
-@Unique(['buyerId', 'sellerId', 'vehicleId'])
+// O singură conversație per buyer-seller (peer-to-peer).
+// vehicleId reflectă ultimul vehicul discutat — folosit pentru preview în sidebar.
+@Unique(['buyerId', 'sellerId'])
 @Entity('conversations')
 export class Conversation {
   @PrimaryGeneratedColumn()
@@ -41,9 +42,25 @@ export class Conversation {
   @Column()
   vehicleId: number;
 
-  // Numărul de mesaje necitite — util pentru badge-uri în UI
+  // Mesaje necitite per participant
   @Column({ default: 0 })
-  unreadCount: number;
+  unreadByBuyer: number;
+
+  @Column({ default: 0 })
+  unreadBySeller: number;
+
+  // Alias-uri custom — fiecare participant poate redenumi cum vede cealaltă parte
+  @Column({ type: 'text', nullable: true })
+  aliasByBuyer?: string; // ce buyer-ul a setat ca nume pentru seller
+
+  @Column({ type: 'text', nullable: true })
+  aliasBySeller?: string; // ce seller-ul a setat ca nume pentru buyer
+
+  // Câmp virtual — setat de service, nu e în DB
+  unreadCount?: number;
+
+  // Câmp virtual — alias-ul pe care utilizatorul curent l-a setat pentru cealaltă parte
+  aliasForOther?: string | null;
 
   // Ultimul mesaj pentru preview în lista de conversații
   @Column({ nullable: true })
@@ -51,6 +68,10 @@ export class Conversation {
 
   @Column({ nullable: true })
   lastMessageAt: Date;
+
+  // Cine a trimis ultimul mesaj — folosit pentru preview-ul „You sent" în sidebar
+  @Column({ nullable: true })
+  lastMessageSenderId?: number;
 
   @OneToMany(() => Message, (message) => message.conversation)
   messages: Message[];

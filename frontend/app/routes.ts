@@ -16,7 +16,10 @@ export default [
     index("routes/home.tsx"),
     route("", "routes/homepage/index.tsx"),
     route("dashboard", "routes/homepage/main/dashboard.tsx", []),
-    route("messages", "routes/homepage/main/messages.tsx"),
+    route("messages", "routes/homepage/main/messages.tsx", [
+      index("routes/homepage/main/messages/index.tsx"),
+      route(":userId", "routes/homepage/main/messages/$userId.tsx"),
+    ]),
     route("my-listings", "routes/homepage/main/myListinings.tsx"),
     route("my-listings/new", "routes/homepage/main/newListing.tsx"),
     route("wallet", "routes/homepage/main/wallet.tsx"),

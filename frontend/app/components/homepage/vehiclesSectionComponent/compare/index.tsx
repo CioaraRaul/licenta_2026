@@ -106,7 +106,7 @@ export default function CompareComponent() {
   // ─── Main compare view ────────────────────────────────────────────────────
 
   return (
-    <div className="flex-1 flex flex-col p-6 space-y-5 overflow-y-auto min-h-0">
+    <div className="flex-1 flex flex-col p-6 space-y-5 min-h-0 overflow-y-auto">
       {/* Header */}
       <CompareHeader
         vehicleCount={vehicles.length}
@@ -115,7 +115,7 @@ export default function CompareComponent() {
       />
 
       {/* Vehicle cards row */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-4 gap-4 auto-rows-fr">
         {vehicles.map((vehicle) => (
           <CompareCard
             key={vehicle.id}
@@ -128,10 +128,10 @@ export default function CompareComponent() {
         ))}
       </div>
 
-      {/* Similarity overview (only when 2+ vehicles) */}
+      {/* Aggregate similarity (only when 2+ vehicles) */}
       {vehicles.length >= 2 && <CompareSummary vehicles={vehicles} />}
 
-      {/* Comparison table (only when 2+ vehicles) */}
+      {/* Flat comparison table — all rows under each other, no section headers */}
       {vehicles.length >= 2 && <CompareTable vehicles={vehicles} />}
 
       {/* Hint text when only 1 vehicle */}
