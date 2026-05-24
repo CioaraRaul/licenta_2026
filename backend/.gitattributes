@@ -1,0 +1,3 @@
+database.sqlite merge=keepours
+database.sqlite-shm merge=keepours
+database.sqlite-wal merge=keepours
