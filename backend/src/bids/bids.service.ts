@@ -11,6 +11,7 @@ import { Vehicle } from 'src/vehicles/entities/vehicle.entity';
 import { VehicleStatus } from 'src/vehicles/enums/vehicle-status.enum';
 import { BidStatus } from './enums/bid-status.enum';
 import { UserRole } from 'src/users/enum/user-role.enum';
+import { WalletService } from 'src/wallet/wallet.service';
 
 @Injectable()
 export class BidsService {
@@ -20,6 +21,8 @@ export class BidsService {
 
     @InjectRepository(Vehicle)
     private readonly vehicleRepo: Repository<Vehicle>,
+
+    private readonly walletService: WalletService,
   ) {}
 
   async placeBid(
@@ -54,10 +57,11 @@ export class BidsService {
       where: { buyerId, vehicleId, status: BidStatus.PENDING },
     });
 
-    if (existingBid)
-      throw new BadRequestException(
-        'You already have a pending bid on this vehicle. Withdraw it first.',
-      );
+    if (existingBid) {
+      existingBid.amount = amount;
+      existingBid.message = message;
+      return this.bidRepo.save(existingBid);
+    }
 
     const bid = this.bidRepo.create({
       buyerId,
@@ -118,6 +122,15 @@ export class BidsService {
     if (bid.status !== BidStatus.PENDING)
       throw new BadRequestException('Only pending bids can be accepted');
 
+    // Transferăm fondurile din portofelul cumpărătorului la vânzător
+    await this.walletService.transfer(
+      bid.buyerId,
+      bid.vehicle.sellerId,
+      Number(bid.amount),
+      bid.id,
+      `Payment for ${bid.vehicle.make} ${bid.vehicle.model} (${bid.vehicle.year})`,
+    );
+
     // Acceptăm bid-ul curent
     bid.status = BidStatus.ACCEPTED;
     await this.bidRepo.save(bid);
@@ -134,9 +147,10 @@ export class BidsService {
       })
       .execute();
 
-    // Marcăm vehiculul ca pending (rezervat)
+    // Marcăm vehiculul ca vândut
     await this.vehicleRepo.update(bid.vehicleId, {
-      status: VehicleStatus.PENDING,
+      status: VehicleStatus.SOLD,
+      isActive: false,
     });
 
     return bid;
@@ -205,5 +219,16 @@ export class BidsService {
 
     bid.status = BidStatus.WITHDRAWN;
     await this.bidRepo.save(bid);
+  }
+
+  // ─── Delete Bid (Buyer) ────────────────────────────────────────────────────
+
+  async deleteBid(buyerId: number, bidId: number): Promise<void> {
+    const bid = await this.bidRepo.findOne({ where: { id: bidId } });
+    if (!bid) throw new NotFoundException('Bid not found');
+
+    if (bid.buyerId !== buyerId) throw new ForbiddenException('Access denied');
+
+    await this.bidRepo.remove(bid);
   }
 }

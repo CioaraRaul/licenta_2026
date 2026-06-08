@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   DefaultValuePipe,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -91,5 +92,11 @@ export class BidsController {
   @UseGuards(JwtAuthGuard)
   withdrawBid(@Request() req, @Param('bidId', ParseIntPipe) bidId: number) {
     return this.bidsService.withdrawBid(req.user.userId, bidId);
+  }
+
+  @Delete(':bidId')
+  @UseGuards(JwtAuthGuard)
+  deleteBid(@Request() req, @Param('bidId', ParseIntPipe) bidId: number) {
+    return this.bidsService.deleteBid(req.user.userId, bidId);
   }
 }
