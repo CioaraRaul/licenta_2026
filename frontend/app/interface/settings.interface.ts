@@ -69,7 +69,8 @@ export type SettingsTab =
   | "profile"
   | "notifications"
   | "security"
-  | "preferences";
+  | "preferences"
+  | "language";
 
 export interface SettingsSidebarProps {
   activeTab: SettingsTab;

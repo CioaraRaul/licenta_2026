@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Generate the thesis PowerPoint for the AutoVault marketplace project."""
+"""Generează prezentarea PowerPoint pentru proiectul de licență AutoVault."""
 
 import os
 from pptx import Presentation
@@ -13,14 +13,14 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 SHOTS = os.path.join(ROOT, "screenshots")
 OUT = os.path.join(ROOT, "Licenta-AutoMarketplace.pptx")
 
-# 16:9 widescreen
+# Format 16:9
 SLIDE_W = Inches(13.333)
 SLIDE_H = Inches(7.5)
 
-# Brand palette
+# Paletă de culori
 NAVY = RGBColor(0x0F, 0x23, 0x4E)
 NAVY_DARK = RGBColor(0x07, 0x14, 0x2F)
-ACCENT = RGBColor(0xF5, 0x9E, 0x0B)   # warm amber
+ACCENT = RGBColor(0xF5, 0x9E, 0x0B)
 TEXT = RGBColor(0x1F, 0x29, 0x37)
 MUTED = RGBColor(0x6B, 0x72, 0x80)
 LIGHT = RGBColor(0xF3, 0xF4, 0xF6)
@@ -105,7 +105,6 @@ def add_bullets(slide, x, y, w, h, items, *, size=20, color=TEXT, bullet_color=A
 
 
 def header(slide, title, subtitle=None, page=None, total=None):
-    # Top color band - taller for bigger header
     add_rect(slide, 0, 0, SLIDE_W, Inches(1.25), fill=NAVY)
     add_rect(slide, 0, Inches(1.25), SLIDE_W, Inches(0.08), fill=ACCENT)
     add_text(slide, Inches(0.5), Inches(0.2), Inches(10.5), Inches(0.6),
@@ -113,7 +112,6 @@ def header(slide, title, subtitle=None, page=None, total=None):
     if subtitle:
         add_text(slide, Inches(0.5), Inches(0.82), Inches(10.5), Inches(0.4),
                  subtitle, size=16, color=RGBColor(0xCB, 0xD5, 0xE1))
-    # Page indicator
     if page is not None and total is not None:
         add_text(slide, Inches(11.4), Inches(0.45), Inches(1.7), Inches(0.5),
                  f"{page} / {total}", size=16, bold=True,
@@ -131,7 +129,6 @@ def footer(slide):
 
 
 def add_image_safe(slide, image_name, x, y, w, h, *, caption=None):
-    """Add an image if it exists, otherwise a placeholder."""
     path = os.path.join(SHOTS, image_name) if image_name else None
     border = add_rect(slide, x, y, w, h, fill=LIGHT, line=RGBColor(0xD1, 0xD5, 0xDB))
     if path and os.path.isfile(path):
@@ -141,7 +138,6 @@ def add_image_safe(slide, image_name, x, y, w, h, *, caption=None):
             target_ratio = w / h
             img_ratio = iw / ih
             if img_ratio > target_ratio:
-                # image wider -> fit width
                 new_w = w
                 new_h = int(w / img_ratio)
                 nx = x
@@ -157,28 +153,26 @@ def add_image_safe(slide, image_name, x, y, w, h, *, caption=None):
                      f"[Eroare imagine: {e}]", size=12, color=MUTED)
     else:
         add_text(slide, x, y + h / 2 - Inches(0.4), w, Inches(0.4),
-                 f"[Captura ecran: {image_name or 'placeholder'}]",
+                 f"[Captură ecran: {image_name or 'placeholder'}]",
                  size=14, color=MUTED, align=PP_ALIGN.CENTER)
         add_text(slide, x, y + h / 2 + Inches(0.1), w, Inches(0.4),
-                 "Inserati aici imaginea din aplicatie",
+                 "Inserați aici imaginea din aplicație",
                  size=11, color=MUTED, align=PP_ALIGN.CENTER)
     if caption:
         add_text(slide, x, y + h + Inches(0.05), w, Inches(0.3),
                  caption, size=11, color=MUTED, align=PP_ALIGN.CENTER)
 
 
-# ---------- slide builders ----------
+# ---------- constructori slide-uri ----------
 
 def new_slide(prs):
-    return prs.slides.add_slide(prs.slide_layouts[6])  # blank
+    return prs.slides.add_slide(prs.slide_layouts[6])
 
 
 def slide_title(prs):
     s = new_slide(prs)
-    # Full-bleed navy background
     add_rect(s, 0, 0, SLIDE_W, SLIDE_H, fill=NAVY)
 
-    # Top label centered
     add_text(s, 0, Inches(0.7), SLIDE_W, Inches(0.5),
              "LUCRARE DE LICENȚĂ  •  SESIUNEA IULIE 2026", size=20, bold=True,
              color=ACCENT, align=PP_ALIGN.CENTER)
@@ -186,10 +180,8 @@ def slide_title(prs):
              "Universitatea din Oradea  •  Specializarea Calculatoare",
              size=18, color=RGBColor(0xCB, 0xD5, 0xE1), align=PP_ALIGN.CENTER)
 
-    # Decorative accent bar (centered)
     add_rect(s, Inches(5.92), Inches(2.05), Inches(1.5), Inches(0.1), fill=ACCENT)
 
-    # Centered main title
     add_text(s, 0, Inches(2.4), SLIDE_W, Inches(1.0),
              "Platformă web pentru vânzarea și",
              size=46, bold=True, color=WHITE, align=PP_ALIGN.CENTER)
@@ -200,10 +192,8 @@ def slide_title(prs):
              "utilizând NestJS și React",
              size=30, color=RGBColor(0xCB, 0xD5, 0xE1), align=PP_ALIGN.CENTER)
 
-    # Bottom info bar
     add_rect(s, 0, Inches(6.0), SLIDE_W, Inches(1.5), fill=NAVY_DARK)
 
-    # Two columns inside bottom bar
     add_text(s, Inches(0.8), Inches(6.18), Inches(6), Inches(0.45),
              "ABSOLVENT", size=13, bold=True, color=ACCENT)
     add_text(s, Inches(0.8), Inches(6.55), Inches(6), Inches(0.6),
@@ -215,45 +205,6 @@ def slide_title(prs):
     add_text(s, Inches(7), Inches(6.55), Inches(5.8), Inches(0.6),
              "Pecherle George-Dominic", size=24, bold=True, color=WHITE,
              align=PP_ALIGN.RIGHT)
-
-
-def slide_toc(prs, total):
-    s = new_slide(prs)
-    header(s, "Cuprins", subtitle="Structura prezentării", page=2, total=total)
-    items_left = [
-        "1.  Introducere",
-        "2.  Cerințe și utilizatori",
-        "3.  Tehnologii utilizate",
-        "4.  Proiectare și arhitectură",
-    ]
-    items_right = [
-        "5.  Implementarea aplicației",
-        "6.  Funcționalități avansate",
-        "7.  Concluzii și dezvoltări viitoare",
-    ]
-    add_bullets(s, Inches(0.9), Inches(2.0), Inches(6), Inches(5),
-                items_left, size=30, line_spacing=1.5, space_after=18)
-    add_bullets(s, Inches(7.0), Inches(2.0), Inches(6), Inches(5),
-                items_right, size=30, line_spacing=1.5, space_after=18)
-    footer(s)
-
-
-def section_divider(prs, number, title, subtitle, page, total):
-    s = new_slide(prs)
-    add_rect(s, 0, 0, SLIDE_W, SLIDE_H, fill=NAVY)
-    # centered accent bar above the chapter label
-    add_rect(s, Inches(6.17), Inches(2.5), Inches(1), Inches(0.12), fill=ACCENT)
-    add_text(s, 0, Inches(2.75), SLIDE_W, Inches(0.6),
-             f"CAPITOLUL {number}", size=26, bold=True, color=ACCENT,
-             align=PP_ALIGN.CENTER)
-    add_text(s, 0, Inches(3.5), SLIDE_W, Inches(1.4),
-             title, size=56, bold=True, color=WHITE, align=PP_ALIGN.CENTER)
-    add_text(s, 0, Inches(4.95), SLIDE_W, Inches(0.7),
-             subtitle, size=24, color=RGBColor(0xCB, 0xD5, 0xE1),
-             align=PP_ALIGN.CENTER)
-    add_text(s, Inches(11.4), Inches(7.0), Inches(1.7), Inches(0.4),
-             f"{page} / {total}", size=16, bold=True,
-             color=RGBColor(0xCB, 0xD5, 0xE1), align=PP_ALIGN.RIGHT)
 
 
 def slide_text(prs, title, bullets, *, page, total, subtitle=None, body_size=24):
@@ -271,7 +222,6 @@ def slide_two_columns(prs, title, left_title, left_items, right_title, right_ite
     header(s, title, subtitle=subtitle, page=page, total=total)
     card_y = Inches(1.85)
     card_h = Inches(5.15)
-    # left card with subtle shadow
     add_rect(s, Inches(0.54), card_y + Inches(0.05), Inches(6.1), card_h,
              fill=RGBColor(0xE5, 0xE7, 0xEB), line=None)
     add_rect(s, Inches(0.5), card_y, Inches(6.1), card_h,
@@ -282,7 +232,6 @@ def slide_two_columns(prs, title, left_title, left_items, right_title, right_ite
              align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
     add_bullets(s, Inches(0.85), card_y + Inches(1.0), Inches(5.5), Inches(4.0),
                 left_items, size=body_size, line_spacing=1.2, space_after=10)
-    # right card with subtle shadow
     add_rect(s, Inches(6.77), card_y + Inches(0.05), Inches(6.1), card_h,
              fill=RGBColor(0xE5, 0xE7, 0xEB), line=None)
     add_rect(s, Inches(6.73), card_y, Inches(6.1), card_h,
@@ -319,19 +268,18 @@ def slide_big_image(prs, title, image_name, *, page, total, subtitle=None, capti
 
 def slide_tech_grid(prs, *, page, total):
     s = new_slide(prs)
-    header(s, "Stack tehnologic complet",
-           subtitle="Tehnologii moderne pentru un marketplace web full-stack",
+    header(s, "Stiva tehnologică completă",
+           subtitle="Tehnologii moderne pentru un marketplace web complet",
            page=page, total=total)
-    # 8 boxes 4x2
     items = [
-        ("BACKEND", "NestJS 11", "Framework Node.js modular cu dependency injection"),
-        ("LIMBAJ", "TypeScript", "Tipare statice, decoratori și DTO-uri validate"),
-        ("BAZĂ DATE", "SQLite + TypeORM", "ORM cu sincronizare automată în development"),
-        ("AUTH", "JWT + OAuth2", "Access + refresh tokens, Google și Facebook"),
-        ("FRONTEND", "React 19 + RR 7", "SSR cu React Router în framework mode"),
-        ("STATE", "Zustand 5", "Store-uri persistente în localStorage"),
-        ("STYLING", "Tailwind CSS 4", "Utility-first cu design tokens"),
-        ("MEDIA", "Cloudinary + Multer", "Upload optimizat de imagini"),
+        ("PARTEA DE SERVER", "NestJS 11", "Cadru Node.js modular cu injecție de dependențe"),
+        ("LIMBAJ", "TypeScript", "Tipare statice, decoratori și obiecte de transfer validate"),
+        ("BAZĂ DE DATE", "SQLite + TypeORM", "Mapare relațională cu sincronizare automată"),
+        ("AUTENTIFICARE", "JWT + OAuth2", "Jetoane de acces și reîmprospătare, Google și Facebook"),
+        ("INTERFAȚA", "React 19 + RR 7", "Randare pe server cu React Router în mod cadru"),
+        ("STARE", "Zustand 5", "Magazine persistente în memoria locală a browserului"),
+        ("STILIZARE", "Tailwind CSS 4", "Utilitar-first cu jetoane de design"),
+        ("MEDIA", "Cloudinary + Multer", "Încărcare optimizată de imagini"),
     ]
     cols = 4
     box_w = Inches(3.05)
@@ -343,40 +291,38 @@ def slide_tech_grid(prs, *, page, total):
         r, c = divmod(i, cols)
         x = x0 + c * (box_w + gap)
         y = y0 + r * (box_h + Inches(0.2))
-        # shadow for depth
         add_rect(s, x + Inches(0.04), y + Inches(0.05), box_w, box_h,
                  fill=RGBColor(0xE5, 0xE7, 0xEB), line=None)
         add_rect(s, x, y, box_w, box_h, fill=WHITE, line=RGBColor(0xE5, 0xE7, 0xEB))
         add_rect(s, x, y, box_w, Inches(0.55), fill=NAVY)
         add_text(s, x, y + Inches(0.1), box_w, Inches(0.4),
-                 badge, size=15, bold=True, color=ACCENT, align=PP_ALIGN.CENTER)
+                 badge, size=13, bold=True, color=ACCENT, align=PP_ALIGN.CENTER)
         add_text(s, x + Inches(0.15), y + Inches(0.78), box_w - Inches(0.3), Inches(0.7),
-                 name, size=26, bold=True, color=NAVY, align=PP_ALIGN.CENTER)
+                 name, size=24, bold=True, color=NAVY, align=PP_ALIGN.CENTER)
         add_text(s, x + Inches(0.25), y + Inches(1.6), box_w - Inches(0.5), Inches(0.9),
-                 desc, size=15, color=MUTED, align=PP_ALIGN.CENTER)
+                 desc, size=14, color=MUTED, align=PP_ALIGN.CENTER)
     footer(s)
 
 
 def slide_architecture(prs, *, page, total):
     s = new_slide(prs)
     header(s, "Arhitectura generală a aplicației",
-           subtitle="Flux de date: client → API → ORM → bază de date",
+           subtitle="Fluxul datelor: client → interfață programatică → mapare relațională → bază de date",
            page=page, total=total)
     boxes = [
         ("CLIENT", "Browser (React 19, Vite, Tailwind CSS 4)",
-         "Pagini SSR/SPA, Zustand stores cu persistență în localStorage", BLUE),
-        ("TRANSPORT", "Axios + interceptori HTTP",
-         "Bearer token automat, auto-refresh la 401, request queue", ACCENT),
-        ("API", "NestJS Controllers + Guards",
-         "ValidationPipe global, JWT Auth, Throttling, CORS configurat", NAVY),
-        ("DATA", "TypeORM → SQLite în mod WAL",
-         "Entități, relații tipate, sincronizare automată în development", GREEN),
+         "Pagini randate pe server și client, magazine Zustand cu persistență în browser", BLUE),
+        ("TRANSPORT", "Axios cu interceptori de rețea",
+         "Jeton de acces automat, reîmprospătare automată la eroare 401, coadă de cereri", ACCENT),
+        ("API", "Controlere NestJS cu gardieni de rute",
+         "Conductă de validare globală, autentificare JWT, limitare cereri, CORS configurat", NAVY),
+        ("DATE", "TypeORM → SQLite în mod WAL",
+         "Entități și relații tipate, sincronizare automată a schemei în dezvoltare", GREEN),
     ]
     y = Inches(1.85)
     box_h = Inches(1.18)
     gap = Inches(0.1)
     for badge, title, desc, color in boxes:
-        # subtle shadow
         add_rect(s, Inches(0.74), y + Inches(0.04), Inches(11.9), box_h,
                  fill=RGBColor(0xE5, 0xE7, 0xEB), line=None)
         add_rect(s, Inches(0.7), y, Inches(11.9), box_h,
@@ -396,11 +342,10 @@ def slide_architecture(prs, *, page, total):
 def slide_erd(prs, *, page, total):
     s = new_slide(prs)
     header(s, "Modelul de date — entități și relații",
-           subtitle="Diagrama ER cu cele 9 entități principale",
+           subtitle="Diagrama entitate-relație cu cele 9 entități principale",
            page=page, total=total)
 
     def entity(x, y, w, h, name, fields, color=NAVY):
-        # subtle shadow for depth
         add_rect(s, x + Inches(0.04), y + Inches(0.05), w, h,
                  fill=RGBColor(0xE5, 0xE7, 0xEB), line=None)
         add_rect(s, x, y, w, h, fill=WHITE, line=color)
@@ -412,7 +357,6 @@ def slide_erd(prs, *, page, total):
                      w - Inches(0.3), Inches(0.33),
                      f, size=15, color=TEXT)
 
-    # 3x3 layout with bigger boxes and more breathing room
     col_w = Inches(3.95)
     row_h = Inches(1.65)
     gap_x = Inches(0.2)
@@ -422,56 +366,56 @@ def slide_erd(prs, *, page, total):
     cols = [x0, x0 + col_w + gap_x, x0 + 2 * (col_w + gap_x)]
     rows = [y0, y0 + row_h + gap_y, y0 + 2 * (row_h + gap_y)]
 
-    # Row 1
-    entity(cols[0], rows[0], col_w, row_h, "Buyer",
-           ["walletBalance, currency", "totalSpent, receiveCarAlerts"], color=BLUE)
-    entity(cols[1], rows[0], col_w, row_h, "User",
-           ["id, email, password", "role, firstName, lastName",
-            "isEmailVerified, createdAt"], color=NAVY)
-    entity(cols[2], rows[0], col_w, row_h, "Vehicle",
-           ["make, model, year", "price, mileage, fuelType",
-            "images, viewsCount, status"], color=GREEN)
+    # Rândul 1
+    entity(cols[0], rows[0], col_w, row_h, "Cumpărător",
+           ["soldDisponibil, monedă", "totalCheltuit, alerteVehicule"], color=BLUE)
+    entity(cols[1], rows[0], col_w, row_h, "Utilizator",
+           ["id, adresăEmail, parolă", "rol, prenume, numeFamilie",
+            "emailVerificat, datăCreare"], color=NAVY)
+    entity(cols[2], rows[0], col_w, row_h, "Vehicul",
+           ["marcă, model, an", "preț, kilometraj, combustibil",
+            "imagini, vizualizări, stare"], color=GREEN)
 
-    # Row 2
-    entity(cols[0], rows[1], col_w, row_h, "Seller",
-           ["walletBalance, IBAN", "commissionRate, sellerRating"], color=BLUE)
-    entity(cols[1], rows[1], col_w, row_h, "Conversation",
-           ["buyerId, sellerId, vehicleId",
-            "unreadByBuyer, unreadBySeller",
-            "lastMessage, lastMessageAt"], color=ACCENT)
-    entity(cols[2], rows[1], col_w, row_h, "Bid",
-           ["amount, status, message",
-            "expiresAt, rejectionReason",
-            "buyerId, vehicleId"], color=ACCENT)
+    # Rândul 2
+    entity(cols[0], rows[1], col_w, row_h, "Vânzător",
+           ["soldDisponibil, IBAN", "cotăComision, evaluare"], color=BLUE)
+    entity(cols[1], rows[1], col_w, row_h, "Conversație",
+           ["idCumpărător, idVânzător, idVehicul",
+            "necititeCumpărător, necititeVânzător",
+            "ultimMesaj, datăUltimMesaj"], color=ACCENT)
+    entity(cols[2], rows[1], col_w, row_h, "Ofertă",
+           ["sumă, stare, mesaj",
+            "expirăLa, motivRespingere",
+            "idCumpărător, idVehicul"], color=ACCENT)
 
-    # Row 3
-    entity(cols[0], rows[2], col_w, row_h, "SavedVehicle",
-           ["userId, vehicleId", "unique (userId, vehicleId)"], color=BLUE)
-    entity(cols[1], rows[2], col_w, row_h, "Message",
-           ["content, status", "senderId, conversationId",
-            "createdAt"], color=ACCENT)
-    entity(cols[2], rows[2], col_w, row_h, "Transaction",
-           ["amount, type, status", "userId, referenceId",
-            "description, createdAt"], color=GREEN)
+    # Rândul 3
+    entity(cols[0], rows[2], col_w, row_h, "VehiculSalvat",
+           ["idUtilizator, idVehicul", "unic (idUtilizator, idVehicul)"], color=BLUE)
+    entity(cols[1], rows[2], col_w, row_h, "Mesaj",
+           ["conținut, stare", "idTrimițător, idConversație",
+            "datăCreare"], color=ACCENT)
+    entity(cols[2], rows[2], col_w, row_h, "Tranzacție",
+           ["sumă, tip, stare", "idUtilizator, idReferință",
+            "descriere, datăCreare"], color=GREEN)
 
     footer(s)
 
 
 def slide_modules(prs, *, page, total):
     s = new_slide(prs)
-    header(s, "Module backend NestJS",
-           subtitle="9 module principale, fiecare cu controller, service, entity si DTO",
+    header(s, "Module ale serverului NestJS",
+           subtitle="9 module principale, fiecare cu controler, serviciu, entitate și obiect de transfer",
            page=page, total=total)
     modules = [
-        ("users / auth", "Inregistrare, autentificare, JWT, OAuth, verificare email, reset parola"),
-        ("vehicles", "CRUD anunturi cu 40+ campuri tehnice; filtrare si sortare avansata"),
-        ("bids", "Plasare oferte de catre cumparatori, acceptare/respingere de vanzatori"),
-        ("messages", "Conversatii persistente buyer-seller-vehicle cu unread tracking"),
-        ("saved-vehicles", "Lista de favorite per cumparator cu constrangere unica"),
-        ("wallet", "Carduri, depozite, retrageri, soldi blocati pentru bid-uri"),
-        ("dashboard", "Agregare metrici in functie de rol (BUYER / SELLER)"),
-        ("upload", "Incarcare imagini pe Cloudinary cu Multer middleware"),
-        ("common", "Guards, decorators, exception filters, throttler config"),
+        ("utilizatori / autentificare", "Înregistrare, autentificare, JWT, OAuth, verificare email, resetare parolă"),
+        ("vehicule", "Operații complete pe anunțuri cu 40+ câmpuri tehnice; filtrare și sortare avansată"),
+        ("oferte", "Plasare oferte de cumpărători, acceptare/respingere de vânzători"),
+        ("mesaje", "Conversații persistente cumpărător-vânzător-vehicul cu urmărire necitite"),
+        ("vehicule-salvate", "Listă de favorite per cumpărător cu constrângere de unicitate"),
+        ("portofel", "Carduri, depozite, retrageri, sume blocate pentru oferte"),
+        ("tablou-de-bord", "Agregare metrici în funcție de rol (CUMPĂRĂTOR / VÂNZĂTOR)"),
+        ("încărcare", "Încărcare imagini pe Cloudinary cu middleware Multer"),
+        ("comun", "Gardieni de rute, decoratori, filtre de excepții, configurare limitare cereri"),
     ]
     y0 = Inches(1.75)
     for i, (name, desc) in enumerate(modules):
@@ -493,27 +437,27 @@ def slide_four_roles(prs, *, page, total):
            subtitle="Patru roluri cu acces granular pe resurse",
            page=page, total=total)
     roles = [
-        ("BUYER", BLUE, "cumpărător",
+        ("CUMPĂRĂTOR", BLUE, "rol pentru achiziții",
          ["Caută și filtrează vehicule.",
-          "Salvează favorite, compară mașini.",
-          "Plasează oferte (bids) pe vehicule.",
+          "Salvează favorite și compară mașini.",
+          "Plasează oferte pe vehicule.",
           "Comunică prin mesagerie.",
-          "Wallet cu sume blocate."]),
-        ("SELLER", GREEN, "vânzător",
+          "Portofel cu sume blocate."]),
+        ("VÂNZĂTOR", GREEN, "rol pentru vânzări",
          ["Adaugă anunțuri detaliate.",
-          "Editează / marchează ca SOLD.",
+          "Editează și marchează ca VÂNDUT.",
           "Acceptă sau respinge oferte.",
-          "Comunică cu cumpărători.",
+          "Comunică cu cumpărătorii.",
           "Vede câștiguri și comisioane."]),
-        ("GUEST", ACCENT, "vizitator",
+        ("VIZITATOR", ACCENT, "rol pentru navigare",
          ["Acces public la anunțuri.",
           "Vede detalii complete.",
           "Nu poate salva sau oferta.",
           "Invitat să se autentifice."]),
-        ("ADMIN", NAVY, "administrator",
+        ("ADMINISTRATOR", NAVY, "rol de administrare (în dezvoltare)",
          ["Rapoarte agregate.",
           "Pregătit la nivel de entitate.",
-          "Extensibil pentru moderare."]),
+          "Implementare planificată."]),
     ]
     box_w = Inches(6.2)
     box_h = Inches(2.45)
@@ -525,42 +469,80 @@ def slide_four_roles(prs, *, page, total):
         r, c = divmod(i, 2)
         x = x0 + c * (box_w + gap_x)
         y = y0 + r * (box_h + gap_y)
-        # shadow
         add_rect(s, x + Inches(0.04), y + Inches(0.05), box_w, box_h,
                  fill=RGBColor(0xE5, 0xE7, 0xEB), line=None)
         add_rect(s, x, y, box_w, box_h, fill=WHITE, line=RGBColor(0xE5, 0xE7, 0xEB))
-        # left strip
         add_rect(s, x, y, Inches(1.75), box_h, fill=color)
-        add_text(s, x, y + Inches(0.55), Inches(1.75), Inches(0.55),
-                 badge, size=22, bold=True, color=WHITE,
+        add_text(s, x, y + Inches(0.45), Inches(1.75), Inches(0.55),
+                 badge, size=18, bold=True, color=WHITE,
                  align=PP_ALIGN.CENTER)
-        add_text(s, x, y + Inches(1.15), Inches(1.75), Inches(0.4),
-                 sub, size=14, color=RGBColor(0xE5, 0xE7, 0xEB),
+        add_text(s, x, y + Inches(1.1), Inches(1.75), Inches(0.4),
+                 sub, size=12, color=RGBColor(0xE5, 0xE7, 0xEB),
                  align=PP_ALIGN.CENTER)
-        # bullets — more room, bigger text
         add_bullets(s, x + Inches(1.95), y + Inches(0.25),
                     box_w - Inches(2.1), box_h - Inches(0.4),
                     items, size=16, line_spacing=1.22, space_after=8)
     footer(s)
 
 
+def slide_auth(prs, *, page, total):
+    s = new_slide(prs)
+    header(s, "Autentificare și înregistrare",
+           subtitle="Autentificare locală și prin Google / Facebook, cu protecție împotriva atacurilor de forță brută",
+           page=page, total=total)
+
+    # Două imagini side-by-side: login (stânga) și register (dreapta)
+    img_y = Inches(1.85)
+    img_h = Inches(3.85)
+    img_w = Inches(5.9)
+    gap = Inches(0.73)
+    x_left = Inches(0.4)
+    x_right = x_left + img_w + gap
+
+    add_image_safe(s, "01-login.png", x_left, img_y, img_w, img_h,
+                   caption="Autentificare — email / parolă sau cont Google / Facebook")
+    add_image_safe(s, "02-register.png", x_right, img_y, img_w, img_h,
+                   caption="Înregistrare — creare cont nou cu validare câmpuri")
+
+    # Bandă de caracteristici cheie la baza slide-ului
+    features = [
+        ("JWT", "Acces 15 min + reîmprospătare 7 zile"),
+        ("scrypt", "Parole cifrate cu sare aleatorie"),
+        ("Throttling", "Max 5 încercări / minut"),
+        ("Email", "Verificare adresă la înregistrare"),
+    ]
+    feat_w = Inches(3.05)
+    feat_gap = Inches(0.14)
+    x_feat = Inches(0.42)
+    y_feat = Inches(6.15)
+    for badge, desc in features:
+        add_rect(s, x_feat, y_feat, feat_w, Inches(0.75),
+                 fill=WHITE, line=RGBColor(0xE5, 0xE7, 0xEB))
+        add_rect(s, x_feat, y_feat, Inches(1.1), Inches(0.75), fill=NAVY)
+        add_text(s, x_feat, y_feat, Inches(1.1), Inches(0.75),
+                 badge, size=14, bold=True, color=ACCENT,
+                 align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+        add_text(s, x_feat + Inches(1.18), y_feat + Inches(0.12),
+                 feat_w - Inches(1.25), Inches(0.55),
+                 desc, size=13, color=TEXT)
+        x_feat += feat_w + feat_gap
+
+    footer(s)
+
+
 def slide_dashboard_split(prs, *, page, total):
     s = new_slide(prs)
-    header(s, "Dashboard-uri personalizate pe rol",
+    header(s, "Tablouri de bord personalizate pe rol",
            subtitle="Vedere adaptată automat la rolul utilizatorului autentificat",
            page=page, total=total)
-    # Buyer dash on left
     add_image_safe(s, "10-buyer-dashboard.png",
                    Inches(0.5), Inches(1.85), Inches(6.0), Inches(4.15),
-                   caption="Dashboard BUYER — bid-uri, salvări, wallet")
-    # Seller dash on right
+                   caption="Tablou de bord CUMPĂRĂTOR — oferte, salvări, portofel")
     add_image_safe(s, "20-seller-dashboard.png",
                    Inches(6.8), Inches(1.85), Inches(6.0), Inches(4.15),
-                   caption="Dashboard SELLER — anunțuri, vânzări, câștiguri")
-    # short note below both
+                   caption="Tablou de bord VÂNZĂTOR — anunțuri, vânzări, câștiguri")
     add_text(s, Inches(0.5), Inches(6.4), Inches(12.3), Inches(0.55),
-             "Comparator dedicat pentru 2-5 vehicule (route /compare) — "
-             "evidențiază cea mai bună valoare în fiecare categorie.",
+             "Comparator dedicat pentru 2-5 vehicule — evidențiază cea mai bună valoare în fiecare categorie.",
              size=16, color=MUTED, align=PP_ALIGN.CENTER)
     footer(s)
 
@@ -582,184 +564,159 @@ def slide_thanks(prs, *, page, total):
              size=18, color=RGBColor(0xCB, 0xD5, 0xE1), align=PP_ALIGN.CENTER)
 
 
-# -------------- assemble presentation --------------
+# -------------- asamblare prezentare --------------
 
 def build():
     prs = Presentation()
     prs.slide_width = SLIDE_W
     prs.slide_height = SLIDE_H
 
-    # 25 slides total (1 = title cover, 25 = thanks)
-    TOTAL = 25
+    # 18 slide-uri total (1 = copertă, 18 = mulțumiri)
+    TOTAL = 18
 
-    # 1. Title
+    # 1. Copertă
     slide_title(prs)
-    # 2. TOC
-    slide_toc(prs, TOTAL)
 
-    # ----- CAPITOLUL 1: INTRODUCERE -----
-    section_divider(prs, 1, "Introducere",
-                    "Context, motivație și obiective", 3, TOTAL)
+    # 2. Stiva tehnologică
+    slide_tech_grid(prs, page=2, total=TOTAL)
 
-    slide_text(prs, "Context și motivație",
+    # 3. Securitate și servicii externe
+    slide_text(prs, "Securitate și servicii externe",
         [
-            "Piața auto second-hand din România depășește 1,5 miliarde EUR/an.",
-            "Tranzacțiile online cresc cu 20-30% anual.",
-            "Piața rămâne fragmentată, fără un standard clar.",
-            "Cumpărătorii caută transparență și comunicare directă.",
-            "Vânzătorii au nevoie de vizibilitate și gestiune simplă.",
-        ], page=4, total=TOTAL,
-        subtitle="De ce un marketplace dedicat automobilelor")
+            "Jetoane JWT cu 2 secrete: acces (15 min) + reîmprospătare (7 zile).",
+            "Listă neagră de jetoane pentru invalidarea sesiunilor la deconectare.",
+            "Parole cifrate cu scrypt și sare aleatorie.",
+            "Limitare: max 5 încercări de autentificare pe minut.",
+            "OAuth2 prin Passport.js (Google și Facebook).",
+            "Cloudinary pentru imagini, Mailtrap SMTP pentru trimitere email.",
+        ], page=3, total=TOTAL,
+        subtitle="Cum am asigurat protecția datelor utilizatorilor")
 
-    slide_text(prs, "Obiectivele proiectului",
-        [
-            "Platformă web full-stack funcțională end-to-end.",
-            "Suport pentru patru roluri distincte cu acces granular.",
-            "Autentificare securizată: JWT, OAuth, verificare email.",
-            "Sistem complet de bid-uri, mesagerie și portofel.",
-            "Arhitectură modulară, testată și extensibilă.",
-        ], page=5, total=TOTAL)
+    # 4. Arhitectura aplicației
+    slide_architecture(prs, page=4, total=TOTAL)
 
-    # ----- CAPITOLUL 2: CERINTE -----
-    section_divider(prs, 2, "Cerințe și utilizatori",
-                    "Roluri, cerințe funcționale și nefuncționale", 6, TOTAL)
+    # 5. Modelul de date
+    slide_erd(prs, page=5, total=TOTAL)
 
+    # 6. Module backend
+    slide_modules(prs, page=6, total=TOTAL)
+
+    # 7. Tipuri de utilizatori
     slide_four_roles(prs, page=7, total=TOTAL)
 
+    # 8. Cerințe funcționale și nefuncționale
     slide_two_columns(prs, "Cerințe funcționale și nefuncționale",
         "Funcționale",
         [
-            "Autentificare locală + OAuth.",
-            "CRUD complet pe anunțuri.",
-            "Bid-uri cu stări multiple.",
-            "Mesagerie cu unread tracking.",
-            "Wallet cu sume blocate.",
+            "Autentificare locală și prin furnizori externi.",
+            "Operații complete pe anunțuri.",
+            "Sistem de oferte cu stări multiple.",
+            "Mesagerie cu urmărire mesaje necitite.",
+            "Portofel cu sume blocate.",
             "Recomandări vehicule similare.",
         ],
         "Nefuncționale",
         [
             "Securitate: JWT, scrypt, CORS.",
-            "Throttling pe endpoint-uri sensibile.",
-            "Performanță: paginare și SSR.",
-            "Disponibilitate: SQLite WAL.",
-            "Uzabilitate: responsive, limba română.",
+            "Limitare pe rutele sensibile.",
+            "Performanță: paginare și randare pe server.",
+            "Disponibilitate: SQLite în mod WAL.",
+            "Uzabilitate: responsiv, interfață în română.",
             "Mentenabilitate: arhitectură modulară.",
         ], page=8, total=TOTAL)
 
-    # ----- CAPITOLUL 3: TEHNOLOGII -----
-    section_divider(prs, 3, "Tehnologii utilizate",
-                    "Stack-ul full-stack și măsurile de securitate", 9, TOTAL)
+    # 9. Autentificare
+    slide_auth(prs, page=9, total=TOTAL)
 
-    slide_tech_grid(prs, page=10, total=TOTAL)
-
-    slide_text(prs, "Securitate și servicii externe",
-        [
-            "JWT cu 2 secrete: access (15 min) + refresh (7 zile).",
-            "TokenBlacklist pentru invalidare sesiuni la logout.",
-            "Parole hash-uite cu scrypt și sare aleatorie.",
-            "Throttling: max 5 încercări de login pe minut.",
-            "OAuth2 prin Passport.js (Google și Facebook).",
-            "Cloudinary pentru imagini, Mailtrap SMTP pentru email.",
-        ], page=11, total=TOTAL,
-        subtitle="Cum am asigurat protecția datelor utilizatorilor")
-
-    # ----- CAPITOLUL 4: PROIECTARE -----
-    section_divider(prs, 4, "Proiectare și arhitectură",
-                    "Straturi, module și modelul de date", 12, TOTAL)
-
-    slide_architecture(prs, page=13, total=TOTAL)
-    slide_erd(prs, page=14, total=TOTAL)
-
-    # ----- CAPITOLUL 5: IMPLEMENTARE -----
-    section_divider(prs, 5, "Implementarea aplicației",
-                    "Capturi din aplicație și fluxuri reale", 15, TOTAL)
-
-    slide_big_image(prs, "Autentificare și înregistrare",
-        "01-login.png", page=16, total=TOTAL,
-        subtitle="Login local + OAuth Google/Facebook, cu throttling contra brute-force",
-        caption="/auth/login — formular cu validare și redirect după rol")
-
+    # 10. Listare anunțuri
     slide_big_image(prs, "Listarea și filtrarea anunțurilor",
-        "11-find-vehicle.png", page=17, total=TOTAL,
+        "11-find-vehicle.png", page=10, total=TOTAL,
         subtitle="Filtrare după marcă, model, preț, an, combustibil, transmisie și localitate",
-        caption="/find-vehicle — 200 de vehicule din 10 producători")
+        caption="200 de vehicule disponibile din 10 producători diferiți")
 
+    # 11. Detaliu vehicul
     slide_big_image(prs, "Pagina de detaliu vehicul",
-        "12-vehicle-detail.png", page=18, total=TOTAL,
-        subtitle="Peste 40 de câmpuri tehnice, galerie imagini și contact direct cu vânzătorul",
-        caption="/find-vehicle/:id")
+        "12-vehicle-detail.png", page=11, total=TOTAL,
+        subtitle="Peste 40 de câmpuri tehnice, galerie de imagini și contact direct cu vânzătorul",
+        caption="Pagina de detaliu cu informații complete și vehicule similare sugerate")
 
-    slide_with_image(prs, "Sistemul de bid-uri",
+    # 12. Sistemul de oferte
+    slide_with_image(prs, "Sistemul de oferte",
         "15-bids.png",
         [
             "Ofertă cu sumă și mesaj de negociere.",
-            "Stări: pending, accepted, rejected, withdrawn.",
-            "La acceptare → vehiculul devine SOLD.",
-            "Suma cumpărătorului este blocată (frozen).",
-            "Doar rolul BUYER poate plasa bid-uri.",
-        ], page=19, total=TOTAL,
-        image_caption="/bids — bid-uri active și istoric")
+            "Stări: în așteptare, acceptată, respinsă, retrasă.",
+            "La acceptare → vehiculul devine VÂNDUT.",
+            "Suma cumpărătorului este blocată în portofel.",
+            "Doar rolul CUMPĂRĂTOR poate plasa oferte.",
+        ], page=12, total=TOTAL,
+        image_caption="Oferte active și istoric complet")
 
-    slide_with_image(prs, "Mesagerie buyer ↔ seller",
+    # 13. Mesagerie
+    slide_with_image(prs, "Mesagerie cumpărător — vânzător",
         "16b-messages-thread.png",
         [
-            "Conversații peer-to-peer buyer-seller.",
-            "Editare și ștergere de mesaje individuale.",
+            "Conversații directe între cumpărător și vânzător.",
+            "Editare și ștergere mesaje individuale.",
             "Ștergere completă a conversației.",
-            "Unread tracking separat per participant.",
-            "Inițiere din pagina de detaliu vehicul.",
-        ], page=20, total=TOTAL,
-        image_caption="/messages — thread complet",
+            "Urmărire separată a mesajelor necitite per participant.",
+            "Inițiere din pagina de detaliu a vehiculului.",
+        ], page=13, total=TOTAL,
+        image_caption="Fir complet de conversație",
         image_left=True)
 
+    # 14. Portofel
     slide_with_image(prs, "Portofel digital și tranzacții",
         "17-wallet.png",
         [
-            "Sold disponibil + sold blocat (frozen).",
+            "Sold disponibil și sold blocat.",
             "Card asociat cu depozite și retrageri.",
-            "Tipuri: deposit, withdrawal, payment.",
-            "Istoric paginat și filtrat pe tip/status.",
-            "Comision 5% reținut automat la vânzare.",
-        ], page=21, total=TOTAL,
-        image_caption="/wallet — sold, card și istoric")
+            "Tipuri: depozit, retragere, plată.",
+            "Istoric paginat și filtrat pe tip/stare.",
+            "Comision de 5% reținut automat la vânzare.",
+        ], page=14, total=TOTAL,
+        image_caption="Sold, card și istoric tranzacții")
 
-    slide_dashboard_split(prs, page=22, total=TOTAL)
+    # 15. Tablouri de bord
+    slide_dashboard_split(prs, page=15, total=TOTAL)
 
-    # ----- CAPITOLUL 6: AVANSAT + CONCLUZII -----
+    # 16. Vehicule similare
     slide_text(prs, "Recomandări de vehicule similare",
         [
-            "Endpoint dedicat: GET /vehicles/:id/similar.",
-            "Filtrare după aceeași marcă + interval preț ±15%.",
-            "Sortare după distanța absolută față de preț.",
-            "Returnează top 5 pe pagina de detaliu.",
-            "Extensibil cu model ML (KNN, embeddings).",
-        ], page=23, total=TOTAL,
-        subtitle="„Mașini asemănătoare\" sugerate pe pagina de detaliu")
+            "Rută dedicată: GET /vehicule/:id/similare.",
+            "Filtrare după aceeași marcă și interval de preț ±15%.",
+            "Sortare după distanța absolută față de prețul de referință.",
+            "Returnează primele 5 vehicule pe pagina de detaliu.",
+            "Extensibil cu algoritm de învățare automată (KNN, vectori).",
+        ], page=16, total=TOTAL,
+        subtitle="„Vehicule asemănătoare\" sugerate pe pagina de detaliu")
 
-    slide_two_columns(prs, "Concluzii și dezvoltări viitoare",
+    # 17. Concluzii și îmbunătățiri viitoare
+    slide_two_columns(prs, "Concluzii și îmbunătățiri viitoare",
         "Ce am realizat",
         [
-            "Platformă full-stack funcțională.",
-            "Autentificare OAuth + verificare email.",
-            "Sistem complet de bid-uri.",
-            "Mesagerie peer-to-peer.",
-            "Wallet cu tranzacții și sume blocate.",
+            "Platformă web completă și funcțională.",
+            "Autentificare OAuth și verificare email.",
+            "Sistem complet de oferte.",
+            "Mesagerie directă între utilizatori.",
+            "Portofel cu tranzacții și sume blocate.",
             "Recomandări de vehicule similare.",
         ],
         "Îmbunătățiri viitoare",
         [
-            "Recomandări ML (KNN + embeddings).",
-            "Integrare plată: Stripe / MobilPay.",
-            "Migrare pe PostgreSQL.",
-            "Reviews și rating buyer-seller.",
+            "Traducere completă a componentelor (i18n).",
+            "Integrare plată prin Stripe.",
+            "Arhitectură mai curată pe straturi.",
             "Aplicație mobilă React Native.",
-            "Notificări push în timp real.",
-        ], page=24, total=TOTAL)
+            "Roluri suplimentare cu beneficii distincte.",
+            "Notificări în timp real.",
+        ], page=17, total=TOTAL)
 
-    slide_thanks(prs, page=25, total=TOTAL)
+    # 18. Mulțumiri
+    slide_thanks(prs, page=18, total=TOTAL)
 
     prs.save(OUT)
-    print(f"Saved: {OUT}")
+    print(f"Salvat: {OUT}")
 
 
 if __name__ == "__main__":

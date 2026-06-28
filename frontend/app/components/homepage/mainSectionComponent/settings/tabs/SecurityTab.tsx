@@ -1,32 +1,32 @@
 import { MOCK_SESSIONS } from "~/constants/settings.constants";
+import { useTranslation } from "~/hooks/useTranslation";
 
 export default function SecurityTab() {
+  const t = useTranslation();
+  const ts = t.settings.security;
+
   return (
     <div className="space-y-6">
       {/* Password */}
       <div className="bg-[#141417] border border-white/[0.04] rounded-xl overflow-hidden">
         <div className="px-5 py-4 border-b border-white/[0.04]">
-          <h3 className="text-[14px] font-semibold text-[#f5f5f7]">Password</h3>
-          <p className="text-[12px] text-[#8e8e9a] mt-0.5">
-            Manage your password to keep your account secure.
-          </p>
+          <h3 className="text-[14px] font-semibold text-[#f5f5f7]">{ts.password}</h3>
+          <p className="text-[12px] text-[#8e8e9a] mt-0.5">{ts.passwordDesc}</p>
         </div>
         <div className="px-5 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex gap-1">
               {Array.from({ length: 8 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="w-1.5 h-1.5 rounded-full bg-[#8e8e9a]"
-                />
+                <div key={i} className="w-1.5 h-1.5 rounded-full bg-[#8e8e9a]" />
               ))}
             </div>
-            <span className="text-[12px] text-[#555]">
-              Last changed 30 days ago
-            </span>
+            <span className="text-[12px] text-[#555]">{ts.lastChanged}</span>
           </div>
-          <button className="px-3.5 py-1.5 bg-white/[0.04] border border-white/[0.06] rounded-lg text-[12px] text-[#c2c2c9] font-medium hover:bg-white/[0.07] transition-colors">
-            Change Password
+          <button
+            type="button"
+            className="px-3.5 py-1.5 bg-white/[0.04] border border-white/[0.06] rounded-lg text-[12px] text-[#c2c2c9] font-medium hover:bg-white/[0.07] transition-colors"
+          >
+            {ts.changePassword}
           </button>
         </div>
       </div>
@@ -34,12 +34,8 @@ export default function SecurityTab() {
       {/* 2FA */}
       <div className="bg-[#141417] border border-white/[0.04] rounded-xl overflow-hidden">
         <div className="px-5 py-4 border-b border-white/[0.04]">
-          <h3 className="text-[14px] font-semibold text-[#f5f5f7]">
-            Two-Factor Authentication
-          </h3>
-          <p className="text-[12px] text-[#8e8e9a] mt-0.5">
-            Add an extra layer of security to your account.
-          </p>
+          <h3 className="text-[14px] font-semibold text-[#f5f5f7]">{ts.twoFactor}</h3>
+          <p className="text-[12px] text-[#8e8e9a] mt-0.5">{ts.twoFactorDesc}</p>
         </div>
         <div className="px-5 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -58,16 +54,15 @@ export default function SecurityTab() {
               </svg>
             </div>
             <div>
-              <p className="text-[13px] text-[#f5f5f7] font-medium">
-                Not enabled
-              </p>
-              <p className="text-[11px] text-[#8e8e9a]">
-                Recommended for enhanced security
-              </p>
+              <p className="text-[13px] text-[#f5f5f7] font-medium">{ts.notEnabled}</p>
+              <p className="text-[11px] text-[#8e8e9a]">{ts.recommended}</p>
             </div>
           </div>
-          <button className="px-3.5 py-1.5 bg-[#e63946]/10 border border-[#e63946]/20 rounded-lg text-[12px] text-[#e63946] font-medium hover:bg-[#e63946]/20 transition-colors">
-            Enable
+          <button
+            type="button"
+            className="px-3.5 py-1.5 bg-[#e63946]/10 border border-[#e63946]/20 rounded-lg text-[12px] text-[#e63946] font-medium hover:bg-[#e63946]/20 transition-colors"
+          >
+            {ts.enable}
           </button>
         </div>
       </div>
@@ -75,12 +70,8 @@ export default function SecurityTab() {
       {/* Active sessions */}
       <div className="bg-[#141417] border border-white/[0.04] rounded-xl overflow-hidden">
         <div className="px-5 py-4 border-b border-white/[0.04]">
-          <h3 className="text-[14px] font-semibold text-[#f5f5f7]">
-            Active Sessions
-          </h3>
-          <p className="text-[12px] text-[#8e8e9a] mt-0.5">
-            Devices currently logged in to your account.
-          </p>
+          <h3 className="text-[14px] font-semibold text-[#f5f5f7]">{ts.activeSessions}</h3>
+          <p className="text-[12px] text-[#8e8e9a] mt-0.5">{ts.activeSessionsDesc}</p>
         </div>
         <div className="divide-y divide-white/[0.03]">
           {MOCK_SESSIONS.map((session) => (
@@ -110,18 +101,19 @@ export default function SecurityTab() {
                     {session.device}
                     {session.current && (
                       <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#10b981]/10 text-[#10b981]">
-                        Current
+                        {ts.current}
                       </span>
                     )}
                   </p>
-                  <p className="text-[11px] text-[#8e8e9a]">
-                    {session.location}
-                  </p>
+                  <p className="text-[11px] text-[#8e8e9a]">{session.location}</p>
                 </div>
               </div>
               {!session.current && (
-                <button className="px-3 py-1.5 bg-white/[0.04] border border-white/[0.06] rounded-lg text-[12px] text-[#8e8e9a] font-medium hover:bg-white/[0.07] transition-colors">
-                  Revoke
+                <button
+                  type="button"
+                  className="px-3 py-1.5 bg-white/[0.04] border border-white/[0.06] rounded-lg text-[12px] text-[#8e8e9a] font-medium hover:bg-white/[0.07] transition-colors"
+                >
+                  {ts.revoke}
                 </button>
               )}
             </div>

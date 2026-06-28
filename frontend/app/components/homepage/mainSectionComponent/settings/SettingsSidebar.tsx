@@ -1,15 +1,19 @@
 import { SETTINGS_TABS, TAB_ICONS } from "~/constants/settings.constants";
 import type { SettingsSidebarProps } from "~/interface/settings.interface";
+import { useTranslation } from "~/hooks/useTranslation";
 
 export default function SettingsSidebar({
   activeTab,
   onTabChange,
 }: SettingsSidebarProps) {
+  const t = useTranslation();
+
   return (
     <div className="w-[200px] shrink-0 hidden md:block">
       <nav className="space-y-1 sticky top-6">
-        {SETTINGS_TABS.map(({ key, label }) => (
+        {SETTINGS_TABS.map(({ key }) => (
           <button
+            type="button"
             key={key}
             onClick={() => onTabChange(key)}
             className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all text-left ${
@@ -19,12 +23,13 @@ export default function SettingsSidebar({
             }`}
           >
             {TAB_ICONS[key]}
-            {label}
+            {t.settings.tabs[key]}
           </button>
         ))}
 
         <div className="pt-3 mt-3 border-t border-white/[0.04]">
           <button
+            type="button"
             onClick={() => onTabChange("profile")}
             className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[13px] font-medium text-red-400/70 hover:text-red-400 hover:bg-red-500/5 transition-all text-left"
           >
@@ -42,7 +47,7 @@ export default function SettingsSidebar({
               <line x1="12" y1="9" x2="12" y2="13" />
               <line x1="12" y1="17" x2="12.01" y2="17" />
             </svg>
-            Danger Zone
+            {t.settings.sidebarDangerZone}
           </button>
         </div>
       </nav>

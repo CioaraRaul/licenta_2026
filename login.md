@@ -56,6 +56,14 @@ All seeded accounts share the same password: **`Password123!`**
 
 ---
 
+## Admin
+
+| Name  | Email               | Password   |
+|-------|---------------------|------------|
+| admin | `admin@autovault.com` | `Admin@1234` |
+
+---
+
 ## Notes
 
 - Run `seed.ts` to populate the database with all seeded accounts and 200 vehicle listings (20 per seller).
