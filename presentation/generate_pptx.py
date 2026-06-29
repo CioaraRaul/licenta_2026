@@ -174,7 +174,7 @@ def slide_title(prs):
     add_rect(s, 0, 0, SLIDE_W, SLIDE_H, fill=NAVY)
 
     add_text(s, 0, Inches(0.7), SLIDE_W, Inches(0.5),
-             "LUCRARE DE LICENȚĂ  •  SESIUNEA IULIE 2026", size=20, bold=True,
+             "LUCRARE DE DIPLOMĂ  •  SESIUNEA IULIE 2026", size=20, bold=True,
              color=ACCENT, align=PP_ALIGN.CENTER)
     add_text(s, 0, Inches(1.2), SLIDE_W, Inches(0.4),
              "Universitatea din Oradea  •  Specializarea Calculatoare",
@@ -203,7 +203,7 @@ def slide_title(prs):
              "COORDONATOR ȘTIINȚIFIC", size=13, bold=True, color=ACCENT,
              align=PP_ALIGN.RIGHT)
     add_text(s, Inches(7), Inches(6.55), Inches(5.8), Inches(0.6),
-             "Pecherle George-Dominic", size=24, bold=True, color=WHITE,
+             "Ș.L.DR.ING. PECHERLE GEORGE-DOMINIC", size=20, bold=True, color=WHITE,
              align=PP_ALIGN.RIGHT)
 
 
@@ -341,30 +341,44 @@ def slide_architecture(prs, *, page, total):
 
 def slide_erd(prs, *, page, total):
     s = new_slide(prs)
-    header(s, "Modelul de date — entități și relații",
-           subtitle="Diagrama entitate-relație cu cele 9 entități principale",
+    header(s, "Modelul de date",
+           subtitle="Cele 9 entități principale și câmpurile lor cheie",
            page=page, total=total)
+
+    col_w = Inches(3.85)
+    row_h = Inches(1.55)
+    gap_x = Inches(0.38)
+    gap_y = Inches(0.30)
+    x0 = Inches(0.45)
+    y0 = Inches(1.82)
+    cols = [x0, x0 + col_w + gap_x, x0 + 2 * (col_w + gap_x)]
+    rows = [y0, y0 + row_h + gap_y, y0 + 2 * (row_h + gap_y)]
+
+    LINE_C = RGBColor(0x9C, 0xA3, 0xAF)
 
     def entity(x, y, w, h, name, fields, color=NAVY):
         add_rect(s, x + Inches(0.04), y + Inches(0.05), w, h,
                  fill=RGBColor(0xE5, 0xE7, 0xEB), line=None)
         add_rect(s, x, y, w, h, fill=WHITE, line=color)
-        add_rect(s, x, y, w, Inches(0.55), fill=color)
-        add_text(s, x + Inches(0.2), y + Inches(0.08), w - Inches(0.3), Inches(0.45),
-                 name, size=20, bold=True, color=WHITE)
+        add_rect(s, x, y, w, Inches(0.52), fill=color)
+        add_text(s, x + Inches(0.18), y + Inches(0.06), w - Inches(0.25), Inches(0.42),
+                 name, size=19, bold=True, color=WHITE)
         for i, f in enumerate(fields):
-            add_text(s, x + Inches(0.2), y + Inches(0.7) + i * Inches(0.33),
-                     w - Inches(0.3), Inches(0.33),
-                     f, size=15, color=TEXT)
+            add_text(s, x + Inches(0.18), y + Inches(0.62) + i * Inches(0.3),
+                     w - Inches(0.25), Inches(0.3),
+                     f, size=13, color=TEXT)
 
-    col_w = Inches(3.95)
-    row_h = Inches(1.65)
-    gap_x = Inches(0.2)
-    gap_y = Inches(0.13)
-    x0 = Inches(0.45)
-    y0 = Inches(1.85)
-    cols = [x0, x0 + col_w + gap_x, x0 + 2 * (col_w + gap_x)]
-    rows = [y0, y0 + row_h + gap_y, y0 + 2 * (row_h + gap_y)]
+    def hline(gx, row_y, label):
+        cy = row_y + row_h / 2
+        add_rect(s, gx, cy - Inches(0.02), gap_x, Inches(0.04), fill=LINE_C, line=None)
+        add_text(s, gx, cy - Inches(0.24), gap_x, Inches(0.22),
+                 label, size=9, bold=True, color=LINE_C, align=PP_ALIGN.CENTER)
+
+    def vline(col_x, gy, label):
+        cx = col_x + col_w / 2
+        add_rect(s, cx - Inches(0.02), gy, Inches(0.04), gap_y, fill=LINE_C, line=None)
+        add_text(s, cx + Inches(0.06), gy, Inches(0.32), gap_y,
+                 label, size=9, bold=True, color=LINE_C)
 
     # Rândul 1
     entity(cols[0], rows[0], col_w, row_h, "Cumpărător",
@@ -472,15 +486,15 @@ def slide_four_roles(prs, *, page, total):
         add_rect(s, x + Inches(0.04), y + Inches(0.05), box_w, box_h,
                  fill=RGBColor(0xE5, 0xE7, 0xEB), line=None)
         add_rect(s, x, y, box_w, box_h, fill=WHITE, line=RGBColor(0xE5, 0xE7, 0xEB))
-        add_rect(s, x, y, Inches(1.75), box_h, fill=color)
-        add_text(s, x, y + Inches(0.45), Inches(1.75), Inches(0.55),
+        add_rect(s, x, y, Inches(2.0), box_h, fill=color)
+        add_text(s, x, y + Inches(0.45), Inches(2.0), Inches(0.55),
                  badge, size=18, bold=True, color=WHITE,
                  align=PP_ALIGN.CENTER)
-        add_text(s, x, y + Inches(1.1), Inches(1.75), Inches(0.4),
+        add_text(s, x, y + Inches(1.1), Inches(2.0), Inches(0.4),
                  sub, size=12, color=RGBColor(0xE5, 0xE7, 0xEB),
                  align=PP_ALIGN.CENTER)
-        add_bullets(s, x + Inches(1.95), y + Inches(0.25),
-                    box_w - Inches(2.1), box_h - Inches(0.4),
+        add_bullets(s, x + Inches(2.2), y + Inches(0.25),
+                    box_w - Inches(2.35), box_h - Inches(0.4),
                     items, size=16, line_spacing=1.22, space_after=8)
     footer(s)
 
@@ -494,8 +508,8 @@ def slide_auth(prs, *, page, total):
     # Două imagini side-by-side: login (stânga) și register (dreapta)
     img_y = Inches(1.85)
     img_h = Inches(3.85)
-    img_w = Inches(5.9)
-    gap = Inches(0.73)
+    img_w = Inches(6.2)
+    gap = Inches(0.2)
     x_left = Inches(0.4)
     x_right = x_left + img_w + gap
 
@@ -507,7 +521,7 @@ def slide_auth(prs, *, page, total):
     # Bandă de caracteristici cheie la baza slide-ului
     features = [
         ("JWT", "Acces 15 min + reîmprospătare 7 zile"),
-        ("scrypt", "Parole cifrate cu sare aleatorie"),
+        ("scrypt", "Parole cifrate cu salt aleatoriu"),
         ("Throttling", "Max 5 încercări / minut"),
         ("Email", "Verificare adresă la înregistrare"),
     ]
@@ -585,7 +599,7 @@ def build():
         [
             "Jetoane JWT cu 2 secrete: acces (15 min) + reîmprospătare (7 zile).",
             "Listă neagră de jetoane pentru invalidarea sesiunilor la deconectare.",
-            "Parole cifrate cu scrypt și sare aleatorie.",
+            "Parole cifrate cu scrypt și salt aleatoriu.",
             "Limitare: max 5 încercări de autentificare pe minut.",
             "OAuth2 prin Passport.js (Google și Facebook).",
             "Cloudinary pentru imagini, Mailtrap SMTP pentru trimitere email.",
@@ -605,7 +619,7 @@ def build():
     slide_four_roles(prs, page=7, total=TOTAL)
 
     # 8. Cerințe funcționale și nefuncționale
-    slide_two_columns(prs, "Cerințe funcționale și nefuncționale",
+    slide_two_columns(prs, "Cerințe funcționale și tehnice",
         "Funcționale",
         [
             "Autentificare locală și prin furnizori externi.",
@@ -615,7 +629,7 @@ def build():
             "Portofel cu sume blocate.",
             "Recomandări vehicule similare.",
         ],
-        "Nefuncționale",
+        "Tehnice",
         [
             "Securitate: JWT, scrypt, CORS.",
             "Limitare pe rutele sensibile.",
@@ -708,7 +722,7 @@ def build():
             "Integrare plată prin Stripe.",
             "Arhitectură mai curată pe straturi.",
             "Aplicație mobilă React Native.",
-            "Roluri suplimentare cu beneficii distincte.",
+            "Implementare completă a panoului de administrare (ADMIN).",
             "Notificări în timp real.",
         ], page=17, total=TOTAL)
 
