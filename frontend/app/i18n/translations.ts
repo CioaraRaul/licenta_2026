@@ -1,0 +1,318 @@
+const en = {
+  nav: {
+    sectionMain: "Main",
+    sectionVehicles: "Vehicles",
+    dashboard: "Dashboard",
+    messages: "Messages",
+    myListings: "My Listings",
+    wallet: "Wallet",
+    findVehicle: "Find Vehicle",
+    saved: "Saved",
+    myBids: "My Bids",
+    compare: "Compare",
+    helpSupport: "Help & Support",
+    settings: "Settings",
+    listVehicle: "List a vehicle",
+    listVehicleDesc: "Reach thousands of verified buyers.",
+    newListing: "+ New Listing",
+  },
+  navbar: {
+    settings: "Settings",
+    logout: "Logout",
+  },
+  settings: {
+    title: "Settings",
+    subtitle: "Manage your account preferences and configuration.",
+    breadcrumb: {
+      dashboard: "Dashboard",
+      settings: "Settings",
+    },
+    tabs: {
+      profile: "Profile",
+      notifications: "Notifications",
+      security: "Security",
+      preferences: "Preferences",
+      language: "Language",
+    },
+    sidebarDangerZone: "Danger Zone",
+    dangerZone: {
+      title: "Danger Zone",
+      subtitle: "Irreversible actions. Please proceed with caution.",
+      exportData: "Export Data",
+      deleteAccount: "Delete Account",
+      modal: {
+        title: "Delete Account",
+        description:
+          "This action is permanent and cannot be undone. All your data will be permanently deleted. Enter your password to confirm.",
+        password: "Password",
+        passwordPlaceholder: "Enter your password",
+        confirm: "Delete My Account",
+        cancel: "Cancel",
+        deleting: "Deleting…",
+        noPassword: "Please enter your password.",
+        error:
+          "Incorrect password or an error occurred. Please try again.",
+      },
+    },
+    profile: {
+      personalInfo: "Personal Information",
+      personalInfoDesc: "Your account details and public profile info.",
+      edit: "Edit",
+      save: "Save Changes",
+      saving: "Saving…",
+      cancel: "Cancel",
+      username: "Username",
+      firstName: "First Name",
+      lastName: "Last Name",
+      bio: "Bio",
+      email: "Email",
+      emailReadOnly: "(read-only)",
+      connectedAccounts: "Connected Accounts",
+      connectedAccountsDesc: "Link third-party accounts for faster sign-in.",
+      connected: "Connected",
+      notConnected: "Not connected",
+      connect: "Connect",
+      disconnect: "Disconnect",
+      oauthComingSoon: "OAuth integration coming soon. State is local only.",
+      successMessage: "Profile updated successfully.",
+      errorMessage: "Failed to update profile. Please try again.",
+      memberSince: "Member since",
+      emailLabel: "Email",
+      usernameLabel: "Username",
+      roleLabel: "Role",
+    },
+    notifications: {
+      title: "Notification Preferences",
+      subtitle: "Choose which notifications you'd like to receive.",
+      quietHours: "Quiet Hours",
+      quietHoursDesc: "Mute all notifications between 10 PM and 7 AM.",
+      items: {
+        emailNotifications: {
+          label: "Email Notifications",
+          description:
+            "Receive order confirmations, updates, and newsletters via email.",
+        },
+        bidAlerts: {
+          label: "Bid Alerts",
+          description:
+            "Get notified when someone places a bid on your listing.",
+        },
+        messageAlerts: {
+          label: "Message Alerts",
+          description:
+            "Get notified when you receive a new message from a buyer or seller.",
+        },
+        priceDropAlerts: {
+          label: "Price Drop Alerts",
+          description:
+            "Get notified when a saved vehicle drops in price.",
+        },
+        weeklyDigest: {
+          label: "Weekly Digest",
+          description:
+            "Receive a weekly summary of your account activity.",
+        },
+      },
+    },
+    security: {
+      password: "Password",
+      passwordDesc: "Manage your password to keep your account secure.",
+      lastChanged: "Last changed 30 days ago",
+      changePassword: "Change Password",
+      twoFactor: "Two-Factor Authentication",
+      twoFactorDesc: "Add an extra layer of security to your account.",
+      notEnabled: "Not enabled",
+      recommended: "Recommended for enhanced security",
+      enable: "Enable",
+      activeSessions: "Active Sessions",
+      activeSessionsDesc: "Devices currently logged in to your account.",
+      current: "Current",
+      revoke: "Revoke",
+    },
+    preferences: {
+      regional: "Regional Settings",
+      regionalDesc: "Configure currency, units, and language.",
+      currency: "Currency",
+      distanceUnit: "Distance Unit",
+      theme: "Theme",
+      themeDesc: "Choose how AutoVault looks for you.",
+      themes: {
+        dark: "Dark",
+        light: "Light",
+        system: "System",
+      },
+    },
+    language: {
+      title: "Language",
+      subtitle: "Choose your preferred interface language.",
+      english: "English",
+      englishDesc: "Interface in English",
+      romanian: "Română",
+      romanianDesc: "Interfața în română",
+      active: "Active",
+      select: "Select",
+    },
+  },
+};
+
+const ro: typeof en = {
+  nav: {
+    sectionMain: "Principal",
+    sectionVehicles: "Vehicule",
+    dashboard: "Panou de control",
+    messages: "Mesaje",
+    myListings: "Anunțurile mele",
+    wallet: "Portofel",
+    findVehicle: "Caută vehicul",
+    saved: "Salvate",
+    myBids: "Licitațiile mele",
+    compare: "Compară",
+    helpSupport: "Ajutor & Suport",
+    settings: "Setări",
+    listVehicle: "Adaugă un vehicul",
+    listVehicleDesc: "Ajungi la mii de cumpărători verificați.",
+    newListing: "+ Anunț nou",
+  },
+  navbar: {
+    settings: "Setări",
+    logout: "Deconectare",
+  },
+  settings: {
+    title: "Setări",
+    subtitle: "Gestionează preferințele și configurarea contului tău.",
+    breadcrumb: {
+      dashboard: "Panou de control",
+      settings: "Setări",
+    },
+    tabs: {
+      profile: "Profil",
+      notifications: "Notificări",
+      security: "Securitate",
+      preferences: "Preferințe",
+      language: "Limbă",
+    },
+    sidebarDangerZone: "Zonă periculoasă",
+    dangerZone: {
+      title: "Zonă periculoasă",
+      subtitle: "Acțiuni ireversibile. Procedați cu prudență.",
+      exportData: "Exportă date",
+      deleteAccount: "Șterge contul",
+      modal: {
+        title: "Șterge contul",
+        description:
+          "Această acțiune este permanentă și nu poate fi anulată. Toate datele tale vor fi șterse permanent. Introdu parola pentru a confirma.",
+        password: "Parolă",
+        passwordPlaceholder: "Introdu parola ta",
+        confirm: "Șterge contul meu",
+        cancel: "Anulează",
+        deleting: "Se șterge…",
+        noPassword: "Te rugăm să introduci parola.",
+        error:
+          "Parolă incorectă sau a apărut o eroare. Te rugăm să încerci din nou.",
+      },
+    },
+    profile: {
+      personalInfo: "Informații personale",
+      personalInfoDesc: "Detaliile contului tău și informațiile profilului public.",
+      edit: "Editează",
+      save: "Salvează modificările",
+      saving: "Se salvează…",
+      cancel: "Anulează",
+      username: "Nume utilizator",
+      firstName: "Prenume",
+      lastName: "Nume",
+      bio: "Biografie",
+      email: "Email",
+      emailReadOnly: "(doar citire)",
+      connectedAccounts: "Conturi conectate",
+      connectedAccountsDesc:
+        "Conectează conturi terțe pentru autentificare rapidă.",
+      connected: "Conectat",
+      notConnected: "Neconectat",
+      connect: "Conectează",
+      disconnect: "Deconectează",
+      oauthComingSoon:
+        "Integrarea OAuth vine în curând. Starea este doar locală.",
+      successMessage: "Profilul a fost actualizat cu succes.",
+      errorMessage:
+        "Actualizarea profilului a eșuat. Te rugăm să încerci din nou.",
+      memberSince: "Membru din",
+      emailLabel: "Email",
+      usernameLabel: "Nume utilizator",
+      roleLabel: "Rol",
+    },
+    notifications: {
+      title: "Preferințe notificări",
+      subtitle: "Alege ce notificări dorești să primești.",
+      quietHours: "Ore liniștite",
+      quietHoursDesc: "Dezactivează toate notificările între 22:00 și 7:00.",
+      items: {
+        emailNotifications: {
+          label: "Notificări email",
+          description:
+            "Primește confirmări de comenzi, actualizări și buletine informative pe email.",
+        },
+        bidAlerts: {
+          label: "Alerte licitații",
+          description:
+            "Fii notificat când cineva plasează o ofertă pe anunțul tău.",
+        },
+        messageAlerts: {
+          label: "Alerte mesaje",
+          description:
+            "Fii notificat când primești un mesaj nou de la un cumpărător sau vânzător.",
+        },
+        priceDropAlerts: {
+          label: "Alerte scădere preț",
+          description: "Fii notificat când un vehicul salvat scade în preț.",
+        },
+        weeklyDigest: {
+          label: "Rezumat săptămânal",
+          description: "Primește un rezumat săptămânal al activității contului tău.",
+        },
+      },
+    },
+    security: {
+      password: "Parolă",
+      passwordDesc: "Gestionează parola pentru a-ți păstra contul în siguranță.",
+      lastChanged: "Schimbată acum 30 de zile",
+      changePassword: "Schimbă parola",
+      twoFactor: "Autentificare cu doi factori",
+      twoFactorDesc: "Adaugă un nivel suplimentar de securitate contului tău.",
+      notEnabled: "Neactivată",
+      recommended: "Recomandat pentru securitate sporită",
+      enable: "Activează",
+      activeSessions: "Sesiuni active",
+      activeSessionsDesc: "Dispozitivele conectate în prezent la contul tău.",
+      current: "Curent",
+      revoke: "Revocă",
+    },
+    preferences: {
+      regional: "Setări regionale",
+      regionalDesc: "Configurează moneda, unitățile și tema.",
+      currency: "Monedă",
+      distanceUnit: "Unitate de distanță",
+      theme: "Temă",
+      themeDesc: "Alege cum arată AutoVault pentru tine.",
+      themes: {
+        dark: "Întunecat",
+        light: "Luminos",
+        system: "Sistem",
+      },
+    },
+    language: {
+      title: "Limbă",
+      subtitle: "Alege limba preferată pentru interfață.",
+      english: "English",
+      englishDesc: "Interfață în engleză",
+      romanian: "Română",
+      romanianDesc: "Interfața în română",
+      active: "Activ",
+      select: "Selectează",
+    },
+  },
+};
+
+export const translations = { en, ro };
+export type Translations = typeof en;
+export type Language = keyof typeof translations;

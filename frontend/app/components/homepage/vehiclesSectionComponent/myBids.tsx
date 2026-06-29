@@ -13,6 +13,7 @@ import {
 } from "~/utils/bids.utils";
 import { useBidActions } from "~/hooks/useBidActions";
 import { useWithdrawBid } from "~/hooks/useWithdrawBid";
+import { useRemoveBid } from "~/hooks/useRemoveBid";
 import { BIDS_PAGE_TABS, BIDS_PER_PAGE } from "~/constants/bids.constants";
 
 import BidsStatsBar from "./myBids/BidsStatsBar";
@@ -32,7 +33,9 @@ export default function MyBidsComponent({
   error,
 }: MyBidsPageData) {
   // ── Tab state ────────────────────────────────────────────────────────────
-  const [activeTab, setActiveTab] = useState<MyBidsTab>("placed");
+  const [activeTab, setActiveTab] = useState<MyBidsTab>(
+    isSeller ? "received" : "placed",
+  );
 
   // ── Filter / search / sort state ─────────────────────────────────────────
   const [search, setSearch] = useState("");
@@ -46,6 +49,7 @@ export default function MyBidsComponent({
   // ── Action hooks ─────────────────────────────────────────────────────────
   const { actionLoading, handleAccept, handleReject } = useBidActions();
   const { withdrawLoading, handleWithdraw } = useWithdrawBid();
+  const { removeLoading, handleRemove } = useRemoveBid();
 
   // ── Active bids based on tab ─────────────────────────────────────────────
   const activeBids = activeTab === "received" ? receivedBids : placedBids;
@@ -98,8 +102,8 @@ export default function MyBidsComponent({
   if (error) {
     return (
       <div className="flex-1 overflow-y-auto p-6 font-['DM_Sans',sans-serif]">
-        <div className="max-w-[1200px] mx-auto">
-          <div className="bg-[#141417] border border-white/[0.04] rounded-xl p-10 text-center">
+        <div className="max-w-300 mx-auto">
+          <div className="bg-[#141417] border border-white/4 rounded-xl p-10 text-center">
             <svg
               className="mx-auto mb-4 opacity-30"
               width="40"
@@ -127,7 +131,7 @@ export default function MyBidsComponent({
   // ── Render ───────────────────────────────────────────────────────────────
   return (
     <div className="flex-1 overflow-y-auto p-6 font-['DM_Sans',sans-serif]">
-      <div className="max-w-[1200px] mx-auto">
+      <div className="max-w-300 mx-auto">
         {/* ─── Header ─────────────────────────────────────────────────── */}
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -140,24 +144,23 @@ export default function MyBidsComponent({
           </div>
         </div>
 
-        {/* ─── Page Tabs ──────────────────────────────────────────────── */}
+        {/* ─── Page Tabs (only for sellers: placed tab hidden) ────────── */}
         {isSeller && (
           <div className="flex items-center gap-1 mb-6">
-            {BIDS_PAGE_TABS.map((tab) => (
+            {BIDS_PAGE_TABS.filter((tab) => tab.key !== "placed").map((tab) => (
               <button
+                type="button"
                 key={tab.key}
                 onClick={() => handleTabChange(tab.key)}
                 className={`px-4 py-2 text-[13px] font-medium rounded-lg transition-colors ${
                   activeTab === tab.key
                     ? "bg-[#e63946] text-white"
-                    : "text-[#8e8e9a] hover:text-[#f5f5f7] hover:bg-white/[0.04]"
+                    : "text-[#8e8e9a] hover:text-[#f5f5f7] hover:bg-white/4"
                 }`}
               >
                 {tab.label}
                 <span className="ml-2 text-[11px] opacity-70">
-                  {tab.key === "placed"
-                    ? placedBids.length
-                    : receivedBids.length}
+                  {receivedBids.length}
                 </span>
               </button>
             ))}
@@ -168,7 +171,7 @@ export default function MyBidsComponent({
         <BidsStatsBar stats={stats} />
 
         {/* ─── Toolbar + Table ────────────────────────────────────────── */}
-        <div className="bg-[#141417] border border-white/[0.04] rounded-xl mb-5">
+        <div className="bg-[#141417] border border-white/4 rounded-xl mb-5">
           <BidsToolbar
             statusFilter={statusFilter}
             onStatusFilterChange={handleFilterChange}
@@ -188,7 +191,7 @@ export default function MyBidsComponent({
             <div>
               {/* Table header */}
               {activeTab === "received" ? (
-                <div className="grid grid-cols-[1fr_140px_100px_100px_90px_100px] gap-3 px-5 py-2.5 border-b border-white/[0.02] text-[11px] text-[#8e8e9a]/60 uppercase tracking-wider font-semibold">
+                <div className="grid grid-cols-[1fr_140px_100px_100px_90px_100px] gap-3 px-5 py-2.5 border-b border-white/2 text-[11px] text-[#8e8e9a]/60 uppercase tracking-wider font-semibold">
                   <span>Vehicle</span>
                   <span>Buyer</span>
                   <span>Amount</span>
@@ -197,7 +200,7 @@ export default function MyBidsComponent({
                   <span>Actions</span>
                 </div>
               ) : (
-                <div className="grid grid-cols-[1fr_100px_100px_90px_100px] gap-3 px-5 py-2.5 border-b border-white/[0.02] text-[11px] text-[#8e8e9a]/60 uppercase tracking-wider font-semibold">
+                <div className="grid grid-cols-[1fr_100px_100px_90px_100px] gap-3 px-5 py-2.5 border-b border-white/2 text-[11px] text-[#8e8e9a]/60 uppercase tracking-wider font-semibold">
                   <span>Vehicle</span>
                   <span>Amount</span>
                   <span>Date</span>
@@ -220,8 +223,9 @@ export default function MyBidsComponent({
                   <PlacedBidRow
                     key={bid.id}
                     bid={bid}
-                    isLoading={withdrawLoading === bid.id}
+                    isLoading={withdrawLoading === bid.id || removeLoading === bid.id}
                     onWithdraw={() => handleWithdraw(bid.id)}
+                    onRemove={() => handleRemove(bid.id)}
                   />
                 ),
               )}

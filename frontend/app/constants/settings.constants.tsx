@@ -18,11 +18,28 @@ export const SETTINGS_TABS = [
   { key: "notifications", label: "Notifications" },
   { key: "security", label: "Security" },
   { key: "preferences", label: "Preferences" },
+  { key: "language", label: "Language" },
 ] as const satisfies readonly { key: SettingsTab; label: string }[];
 
 // ─── Tab Icons ────────────────────────────────────────────────────────────────
 
 export const TAB_ICONS: Record<SettingsTab, ReactNode> = {
+  language: (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="12" r="10" />
+      <line x1="2" y1="12" x2="22" y2="12" />
+      <path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20" />
+    </svg>
+  ),
   profile: (
     <svg
       width="18"
@@ -165,8 +182,6 @@ export const DISTANCE_OPTIONS = [
 export const LANGUAGE_OPTIONS = [
   { value: "en", label: "English" },
   { value: "ro", label: "Română" },
-  { value: "de", label: "Deutsch" },
-  { value: "fr", label: "Français" },
 ] as const;
 
 export const THEME_OPTIONS: ThemeOption[] = [

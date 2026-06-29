@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { useAuthStore } from "~/store/auth.store";
-import {
-  buildProfileFields,
-  CONNECTED_ACCOUNTS,
-} from "~/constants/settings.constants";
+import { CONNECTED_ACCOUNTS } from "~/constants/settings.constants";
 import { updateProfile } from "~/api/users.api";
+import { useTranslation } from "~/hooks/useTranslation";
 import type { ProfileFormState } from "~/interface/settings.interface";
 
 export default function ProfileTab() {
   const user = useAuthStore((s) => s.user);
   const setUsers = useAuthStore((s) => s.setUsers);
+  const t = useTranslation();
+  const tp = t.settings.profile;
 
   const [isEditing, setIsEditing] = useState(false);
   const [form, setForm] = useState<ProfileFormState>({
@@ -57,12 +57,9 @@ export default function ProfileTab() {
       });
       setUsers(updated);
       setIsEditing(false);
-      setBanner({ type: "success", message: "Profile updated successfully." });
+      setBanner({ type: "success", message: tp.successMessage });
     } catch {
-      setBanner({
-        type: "error",
-        message: "Failed to update profile. Please try again.",
-      });
+      setBanner({ type: "error", message: tp.errorMessage });
     } finally {
       setSaving(false);
     }
@@ -74,13 +71,34 @@ export default function ProfileTab() {
         acc.name === name ? { ...acc, connected: !acc.connected } : acc,
       ),
     );
-    setAccountMsg("OAuth integration coming soon. State is local only.");
+    setAccountMsg(tp.oauthComingSoon);
     setTimeout(() => setAccountMsg(null), 3000);
   };
 
+  const profileFields = [
+    { label: tp.usernameLabel, value: user?.username ?? "—" },
+    { label: tp.emailLabel, value: user?.email ?? "—" },
+    { label: tp.roleLabel, value: user?.role ?? "—" },
+    {
+      label: tp.memberSince,
+      value: user?.createdAt
+        ? new Date(user.createdAt).toLocaleDateString("en-US", {
+            month: "long",
+            year: "numeric",
+          })
+        : "—",
+    },
+  ];
+
+  const editFields: { label: string; key: keyof ProfileFormState }[] = [
+    { label: tp.username, key: "username" },
+    { label: tp.firstName, key: "firstName" },
+    { label: tp.lastName, key: "lastName" },
+    { label: tp.bio, key: "bio" },
+  ];
+
   return (
     <div className="space-y-6">
-      {/* Status banner */}
       {banner && (
         <div
           className={`px-4 py-3 rounded-lg text-[13px] font-medium border ${
@@ -124,41 +142,26 @@ export default function ProfileTab() {
         <div className="px-5 py-4 border-b border-white/[0.04] flex items-center justify-between">
           <div>
             <h3 className="text-[14px] font-semibold text-[#f5f5f7]">
-              Personal Information
+              {tp.personalInfo}
             </h3>
             <p className="text-[12px] text-[#8e8e9a] mt-0.5">
-              Your account details and public profile info.
+              {tp.personalInfoDesc}
             </p>
           </div>
           {!isEditing && (
             <button
+              type="button"
               onClick={handleEdit}
               className="px-3.5 py-1.5 bg-white/[0.04] border border-white/[0.06] rounded-lg text-[12px] text-[#c2c2c9] font-medium hover:bg-white/[0.07] transition-colors"
             >
-              Edit
+              {tp.edit}
             </button>
           )}
         </div>
 
         {isEditing ? (
           <div className="p-5 space-y-4">
-            {(
-              [
-                {
-                  label: "Username",
-                  key: "username" as keyof ProfileFormState,
-                },
-                {
-                  label: "First Name",
-                  key: "firstName" as keyof ProfileFormState,
-                },
-                {
-                  label: "Last Name",
-                  key: "lastName" as keyof ProfileFormState,
-                },
-                { label: "Bio", key: "bio" as keyof ProfileFormState },
-              ] as const
-            ).map(({ label, key }) => (
+            {editFields.map(({ label, key }) => (
               <div key={key}>
                 <label
                   htmlFor={`field-${key}`}
@@ -194,8 +197,8 @@ export default function ProfileTab() {
                 htmlFor="field-email"
                 className="block text-[12px] text-[#8e8e9a] mb-1.5"
               >
-                Email{" "}
-                <span className="text-[#555] text-[11px]">(read-only)</span>
+                {tp.email}{" "}
+                <span className="text-[#555] text-[11px]">{tp.emailReadOnly}</span>
               </label>
               <input
                 id="field-email"
@@ -207,30 +210,32 @@ export default function ProfileTab() {
             </div>
             <div className="flex gap-3 pt-1">
               <button
+                type="button"
                 onClick={handleSave}
                 disabled={saving}
                 className="px-4 py-2 bg-[#e63946] hover:bg-[#c1121f] disabled:opacity-50 rounded-lg text-[13px] text-white font-medium transition-colors"
               >
-                {saving ? "Saving…" : "Save Changes"}
+                {saving ? tp.saving : tp.save}
               </button>
               <button
+                type="button"
                 onClick={handleCancel}
                 disabled={saving}
                 className="px-4 py-2 bg-white/[0.04] border border-white/[0.06] rounded-lg text-[13px] text-[#c2c2c9] font-medium hover:bg-white/[0.07] transition-colors"
               >
-                Cancel
+                {tp.cancel}
               </button>
             </div>
           </div>
         ) : (
           <div className="divide-y divide-white/[0.03]">
-            {buildProfileFields(user).map(({ label, value }) => (
+            {profileFields.map(({ label, value }) => (
               <div
                 key={label}
                 className="flex items-center justify-between px-5 py-3.5"
               >
                 <span className="text-[13px] text-[#8e8e9a]">{label}</span>
-                <span className="text-[13px] text-[#f5f5f7] font-medium">
+                <span className="text-[13px] text-[#f5f5f7] font-medium capitalize">
                   {value}
                 </span>
               </div>
@@ -243,10 +248,10 @@ export default function ProfileTab() {
       <div className="bg-[#141417] border border-white/[0.04] rounded-xl overflow-hidden">
         <div className="px-5 py-4 border-b border-white/[0.04]">
           <h3 className="text-[14px] font-semibold text-[#f5f5f7]">
-            Connected Accounts
+            {tp.connectedAccounts}
           </h3>
           <p className="text-[12px] text-[#8e8e9a] mt-0.5">
-            Link third-party accounts for faster sign-in.
+            {tp.connectedAccountsDesc}
           </p>
         </div>
         {accountMsg && (
@@ -269,11 +274,12 @@ export default function ProfileTab() {
                     {acc.name}
                   </p>
                   <p className="text-[11px] text-[#8e8e9a]">
-                    {acc.connected ? "Connected" : "Not connected"}
+                    {acc.connected ? tp.connected : tp.notConnected}
                   </p>
                 </div>
               </div>
               <button
+                type="button"
                 onClick={() => handleConnectToggle(acc.name)}
                 className={`px-3 py-1.5 border rounded-lg text-[12px] font-medium transition-colors ${
                   acc.connected
@@ -281,7 +287,7 @@ export default function ProfileTab() {
                     : "bg-white/[0.04] border-white/[0.06] text-[#c2c2c9] hover:bg-white/[0.07]"
                 }`}
               >
-                {acc.connected ? "Disconnect" : "Connect"}
+                {acc.connected ? tp.disconnect : tp.connect}
               </button>
             </div>
           ))}

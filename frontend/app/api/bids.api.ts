@@ -31,6 +31,11 @@ export async function withdrawBid(bidId: number): Promise<Bid> {
   return httpClient.patch<Bid>(`/bids/${bidId}/withdraw`);
 }
 
+/** DELETE /bids/:bidId — șterge definitiv o ofertă respinsă/retrasă/expirată */
+export async function deleteBid(bidId: number): Promise<void> {
+  return httpClient.delete<void>(`/bids/${bidId}`);
+}
+
 // ─── Seller endpoints ─────────────────────────────────────────────────────────
 
 /** GET /bids/vehicle/:vehicleId — toate ofertele pentru un vehicul (seller) */

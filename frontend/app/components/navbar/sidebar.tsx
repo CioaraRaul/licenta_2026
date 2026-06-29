@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router";
 import { useAuthStore } from "~/store/auth.store";
+import { useTranslation } from "~/hooks/useTranslation";
 import { getConversations } from "~/api/messages.api";
 
 export default function Sidebar() {
   const location = useLocation();
   const user = useAuthStore((s) => s.user);
   const [collapsed, setCollapsed] = useState(false);
-
   const [unreadCount, setUnreadCount] = useState(0);
+  const t = useTranslation();
 
   const isSeller = user?.role === "seller" || user?.role === "admin";
   const isActive = (href: string) => location.pathname === href;
@@ -27,7 +28,6 @@ export default function Sidebar() {
 
     fetchUnread();
 
-    // Refresh unread count when the user returns to the tab
     const handleFocus = () => fetchUnread();
     window.addEventListener("focus", handleFocus);
     return () => window.removeEventListener("focus", handleFocus);
@@ -35,7 +35,7 @@ export default function Sidebar() {
 
   const mainNav = [
     {
-      label: "Dashboard",
+      label: t.nav.dashboard,
       href: "/dashboard",
       icon: (
         <svg
@@ -56,7 +56,7 @@ export default function Sidebar() {
       ),
     },
     {
-      label: "Messages",
+      label: t.nav.messages,
       href: "/messages",
       icon: (
         <svg
@@ -77,7 +77,7 @@ export default function Sidebar() {
     ...(isSeller
       ? [
           {
-            label: "My Listings",
+            label: t.nav.myListings,
             href: "/my-listings",
             icon: (
               <svg
@@ -101,7 +101,7 @@ export default function Sidebar() {
         ]
       : []),
     {
-      label: "Wallet",
+      label: t.nav.wallet,
       href: "/wallet",
       icon: (
         <svg
@@ -123,7 +123,7 @@ export default function Sidebar() {
 
   const vehicleNav = [
     {
-      label: "Find Vehicle",
+      label: t.nav.findVehicle,
       href: "/find-vehicle",
       icon: (
         <svg
@@ -142,7 +142,7 @@ export default function Sidebar() {
       ),
     },
     {
-      label: "Saved",
+      label: t.nav.saved,
       href: "/saved",
       icon: (
         <svg
@@ -160,7 +160,7 @@ export default function Sidebar() {
       ),
     },
     {
-      label: "My Bids",
+      label: t.nav.myBids,
       href: "/bids",
       icon: (
         <svg
@@ -179,7 +179,7 @@ export default function Sidebar() {
       ),
     },
     {
-      label: "Compare",
+      label: t.nav.compare,
       href: "/compare",
       icon: (
         <svg
@@ -202,7 +202,7 @@ export default function Sidebar() {
 
   const bottomNav = [
     {
-      label: "Help & Support",
+      label: t.nav.helpSupport,
       href: "/help-support",
       icon: (
         <svg
@@ -222,7 +222,7 @@ export default function Sidebar() {
       ),
     },
     {
-      label: "Settings",
+      label: t.nav.settings,
       href: "/settings",
       icon: (
         <svg
@@ -305,10 +305,9 @@ export default function Sidebar() {
 
       {/* Main navigation */}
       <nav className="flex-1 py-4 px-3 overflow-y-auto">
-        {/* Main section */}
         {!collapsed && (
           <div className="text-[10px] font-semibold text-[#8e8e9a]/50 uppercase tracking-[0.08em] px-3 mb-2">
-            Main
+            {t.nav.sectionMain}
           </div>
         )}
         <div className="flex flex-col gap-0.5 mb-5">
@@ -317,10 +316,9 @@ export default function Sidebar() {
           ))}
         </div>
 
-        {/* Vehicles section */}
         {!collapsed && (
           <div className="text-[10px] font-semibold text-[#8e8e9a]/50 uppercase tracking-[0.08em] px-3 mb-2">
-            Vehicles
+            {t.nav.sectionVehicles}
           </div>
         )}
         {collapsed && (
@@ -355,16 +353,16 @@ export default function Sidebar() {
             </svg>
           </Link>
           <div className="text-[13px] font-semibold text-[#f5f5f7] mb-0.5">
-            List a vehicle
+            {t.nav.listVehicle}
           </div>
           <p className="text-[11px] text-[#8e8e9a] leading-relaxed mb-3">
-            Reach thousands of verified buyers.
+            {t.nav.listVehicleDesc}
           </p>
           <Link
             to="/my-listings/new"
             className="block w-full py-2 bg-[#e63946] rounded-lg text-white text-[12px] font-semibold text-center no-underline hover:shadow-[0_4px_12px_rgba(230,57,70,0.3)] transition-all duration-300"
           >
-            + New Listing
+            {t.nav.newListing}
           </Link>
         </div>
       )}
@@ -387,6 +385,8 @@ export default function Sidebar() {
 
       {/* Collapse toggle */}
       <button
+        type="button"
+        title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         onClick={() => setCollapsed(!collapsed)}
         className="h-10 flex items-center justify-center border-t border-white/[0.04] text-[#8e8e9a] hover:text-[#f5f5f7] hover:bg-white/[0.03] transition-colors flex-shrink-0"
       >

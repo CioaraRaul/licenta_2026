@@ -88,6 +88,7 @@ export interface PlacedBidRowProps {
   bid: Bid;
   isLoading: boolean;
   onWithdraw: () => void;
+  onRemove: () => void;
 }
 
 export interface BidsEmptyStateProps {

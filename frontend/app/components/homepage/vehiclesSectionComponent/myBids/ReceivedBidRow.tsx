@@ -1,3 +1,4 @@
+import { Link } from "react-router";
 import type { ReceivedBidRowProps } from "~/interface/bid.interface";
 import {
   getBidVehicleTitle,
@@ -30,7 +31,10 @@ export default function ReceivedBidRow({
       }`}
     >
       {/* Vehicle info */}
-      <div className="flex items-center gap-3 min-w-0">
+      <Link
+        to={`/find-vehicle/${bid.vehicleId}`}
+        className="flex items-center gap-3 min-w-0 group/link"
+      >
         {thumbnail ? (
           <img
             src={thumbnail}
@@ -57,7 +61,7 @@ export default function ReceivedBidRow({
           </div>
         )}
         <div className="min-w-0">
-          <div className="text-[13px] font-medium text-[#f5f5f7] truncate">
+          <div className="text-[13px] font-medium text-[#f5f5f7] truncate group-hover/link:text-[#e63946] transition-colors">
             {title}
           </div>
           {bid.message && (
@@ -66,7 +70,7 @@ export default function ReceivedBidRow({
             </div>
           )}
         </div>
-      </div>
+      </Link>
 
       {/* Buyer info */}
       <div className="flex items-center gap-2 min-w-0">

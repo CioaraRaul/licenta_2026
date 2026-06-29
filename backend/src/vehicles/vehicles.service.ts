@@ -175,12 +175,25 @@ export class VehiclesService {
     return vehicle;
   }
 
+  private async findOneInternal(id: number): Promise<Vehicle> {
+    const vehicle = await this.vehicleRepo.findOne({
+      where: { id },
+      relations: ['seller'],
+    });
+
+    if (!vehicle) {
+      throw new NotFoundException(`Vehicle with ID ${id} not found`);
+    }
+
+    return vehicle;
+  }
+
   async update(
     id: number,
     updateVehicleDto: UpdateVehicleDto,
     userId: number,
   ): Promise<Vehicle> {
-    const vehicle = await this.findOne(id);
+    const vehicle = await this.findOneInternal(id);
 
     if (vehicle.sellerId !== userId) {
       throw new ForbiddenException('You can only update your own vehicles');
@@ -198,7 +211,7 @@ export class VehiclesService {
   }
 
   async remove(id: number, userId: number): Promise<void> {
-    const vehicle = await this.findOne(id);
+    const vehicle = await this.findOneInternal(id);
 
     if (vehicle.sellerId !== userId) {
       throw new ForbiddenException('You can only delete your own vehicles ');
@@ -209,7 +222,7 @@ export class VehiclesService {
   }
 
   async deactivate(id: number, userId: number): Promise<Vehicle> {
-    const vehicle = await this.findOne(id);
+    const vehicle = await this.findOneInternal(id);
 
     if (vehicle.sellerId !== userId) {
       throw new ForbiddenException('You can only deactivate your own vehicles');
@@ -258,7 +271,7 @@ export class VehiclesService {
   }
 
   async markAsSold(id: number, userId: number): Promise<Vehicle> {
-    const vehicle = await this.findOne(id);
+    const vehicle = await this.findOneInternal(id);
 
     if (vehicle.sellerId !== userId) {
       throw new ForbiddenException(

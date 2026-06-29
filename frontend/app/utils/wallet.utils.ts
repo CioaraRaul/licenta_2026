@@ -101,7 +101,7 @@ export function validateWithdrawalAmount(
 /* ─── Transaction pagination ─────────────────────────────────────────────── */
 
 export function getTotalPages(total: number): number {
-  return Math.max(1, Math.ceil(total / 10));
+  return Math.max(1, Math.ceil((Number(total) || 0) / 10));
 }
 
 /* ─── Card helpers ────────────────────────────────────────────────────────── */
