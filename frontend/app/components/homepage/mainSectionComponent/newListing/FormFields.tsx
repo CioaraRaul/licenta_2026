@@ -40,6 +40,7 @@ interface SelectProps {
   onChange: (v: string) => void;
   options: ReadonlyArray<{ value: string; label: string }>;
   required?: boolean;
+  placeholder?: string;
 }
 
 export function Select({
@@ -48,6 +49,7 @@ export function Select({
   onChange,
   options,
   required = false,
+  placeholder,
 }: SelectProps) {
   return (
     <div className="flex flex-col gap-1.5">
@@ -58,8 +60,13 @@ export function Select({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full px-3.5 py-2.5 bg-white/[0.04] border border-white/[0.06] rounded-lg text-[13px] text-[#f5f5f7] focus:outline-none focus:border-[#e63946]/40 transition-colors appearance-none cursor-pointer"
+        className={`w-full px-3.5 py-2.5 bg-white/[0.04] border border-white/[0.06] rounded-lg text-[13px] focus:outline-none focus:border-[#e63946]/40 transition-colors appearance-none cursor-pointer ${value === "" ? "text-[#555]" : "text-[#f5f5f7]"}`}
       >
+        {placeholder !== undefined && (
+          <option value="" disabled className="bg-[#1c1c21] text-[#555]">
+            {placeholder}
+          </option>
+        )}
         {options.map((opt) => (
           <option
             key={opt.value}

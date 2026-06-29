@@ -9,7 +9,7 @@ All seeded accounts share the same password: **`Password123!`**
 | Name                          | Email                          | Password             |
 | ----------------------------- | ------------------------------ | -------------------- |
 | testbuyer (main demo account) | `testbuyer@test.com`           | your signup password |
-| Maria Barbu                   | `seed.buyer1@automarket.test`  | `   `                |
+| Maria Barbu                   | `seed.buyer1@automarket.test`  | `Password123!`       |
 | Elena Dinu                    | `seed.buyer2@automarket.test`  | `Password123!`       |
 | Andreea Marin                 | `seed.buyer3@automarket.test`  | `Password123!`       |
 | Ioana Neagu                   | `seed.buyer4@automarket.test`  | `Password123!`       |

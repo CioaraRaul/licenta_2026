@@ -16,7 +16,7 @@ import {
   COMMON_FEATURES,
   COMMON_SAFETY_FEATURES,
   MAX_IMAGES,
-  DEV_FORM,
+  DEFAULT_FORM,
   type NewListingForm,
 } from "~/constants/newListing.constants";
 import { Input, Select, Toggle } from "./newListing/FormFields";
@@ -32,8 +32,7 @@ export default function NewListingComponent() {
   const [error, setError] = useState<string | null>(null);
 
   // ── Form state ──────────────────────────────────────────────────────────
-  // TODO: Switch back to DEFAULT_FORM after testing
-  const [form, setForm] = useState<NewListingForm>(DEV_FORM);
+  const [form, setForm] = useState<NewListingForm>(DEFAULT_FORM);
 
   const [features, setFeatures] = useState<string[]>([]);
   const [safetyFeatures, setSafetyFeatures] = useState<string[]>([]);
@@ -222,21 +221,22 @@ export default function NewListingComponent() {
                 label="Make"
                 value={form.make}
                 onChange={(v) => updateField("make", v)}
-                placeholder="e.g. Toyota"
+                placeholder="ex: Toyota"
                 required
               />
               <Input
                 label="Model"
                 value={form.model}
                 onChange={(v) => updateField("model", v)}
-                placeholder="e.g. Camry"
+                placeholder="ex: Camry"
                 required
               />
               <Input
                 label="Year"
-                value={form.year}
+                value={form.year || ""}
                 onChange={(v) => updateField("year", parseInt(v) || 0)}
                 type="number"
+                placeholder="ex: 2022"
                 required
               />
             </div>
@@ -260,7 +260,7 @@ export default function NewListingComponent() {
                 label="Trim"
                 value={form.trim}
                 onChange={(v) => updateField("trim", v)}
-                placeholder="e.g. SE, XLE, Limited"
+                placeholder="ex: SE, XLE, Limited"
               />
             </div>
 
@@ -269,14 +269,14 @@ export default function NewListingComponent() {
                 label="VIN"
                 value={form.vin}
                 onChange={(v) => updateField("vin", v)}
-                placeholder="17-character VIN"
+                placeholder="ex: 1HGBH41JXMN109186"
                 required
               />
               <Input
                 label="License Plate"
                 value={form.licensePlate}
                 onChange={(v) => updateField("licensePlate", v)}
-                placeholder="Optional"
+                placeholder="ex: B-123-ABC"
               />
             </div>
           </div>
@@ -294,31 +294,31 @@ export default function NewListingComponent() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <Input
                   label="Engine Size (L)"
-                  value={form.engineSize}
+                  value={form.engineSize || ""}
                   onChange={(v) => updateField("engineSize", parseFloat(v) || 0)}
                   type="number"
-                  placeholder="e.g. 2.5"
+                  placeholder="ex: 2.5"
                   required
                 />
                 <Input
                   label="Engine Type"
                   value={form.engineType}
                   onChange={(v) => updateField("engineType", v)}
-                  placeholder="e.g. Inline-4, V6"
+                  placeholder="ex: Inline-4, V6"
                 />
                 <Input
                   label="Horsepower"
-                  value={form.horsepower}
+                  value={form.horsepower || ""}
                   onChange={(v) => updateField("horsepower", parseInt(v) || 0)}
                   type="number"
-                  placeholder="e.g. 203"
+                  placeholder="ex: 203"
                 />
                 <Input
                   label="Torque (lb-ft)"
-                  value={form.torque}
+                  value={form.torque || ""}
                   onChange={(v) => updateField("torque", parseInt(v) || 0)}
                   type="number"
-                  placeholder="e.g. 184"
+                  placeholder="ex: 184"
                 />
               </div>
             </div>
@@ -364,19 +364,21 @@ export default function NewListingComponent() {
                   label="Interior Color"
                   value={form.interiorColor}
                   onChange={(v) => updateField("interiorColor", v)}
-                  placeholder="e.g. Black leather"
+                  placeholder="ex: Black leather"
                 />
                 <Input
                   label="Doors"
-                  value={form.doors}
+                  value={form.doors || ""}
                   onChange={(v) => updateField("doors", parseInt(v) || 0)}
                   type="number"
+                  placeholder="ex: 4"
                 />
                 <Input
                   label="Seats"
-                  value={form.seats}
+                  value={form.seats || ""}
                   onChange={(v) => updateField("seats", parseInt(v) || 0)}
                   type="number"
+                  placeholder="ex: 5"
                 />
               </div>
             </div>
@@ -391,28 +393,28 @@ export default function NewListingComponent() {
                   label="City"
                   value={form.city}
                   onChange={(v) => updateField("city", v)}
-                  placeholder="e.g. Los Angeles"
+                  placeholder="ex: Los Angeles"
                   required
                 />
                 <Input
                   label="Country"
                   value={form.country}
                   onChange={(v) => updateField("country", v)}
-                  placeholder="e.g. United States"
+                  placeholder="ex: United States"
                   required
                 />
                 <Input
                   label="ZIP Code"
                   value={form.zipCode}
                   onChange={(v) => updateField("zipCode", v)}
-                  placeholder="e.g. 90001"
+                  placeholder="ex: 90001"
                 />
                 <Input
                   label="Mileage"
-                  value={form.mileage}
+                  value={form.mileage || ""}
                   onChange={(v) => updateField("mileage", parseInt(v) || 0)}
                   type="number"
-                  placeholder="e.g. 35000"
+                  placeholder="ex: 35000"
                   required
                 />
               </div>
@@ -426,15 +428,16 @@ export default function NewListingComponent() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Input
                   label="Previous Owners"
-                  value={form.previousOwners}
+                  value={form.previousOwners || ""}
                   onChange={(v) => updateField("previousOwners", parseInt(v) || 0)}
                   type="number"
+                  placeholder="ex: 1"
                 />
                 <Input
                   label="Service History"
                   value={form.serviceHistory}
                   onChange={(v) => updateField("serviceHistory", v)}
-                  placeholder="e.g. Full dealer service history"
+                  placeholder="ex: Full dealer service history"
                 />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
@@ -712,18 +715,18 @@ export default function NewListingComponent() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input
                 label="Price ($)"
-                value={form.price}
+                value={form.price || ""}
                 onChange={(v) => updateField("price", parseInt(v) || 0)}
                 type="number"
-                placeholder="e.g. 25000"
+                placeholder="ex: 25000"
                 required
               />
               <Input
                 label="Original Price ($)"
-                value={form.originalPrice}
+                value={form.originalPrice || ""}
                 onChange={(v) => updateField("originalPrice", parseInt(v) || 0)}
                 type="number"
-                placeholder="Optional — shows discount"
+                placeholder="ex: 30000 (optional — shows discount)"
               />
             </div>
             <Toggle

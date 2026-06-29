@@ -229,16 +229,29 @@ export class WalletService {
     description: string,
   ): Promise<void> {
     await this.dataSource.transaction(async (manager) => {
-      const buyerWallet = await manager.findOne(Wallet, {
+      let buyerWallet = await manager.findOne(Wallet, {
         where: { userId: buyerId },
       });
-      if (!buyerWallet) throw new BadRequestException('Buyer wallet not found');
+      if (!buyerWallet) {
+        buyerWallet = manager.create(Wallet, {
+          userId: buyerId,
+          balance: 0,
+          frozenBalance: 0,
+        });
+        await manager.save(buyerWallet);
+      }
 
-      const sellerWallet = await manager.findOne(Wallet, {
+      let sellerWallet = await manager.findOne(Wallet, {
         where: { userId: sellerId },
       });
-      if (!sellerWallet)
-        throw new BadRequestException('Seller wallet not found');
+      if (!sellerWallet) {
+        sellerWallet = manager.create(Wallet, {
+          userId: sellerId,
+          balance: 0,
+          frozenBalance: 0,
+        });
+        await manager.save(sellerWallet);
+      }
 
       if (Number(buyerWallet.balance) < Number(amount))
         throw new BadRequestException('Insufficient funds in wallet');
